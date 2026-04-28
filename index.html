@@ -491,8 +491,9 @@ const WORKER_URL = 'https://folio-price.stevetest181.workers.dev';
 
 // KLSE tickers need .KL suffix for Yahoo Finance (avoid double suffix)
 function toYahooSymbol(ticker, market) {
-  if (market !== 'MY') return ticker;
-  return ticker.toUpperCase().endsWith('.KL') ? ticker : `${ticker}.KL`;
+  if (market === 'MY') return ticker.toUpperCase().endsWith('.KL') ? ticker : `${ticker}.KL`;
+  if (market === 'SG') return ticker.toUpperCase().endsWith('.SI') ? ticker : `${ticker}.SI`;
+  return ticker;
 }
 
 // Price + rate cache (5 min TTL)
