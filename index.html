@@ -678,7 +678,10 @@ function badgeColor(ticker) {
 
 function tickerBadge(ticker, market) {
   const [bg, fg] = badgeColor(ticker);
-  const label = market === 'MY' ? ticker + '.KL' : ticker;
+  const label =
+    market === 'MY' ? ticker + '.KL' :
+    market === 'SG' ? ticker + '.SI' :
+    ticker;
   const fs = label.length <= 3 ? '8px' : label.length <= 4 ? '7px' : label.length <= 6 ? '6px' : '5px';
   return `<div class="ticker-badge" style="background:${bg};color:${fg};font-size:${fs};text-align:center;display:flex;align-items:center;justify-content:center;line-height:1.1;">${label}</div>`;
 }
@@ -896,8 +899,12 @@ async function renderDashboard() {
         <div class="ticker-wrap">
           ${tickerBadge(h.ticker, h.market)}
           <div>
-            <div class="s-name">${h.market === 'MY' ? h.ticker + '.KL' : h.ticker}</div>
-            <div class="s-units">${h.market === 'MY' ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
+              <div class="s-name">
+                ${h.market === 'MY' ? h.ticker + '.KL' :
+                  h.market === 'SG' ? h.ticker + '.SI' :
+                  h.ticker}
+              </div>
+            <div class="s-units">${(h.market === 'MY' || h.market === 'SG') ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
           </div>
         </div>
         <div>
@@ -925,8 +932,12 @@ async function renderDashboard() {
         <div class="ticker-wrap">
           ${tickerBadge(h.ticker, h.market)}
           <div>
-            <div class="s-name">${h.market === 'MY' ? h.ticker + '.KL' : h.ticker}</div>
-            <div class="s-units">${h.market === 'MY' ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
+            <div class="s-name">
+              ${h.market === 'MY' ? h.ticker + '.KL' :
+                h.market === 'SG' ? h.ticker + '.SI' :
+                h.ticker}
+            </div>
+            <div class="s-units">${(h.market === 'MY' || h.market === 'SG') ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
           </div>
         </div>
         <div>
@@ -1350,7 +1361,10 @@ async function renderDVSummary() {
     const dvYieldStr = r.netYield !== null ? (r.netYield * 100).toFixed(2) + '%' : '#N/A';
     const estAnnStr  = r.estAnnDV !== null ? 'RM' + toRM(r.estAnnDV, r.market).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) : '#N/A';
     const dvRecvRM   = toRM(r.dvRecvThisYear, r.market);
-    const name = r.market === 'MY' ? r.ticker + '.KL' : r.ticker;
+    const name =
+      r.market === 'MY' ? r.ticker + '.KL' :
+      r.market === 'SG' ? r.ticker + '.SI' :
+      r.ticker;
     const [bg, fg] = badgeColor(r.ticker);
     return `
     <div style="display:grid;grid-template-columns:1.4fr 1.2fr 0.8fr 1fr;column-gap:6px;padding:10px 14px;border-top:1px solid var(--border);background:var(--card);align-items:center;">
@@ -1572,8 +1586,12 @@ async function renderDashboardHistorical(year) {
         <div class="ticker-wrap">
           ${tickerBadge(h.ticker, h.market)}
           <div>
-            <div class="s-name">${h.market === 'MY' ? h.ticker + '.KL' : h.ticker}</div>
-            <div class="s-units">${h.market === 'MY' ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
+            <div class="s-name">
+              ${h.market === 'MY' ? h.ticker + '.KL' :
+                h.market === 'SG' ? h.ticker + '.SI' :
+                h.ticker}
+            </div>
+            <div class="s-units">${(h.market === 'MY' || h.market === 'SG') ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
           </div>
         </div>
         <div>
@@ -1601,8 +1619,12 @@ async function renderDashboardHistorical(year) {
         <div class="ticker-wrap">
           ${tickerBadge(h.ticker, h.market)}
           <div>
-            <div class="s-name">${h.market === 'MY' ? h.ticker + '.KL' : h.ticker}</div>
-            <div class="s-units">${h.market === 'MY' ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
+            <div class="s-name">
+              ${h.market === 'MY' ? h.ticker + '.KL' :
+                h.market === 'SG' ? h.ticker + '.SI' :
+                h.ticker}
+            </div>
+            <div class="s-units">${(h.market === 'MY' || h.market === 'SG') ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
           </div>
         </div>
         <div>
