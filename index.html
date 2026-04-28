@@ -748,7 +748,7 @@ async function renderTxnLog() {
       <div class="log-right">
         <div class="log-amount ${t.action === 'buy' ? 'neg' : 'pos'}">${t.action === 'buy' ? '-' : '+'}${fmt(t.units * t.price, t.market)}</div>
         <div class="tag" style="background:rgba(99,102,241,0.12);color:#a5b4fc;">${t.type}</div>
-        <button class="btn btn-danger" onclick="deleteTxn(${t.id})">Delete</button>
+        <button class="btn btn-danger" onclick="deleteTxn('${t.id}')">Delete</button>
       </div>
     </div>`).join('');
 }
@@ -797,7 +797,7 @@ async function renderDivLog() {
       </div>
       <div class="log-right">
         <div class="log-amount pos">+${fmt(d.amount, d.market)}</div>
-        <button class="btn btn-danger" onclick="deleteDiv(${d.id})">Delete</button>
+        <button class="btn btn-danger" onclick="deleteDiv('${d.id}')">Delete</button>
       </div>
     </div>`).join('');
 }
