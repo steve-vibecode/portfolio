@@ -200,6 +200,7 @@ nav {
 .tag-div  { background: rgba(245,158,11,0.15); color: var(--orange); }
 .tag-my   { background: rgba(59,130,246,0.12); color: #7ab4ff; }
 .tag-us   { background: rgba(99,102,241,0.12); color: #a5b4fc; }
+.tag-sg   { background: rgba(16,185,129,0.12); color: #6ee7b7; }
 
 /* ── EMPTY STATE ── */
 .empty { text-align: center; padding: 40px 20px; color: var(--text3); }
@@ -277,6 +278,7 @@ nav {
           <select class="form-select" id="txn-market">
             <option value="US">🇺🇸 US (USD)</option>
             <option value="MY">🇲🇾 MY (MYR)</option>
+            <option value="SG">🇸🇬 SG (SGD)</option>
           </select>
         </div>
       </div>
@@ -335,7 +337,7 @@ nav {
         <div style="font-family:monospace;font-size:11px;color:var(--text);">date | ticker | market | action | type | units | price | div_tax</div>
         <div style="margin-top:8px;font-size:11px;">
           • <b>date</b>: YYYY-MM-DD<br>
-          • <b>market</b>: US or MY<br>
+          • <b>market</b>: US/MY/SG<br>
           • <b>action</b>: buy or sell<br>
           • <b>type</b>: growth or dividend<br>
           • <b>div_tax</b>: 0–100 (optional, for dividend stocks only)
@@ -388,6 +390,7 @@ nav {
           <select class="form-select" id="div-market">
             <option value="US">🇺🇸 US (USD)</option>
             <option value="MY">🇲🇾 MY (MYR)</option>
+            <option value="SG">🇸🇬 SG (SGD)</option>
           </select>
         </div>
       </div>
@@ -419,7 +422,7 @@ nav {
         <div style="font-family:monospace;font-size:11px;color:var(--text);">ticker | market | amount | month</div>
         <div style="margin-top:8px;font-size:11px;">
           • <b>ticker</b>: e.g. JEPQ, 1155<br>
-          • <b>market</b>: US or MY<br>
+          • <b>market</b>: US/MY/SG<br>
           • <b>amount</b>: e.g. 150.00<br>
           • <b>month</b>: YYYY-MM (e.g. 2025-03)<br>
           &nbsp;&nbsp;Also accepts: Mar-2025 · March 2025 · 03/2025 · 2025/03
@@ -659,7 +662,10 @@ function showToast(msg, isError = false) {
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function fmt(n, currency, decimals = 2) {
-  const sym = currency === 'MY' ? 'RM' : '$';
+  const sym =
+    currency === 'MY' ? 'RM' :
+    currency === 'SG' ? 'S$' :
+    '$';
   return sym + Math.abs(n).toLocaleString('en', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 }
 function sgn(n, currency) { return (n >= 0 ? '+' : '-') + fmt(n, currency); }
@@ -1098,7 +1104,7 @@ function parseImportRow(row) {
   if (!date || date === 'NaN-NaN-NaN') errors.push('missing/invalid date');
   if (!ticker) errors.push('missing ticker');
   const mkt = String(market||'').trim().toUpperCase();
-  if (!['US','MY'].includes(mkt)) errors.push(`market must be US or MY`);
+  if (!['US','MY','SG'].includes(mkt)) errors.push(`market must be US/MY/SG`);
   const act = String(action||'').trim().toLowerCase();
   if (!['buy','sell'].includes(act)) errors.push(`action must be buy or sell`);
   const typ = String(type||'').trim().toLowerCase();
@@ -1788,7 +1794,7 @@ function parseDivImportRow(row) {
   const month  = parseMonthToYYYYMM(rawMonth);
 
   if (!ticker) errors.push('missing ticker');
-  if (!['US','MY'].includes(mkt)) errors.push('market must be US or MY');
+  if (!['US','MY','SG'].includes(mkt)) errors.push('market must be US/MY/SG');
   if (isNaN(amt) || amt <= 0) errors.push('invalid amount');
   if (!month) errors.push(`invalid month: "${rawMonth}" — use YYYY-MM`);
 
