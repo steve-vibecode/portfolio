@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#0a0f1e"/>
+<title>Stocks Portfolio</title>
+<style>
+:root {
+  --bg: #0a0f1e;
+  --surface: #131929;
+  --card: #1a2235;
+  --border: #1e2d45;
+  --accent: #3b82f6;
+  --accent2: #10b981;
+  --red: #ef4444;
+  --orange: #f59e0b;
+  --text: #f0f4ff;
+  --text2: #7a8aaa;
+  --text3: #4a5a7a;
+  --green: #10b981;
+  --radius: 14px;
+  --nav-h: 64px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* ── PAGES ── */
+.page { display: none; flex-direction: column; min-height: calc(100vh - var(--nav-h)); overflow-y: auto; padding: 10px 14px calc(var(--nav-h) + 24px); }
+.page.active { display: flex; }
+.page#page-dashboard { padding: 8px 14px calc(var(--nav-h) + 24px); }
+.page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 16px; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 480px;
+  height: var(--nav-h);
+  background: rgba(13,20,40,0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center;
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 4px; cursor: pointer; padding: 8px 0;
+  color: var(--text3); transition: color 0.2s;
+}
+.nav-btn.active { color: var(--accent); }
+.nav-btn svg { width: 22px; height: 22px; }
+.nav-btn span { font-size: 10px; font-weight: 500; letter-spacing: 0.3px; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.card-label { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 4px; }
+.card-value { font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+.card-sub { font-size: 12px; color: var(--text2); margin-top: 3px; }
+
+/* ── SUMMARY HERO ── */
+.hero {
+  background: linear-gradient(135deg, #0f1f45 0%, #1a2f60 100%);
+  border: 1px solid #1e3a7a;
+  border-radius: var(--radius);
+  padding: 18px 18px 16px;
+  margin-bottom: 10px;
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: -40px; right: -40px;
+  width: 150px; height: 150px;
+  background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.hero-label { font-size: 10px; color: #7a9adc; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+.hero-amount { font-size: 30px; font-weight: 800; letter-spacing: -1px; }
+.hero-row { display: flex; gap: 10px; margin-top: 8px; align-items: center; flex-wrap: wrap; }
+.hero-gain { font-size: 13px; font-weight: 600; }
+.hero-badge { font-size: 11px; color: #7a9adc; margin-left: auto; }
+
+/* ── ACC SECTION ── */
+.acc-section { margin-bottom: 8px; }
+.acc-head {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius) var(--radius) 0 0;
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+.acc-head-row { display: flex; justify-content: space-between; align-items: baseline; }
+.acc-type { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+.acc-val { font-size: 19px; font-weight: 700; }
+.acc-pl { display: flex; gap: 8px; align-items: baseline; margin-top: 5px; }
+.acc-pl span { font-size: 13px; font-weight: 600; }
+.acc-ann { text-align: right; }
+.acc-ann-label { font-size: 10px; color: var(--text2); }
+.acc-ann-val { font-size: 15px; font-weight: 700; color: var(--orange); }
+.acc-ann-pct { font-size: 13px; color: var(--orange); margin-top: 2px; }
+
+.col-head {
+  background: #111827; display: grid; column-gap: 6px;
+  padding: 5px 16px; font-size: 9px; color: var(--text3);
+  text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600;
+  border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+  text-align: center;
+}
+.col-head span:first-child { text-align: left; padding-left: 38px; }
+.col-div  { grid-template-columns: 1.5fr 1fr 1.1fr 1fr; }
+.col-grow { grid-template-columns: 1.7fr 1.1fr 1.2fr 1fr; }
+
+.stock-row {
+  background: var(--card); display: grid; column-gap: 6px;
+  padding: 9px 16px; border-top: 1px solid var(--border);
+  border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+  align-items: center;
+}
+.stock-row:last-child { border-radius: 0 0 var(--radius) var(--radius); }
+.row-div  { grid-template-columns: 1.5fr 1fr 1.1fr 1fr; }
+.row-grow { grid-template-columns: 1.7fr 1.1fr 1.2fr 1fr; }
+
+.stock-row > div { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.stock-row > div:first-child { flex-direction: row; align-items: center; justify-content: flex-start; text-align: left; min-width: 0; }
+.ticker-wrap > div { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; overflow: hidden; }
+
+.ticker-badge {
+  width: 34px; height: 24px; border-radius: 6px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 6px; font-weight: 800; margin-right: 7px;
+  letter-spacing: -0.2px; text-align: center; line-height: 1.1;
+  overflow: hidden;
+}
+.s-name { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.s-units { font-size: 9px; color: var(--text2); margin-top: 1px; white-space: nowrap; }
+.cell-main { font-size: 10.5px; font-weight: 600; white-space: nowrap; }
+.cell-sub  { font-size: 9px; color: var(--text2); margin-top: 2px; white-space: nowrap; }
+.cell-pct  { font-size: 9px; font-weight: 600; margin-top: 2px; white-space: nowrap; }
+
+/* ── FORMS ── */
+.form-section { margin-bottom: 20px; }
+.form-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+.form-group { margin-bottom: 12px; }
+.form-label { font-size: 12px; color: var(--text2); margin-bottom: 5px; display: block; }
+.form-input, .form-select {
+  width: 100%; background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 11px 14px; color: var(--text);
+  font-size: 15px; outline: none; -webkit-appearance: none;
+  transition: border-color 0.2s;
+}
+.form-input:focus, .form-select:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--text3); }
+.form-select option { background: var(--card); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+.btn {
+  width: 100%; padding: 14px; border-radius: 12px; border: none;
+  font-size: 15px; font-weight: 700; cursor: pointer; letter-spacing: 0.2px;
+  transition: opacity 0.2s, transform 0.1s;
+}
+.btn:active { transform: scale(0.98); opacity: 0.85; }
+.btn-primary { background: var(--accent); color: white; }
+.btn-success { background: var(--green); color: white; }
+.btn-danger  { background: transparent; color: var(--red); border: 1px solid var(--red); padding: 8px; font-size: 12px; border-radius: 8px; width: auto; }
+
+/* ── LOG LIST ── */
+.log-list { margin-top: 16px; }
+.log-item {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 14px; margin-bottom: 8px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.log-left { display: flex; flex-direction: column; gap: 3px; }
+.log-ticker { font-size: 14px; font-weight: 700; }
+.log-detail { font-size: 11px; color: var(--text2); }
+.log-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.log-amount { font-size: 13px; font-weight: 600; }
+.tag {
+  font-size: 9px; font-weight: 700; padding: 2px 8px;
+  border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.tag-buy  { background: rgba(16,185,129,0.15); color: var(--green); }
+.tag-sell { background: rgba(239,68,68,0.15);  color: var(--red); }
+.tag-div  { background: rgba(245,158,11,0.15); color: var(--orange); }
+.tag-my   { background: rgba(59,130,246,0.12); color: #7ab4ff; }
+.tag-us   { background: rgba(99,102,241,0.12); color: #a5b4fc; }
+
+/* ── EMPTY STATE ── */
+.empty { text-align: center; padding: 40px 20px; color: var(--text3); }
+.empty svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.3; }
+.empty p { font-size: 14px; }
+
+/* ── COLORS ── */
+.pos   { color: var(--green); }
+.neg   { color: var(--red); }
+.neu   { color: var(--text); }
+.ora   { color: var(--orange); }
+.dim   { color: var(--text2); }
+
+/* ── SEGMENT ── */
+.segment { display: flex; background: var(--surface); border-radius: 10px; padding: 3px; margin-bottom: 16px; }
+.seg-btn { flex: 1; padding: 8px; border-radius: 8px; border: none; background: none; color: var(--text2); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.seg-btn.active { background: var(--card); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { display: none; }
+
+/* ── SKELETON LOADER ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--card) 25%, var(--border) 50%, var(--card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+  display: inline-block;
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.toast {
+  position: fixed; bottom: calc(var(--nav-h) + 12px); left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--green); color: white;
+  padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 600;
+  opacity: 0; transition: all 0.3s; z-index: 999; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.error { background: var(--red); }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<!-- PAGES -->
+<div class="page active" id="page-dashboard">
+  <div id="dashboard-content">
+    <div class="empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18M9 17V9m4 8v-4m4 4V5"/></svg>
+      <p>No transactions yet.<br>Add stocks in the Transactions tab.</p>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-transactions">
+  <div class="page-title">Transactions</div>
+  <div class="segment">
+    <button class="seg-btn active" onclick="switchSeg('txn','add')">Add</button>
+    <button class="seg-btn" onclick="switchSeg('txn','log')">History</button>
+    <button class="seg-btn" onclick="switchSeg('txn','import')">Import</button>
+  </div>
+  <div id="txn-add">
+    <div class="form-section">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ticker</label>
+          <input class="form-input" id="txn-ticker" placeholder="e.g. AAPL" style="text-transform:uppercase"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Market</label>
+          <select class="form-select" id="txn-market">
+            <option value="US">🇺🇸 US (USD)</option>
+            <option value="MY">🇲🇾 MY (MYR)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Action</label>
+          <select class="form-select" id="txn-action">
+            <option value="buy">Buy</option>
+            <option value="sell">Sell</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" id="txn-type" onchange="toggleDivTax()">
+            <option value="growth">Growth</option>
+            <option value="dividend">Dividend</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Units</label>
+          <input class="form-input" id="txn-units" type="number" placeholder="0" min="0" step="any"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Price per unit</label>
+          <input class="form-input" id="txn-price" type="number" placeholder="0.00" min="0" step="any"/>
+        </div>
+      </div>
+      <div class="form-group" id="txn-tax-group" style="display:none;">
+        <label class="form-label">Dividend Withholding Tax (%)</label>
+        <input class="form-input" id="txn-tax" type="number" placeholder="e.g. 30 for US stocks" min="0" max="100" step="any"/>
+        <div style="font-size:11px;color:var(--text2);margin-top:5px;">💡 Typically 30% for US stocks held by Malaysians, 0% for MY stocks</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input class="form-input" id="txn-date" type="date"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes (optional)</label>
+        <input class="form-input" id="txn-notes" placeholder="e.g. DCA, rebalancing..."/>
+      </div>
+      <button class="btn btn-primary" onclick="addTransaction()">Add Transaction</button>
+    </div>
+  </div>
+  <div id="txn-log" style="display:none;">
+    <div id="txn-list"></div>
+  </div>
+  <div id="txn-import" style="display:none;">
+    <div class="form-section">
+      <div class="form-title">Import from CSV / Excel</div>
+
+      <!-- Format guide -->
+      <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.8;">
+        <div style="font-weight:700;color:var(--accent);margin-bottom:6px;">Required column order:</div>
+        <div style="font-family:monospace;font-size:11px;color:var(--text);">date | ticker | market | action | type | units | price | div_tax</div>
+        <div style="margin-top:8px;font-size:11px;">
+          • <b>date</b>: YYYY-MM-DD<br>
+          • <b>market</b>: US or MY<br>
+          • <b>action</b>: buy or sell<br>
+          • <b>type</b>: growth or dividend<br>
+          • <b>div_tax</b>: 0–100 (optional, for dividend stocks only)
+        </div>
+      </div>
+
+      <!-- Download template -->
+      <button class="btn" onclick="downloadTemplate()" style="background:rgba(59,130,246,0.15);color:var(--accent);border:1px solid rgba(59,130,246,0.3);margin-bottom:12px;">
+        ↓ Download CSV Template
+      </button>
+
+      <!-- File upload -->
+      <div id="import-drop-zone" onclick="document.getElementById('import-file').click()"
+        style="border:2px dashed var(--border);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color 0.2s;margin-bottom:12px;">
+        <div style="font-size:28px;margin-bottom:8px;">📂</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);">Tap to select file</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px;">Supports .csv and .xlsx</div>
+      </div>
+      <input type="file" id="import-file" accept=".csv,.xlsx" style="display:none;" onchange="handleImportFile(this)"/>
+
+      <!-- Preview -->
+      <div id="import-preview" style="display:none;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text);">Preview</div>
+        <div id="import-preview-list"></div>
+        <div style="display:flex;gap:10px;margin-top:12px;">
+          <button class="btn btn-primary" onclick="confirmImport()" id="import-confirm-btn">Import All</button>
+          <button class="btn" onclick="cancelImport()" style="background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2);">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-dividends">
+  <div class="page-title">Dividends</div>
+  <div class="segment">
+    <button class="seg-btn active" onclick="switchSeg('div','add')">Add</button>
+    <button class="seg-btn" onclick="switchSeg('div','log')">History</button>
+    <button class="seg-btn" onclick="switchSeg('div','import')">Import</button>
+  </div>
+  <div id="div-add">
+    <div class="form-section">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Ticker</label>
+          <input class="form-input" id="div-ticker" placeholder="e.g. 5176" style="text-transform:uppercase"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Market</label>
+          <select class="form-select" id="div-market">
+            <option value="US">🇺🇸 US (USD)</option>
+            <option value="MY">🇲🇾 MY (MYR)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Amount received</label>
+          <input class="form-input" id="div-amount" type="number" placeholder="0.00" min="0" step="any"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Month</label>
+          <input class="form-input" id="div-date" type="month"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes (optional)</label>
+        <input class="form-input" id="div-notes" placeholder="e.g. Q1 dividend..."/>
+      </div>
+      <button class="btn btn-success" onclick="addDividend()">Log Dividend</button>
+    </div>
+  </div>
+  <div id="div-log" style="display:none;">
+    <div id="div-list"></div>
+  </div>
+  <div id="div-import" style="display:none;">
+    <div class="form-section">
+      <div class="form-title">Import Dividends from CSV / Excel</div>
+      <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.8;">
+        <div style="font-weight:700;color:var(--accent);margin-bottom:6px;">Required column order:</div>
+        <div style="font-family:monospace;font-size:11px;color:var(--text);">ticker | market | amount | month</div>
+        <div style="margin-top:8px;font-size:11px;">
+          • <b>ticker</b>: e.g. JEPQ, 1155<br>
+          • <b>market</b>: US or MY<br>
+          • <b>amount</b>: e.g. 150.00<br>
+          • <b>month</b>: YYYY-MM (e.g. 2025-03)<br>
+          &nbsp;&nbsp;Also accepts: Mar-2025 · March 2025 · 03/2025 · 2025/03
+        </div>
+      </div>
+      <button class="btn" onclick="downloadDivTemplate()" style="background:rgba(59,130,246,0.15);color:var(--accent);border:1px solid rgba(59,130,246,0.3);margin-bottom:12px;">
+        ↓ Download CSV Template
+      </button>
+      <div onclick="document.getElementById('div-import-file').click()"
+        style="border:2px dashed var(--border);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;margin-bottom:12px;">
+        <div style="font-size:28px;margin-bottom:8px;">📂</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text);">Tap to select file</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px;">Supports .csv and .xlsx</div>
+      </div>
+      <input type="file" id="div-import-file" accept=".csv,.xlsx" style="display:none;" onchange="handleDivImportFile(this)"/>
+      <div id="div-import-preview" style="display:none;">
+        <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text);">Preview</div>
+        <div id="div-import-preview-list"></div>
+        <div style="display:flex;gap:10px;margin-top:12px;">
+          <button class="btn btn-success" onclick="confirmDivImport()" id="div-import-confirm-btn">Import All</button>
+          <button class="btn" onclick="cancelDivImport()" style="background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2);">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DV SUMMARY PAGE -->
+<div class="page" id="page-dvsummary">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+    <div style="font-size:18px;font-weight:700;letter-spacing:-0.3px;">DV Summary</div>
+    <select id="dvsummary-year" onchange="renderDVSummary()" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);font-size:12px;font-weight:600;outline:none;-webkit-appearance:none;">
+      <option value="current">Current Year</option>
+    </select>
+  </div>
+  <div id="dvsummary-content">
+    <div class="empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18M9 17V9m4 8v-4m4 4V5"/></svg>
+      <p>No dividend data yet.</p>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav>
+  <div class="nav-btn active" id="nav-dashboard" onclick="goPage('dashboard')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M9 17V9m4 8v-4m4 4V5"/></svg>
+    <span>Dashboard</span>
+  </div>
+  <div class="nav-btn" id="nav-dvsummary" onclick="goPage('dvsummary')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+    <span>DV Summary</span>
+  </div>
+  <div class="nav-btn" id="nav-transactions" onclick="goPage('transactions')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16m-4-4 4 4 4-4M8 8l4-4 4 4"/></svg>
+    <span>Transactions</span>
+  </div>
+  <div class="nav-btn" id="nav-dividends" onclick="goPage('dividends')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    <span>Dividends</span>
+  </div>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG — paste your Worker URL here after deploying ──────────────────────
+const WORKER_URL = 'https://folio-price.stevetest181.workers.dev';
+
+// KLSE tickers need .KL suffix for Yahoo Finance (avoid double suffix)
+function toYahooSymbol(ticker, market) {
+  if (market !== 'MY') return ticker;
+  return ticker.toUpperCase().endsWith('.KL') ? ticker : `${ticker}.KL`;
+}
+
+// Price + rate cache (5 min TTL)
+let priceCache = {};
+let priceCacheTime = 0;
+let cachedRate = null;
+
+async function fetchLivePrices(holdings) {
+  const now = Date.now();
+  const cacheValid = now - priceCacheTime < 5 * 60 * 1000 && Object.keys(priceCache).length;
+
+  // Always fetch rate if we don't have it yet, even on cache hit
+  if (!cachedRate) {
+    try {
+      const rateResp = await fetch(`${WORKER_URL}/rate`);
+      const rateData = await rateResp.json();
+      if (rateData.rate && rateData.rate > 1) cachedRate = rateData.rate;
+    } catch(e) {}
+  }
+
+  if (cacheValid) return priceCache;
+
+  const symbols = holdings.map(h => toYahooSymbol(h.ticker, h.market));
+  if (!symbols.length) return {};
+  try {
+    const [priceResp, rateResp] = await Promise.all([
+      fetch(`${WORKER_URL}/price?symbols=${symbols.join(',')}`),
+      fetch(`${WORKER_URL}/rate`)
+    ]);
+    const data = await priceResp.json();
+    const rateData = await rateResp.json();
+    if (rateData.rate && rateData.rate > 1) cachedRate = rateData.rate;
+    priceCache = data;
+    priceCacheTime = now;
+    return data;
+  } catch (e) {
+    console.warn('Price fetch failed:', e.message);
+    return {};
+  }
+}
+
+function skeletonDashboard(label) {
+  const sk = (w, h=14, r=6) => `<div class="skeleton" style="width:${w};height:${h}px;border-radius:${r}px;"></div>`;
+  return `
+  <!-- Skeleton hero -->
+  <div class="hero" style="position:relative;">
+    <div class="hero-label">${label}</div>
+    ${sk('60%', 38, 8)}
+    <div style="display:flex;gap:10px;margin-top:10px;">${sk('28%')} ${sk('18%')}</div>
+    <div style="display:flex;justify-content:space-between;margin-top:8px;">${sk('35%',10)} ${sk('22%',10)}</div>
+  </div>
+  <!-- Skeleton dividend acc -->
+  <div class="acc-section">
+    <div class="acc-head">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;">${sk('30%',10)} ${sk('20%',10)}</div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:6px;">${sk('45%',22,6)} ${sk('30%',22,6)}</div>
+      <div style="display:flex;gap:10px;margin-top:6px;">${sk('32%')} ${sk('18%')}</div>
+    </div>
+    <div class="col-head col-div"><span>STOCKS</span><span>P/L (%)</span><span>CAP GAIN / DV</span><span>LIVE / AVG</span></div>
+    ${[1,2,3,4].map(()=>`
+    <div class="stock-row row-div">
+      <div style="display:flex;align-items:center;gap:8px;">${sk('34px',24,6)} <div>${sk('60px',11)} <div style="margin-top:4px;">${sk('50px',9)}</div></div></div>
+      <div>${sk('70%',11)} <div style="margin-top:4px;">${sk('50%',9)}</div></div>
+      <div>${sk('80%',11)} <div style="margin-top:4px;">${sk('60%',9)}</div></div>
+      <div>${sk('60%',11)} <div style="margin-top:4px;">${sk('70%',9)}</div></div>
+    </div>`).join('')}
+  </div>
+  <!-- Skeleton growth acc -->
+  <div class="acc-section">
+    <div class="acc-head">
+      <div>${sk('25%',10)}</div>
+      <div style="margin-top:6px;">${sk('40%',22,6)}</div>
+      <div style="display:flex;gap:10px;margin-top:6px;">${sk('28%')} ${sk('16%')}</div>
+    </div>
+    <div class="col-head col-grow"><span>STOCKS</span><span>P/L (%)</span><span>LIVE / AVG</span><span>VALUE</span></div>
+    ${[1,2,3,4].map(()=>`
+    <div class="stock-row row-grow">
+      <div style="display:flex;align-items:center;gap:8px;">${sk('34px',24,6)} <div>${sk('55px',11)} <div style="margin-top:4px;">${sk('45px',9)}</div></div></div>
+      <div>${sk('65%',11)} <div style="margin-top:4px;">${sk('45%',9)}</div></div>
+      <div>${sk('75%',11)} <div style="margin-top:4px;">${sk('55%',9)}</div></div>
+      <div>${sk('70%',11)}</div>
+    </div>`).join('')}
+  </div>`;
+}
+
+// ── DB ────────────────────────────────────────────────────────────────────────
+let db;
+const DB_NAME = 'folio', DB_VER = 1;
+
+function openDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(DB_NAME, DB_VER);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      if (!d.objectStoreNames.contains('transactions')) {
+        const s = d.createObjectStore('transactions', { keyPath: 'id', autoIncrement: true });
+        s.createIndex('ticker', 'ticker');
+        s.createIndex('type', 'type');
+      }
+      if (!d.objectStoreNames.contains('dividends')) {
+        const s = d.createObjectStore('dividends', { keyPath: 'id', autoIncrement: true });
+        s.createIndex('ticker', 'ticker');
+      }
+    };
+    req.onsuccess = e => { db = e.target.result; res(db); };
+    req.onerror   = e => rej(e);
+  });
+}
+
+function dbAdd(store, data) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).add(data);
+    req.onsuccess = () => res(req.result);
+    req.onerror   = () => rej(req.error);
+  });
+}
+
+function dbGetAll(store) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = tx.objectStore(store).getAll();
+    req.onsuccess = () => res(req.result);
+    req.onerror   = () => rej(req.error);
+  });
+}
+
+function dbDelete(store, id) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).delete(id);
+    req.onsuccess = () => res();
+    req.onerror   = () => rej(req.error);
+  });
+}
+
+// ── NAV ───────────────────────────────────────────────────────────────────────
+function goPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'dvsummary') renderDVSummary();
+  if (name === 'transactions') renderTxnLog();
+  if (name === 'dividends') renderDivLog();
+}
+
+function switchSeg(page, tab) {
+  if (page === 'txn') {
+    document.getElementById('txn-add').style.display    = tab === 'add'    ? 'block' : 'none';
+    document.getElementById('txn-log').style.display    = tab === 'log'    ? 'block' : 'none';
+    document.getElementById('txn-import').style.display = tab === 'import' ? 'block' : 'none';
+    if (tab === 'log') renderTxnLog();
+  } else {
+    document.getElementById('div-add').style.display    = tab === 'add'    ? 'block' : 'none';
+    document.getElementById('div-log').style.display    = tab === 'log'    ? 'block' : 'none';
+    document.getElementById('div-import').style.display = tab === 'import' ? 'block' : 'none';
+    if (tab === 'log') renderDivLog();
+  }
+  const pageId = page === 'txn' ? 'transactions' : 'dividends';
+  const btns = document.querySelectorAll(`#page-${pageId} .seg-btn`);
+  const tabs = page === 'txn' ? ['add','log','import'] : ['add','log','import'];
+  btns.forEach((b, i) => b.classList.toggle('active', tabs[i] === tab));
+}
+
+// ── TOAST ────────────────────────────────────────────────────────────────────
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '') + ' show';
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function fmt(n, currency, decimals = 2) {
+  const sym = currency === 'MY' ? 'RM' : '$';
+  return sym + Math.abs(n).toLocaleString('en', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+function sgn(n, currency) { return (n >= 0 ? '+' : '-') + fmt(n, currency); }
+function pct(n) { return (n >= 0 ? '+' : '') + n.toFixed(2) + '%'; }
+function cc(n)  { return n >= 0 ? 'pos' : 'neg'; }
+
+function badgeColor(ticker) {
+  const colors = [
+    ['#1a3a6b','#7ab4ff'], ['#1a4a2a','#6ee7b7'], ['#4a1a1a','#fca5a5'],
+    ['#2a1a4a','#c4b5fd'], ['#4a3a1a','#fcd34d'], ['#1a3a4a','#7dd3fc'],
+    ['#3a1a4a','#f0abfc'], ['#1a4a4a','#5eead4'],
+  ];
+  let h = 0; for (let c of ticker) h = (h * 31 + c.charCodeAt(0)) % colors.length;
+  return colors[Math.abs(h)];
+}
+
+function tickerBadge(ticker, market) {
+  const [bg, fg] = badgeColor(ticker);
+  const label = market === 'MY' ? ticker + '.KL' : ticker;
+  const fs = label.length <= 3 ? '8px' : label.length <= 4 ? '7px' : label.length <= 6 ? '6px' : '5px';
+  return `<div class="ticker-badge" style="background:${bg};color:${fg};font-size:${fs};text-align:center;display:flex;align-items:center;justify-content:center;line-height:1.1;">${label}</div>`;
+}
+
+function today() { return new Date().toISOString().split('T')[0]; }
+
+// ── TRANSACTIONS ──────────────────────────────────────────────────────────────
+function toggleDivTax() {
+  const type = document.getElementById('txn-type').value;
+  document.getElementById('txn-tax-group').style.display = type === 'dividend' ? 'block' : 'none';
+}
+
+async function addTransaction() {
+  const ticker = document.getElementById('txn-ticker').value.trim().toUpperCase();
+  const market = document.getElementById('txn-market').value;
+  const action = document.getElementById('txn-action').value;
+  const type   = document.getElementById('txn-type').value;
+  const units  = parseFloat(document.getElementById('txn-units').value);
+  const price  = parseFloat(document.getElementById('txn-price').value);
+  const date   = document.getElementById('txn-date').value || today();
+  const notes  = document.getElementById('txn-notes').value.trim();
+  const divTax = type === 'dividend' ? (parseFloat(document.getElementById('txn-tax').value) || 0) : 0;
+
+  if (!ticker || isNaN(units) || units <= 0 || isNaN(price) || price <= 0) {
+    showToast('Please fill in all required fields', true); return;
+  }
+
+  // Check if ticker already exists — enforce same type and market
+  const existing = await dbGetAll('transactions');
+  const prev = existing.find(t => t.ticker === ticker);
+  if (prev) {
+    if (prev.type !== type) {
+      showToast(`${ticker} is already set as ${prev.type}. Type cannot be changed.`, true); return;
+    }
+    if (prev.market !== market) {
+      showToast(`${ticker} is already set as ${prev.market} market. Market cannot be changed.`, true); return;
+    }
+  }
+
+  await dbAdd('transactions', { ticker, market, action, type, units, price, date, notes, divTax, createdAt: Date.now() });
+  showToast(`${action === 'buy' ? 'Bought' : 'Sold'} ${ticker} logged!`);
+
+  // reset form
+  document.getElementById('txn-ticker').value = '';
+  document.getElementById('txn-units').value  = '';
+  document.getElementById('txn-price').value  = '';
+  document.getElementById('txn-notes').value  = '';
+  document.getElementById('txn-tax').value    = '';
+  document.getElementById('txn-date').value   = today();
+  toggleDivTax();
+}
+
+async function renderTxnLog() {
+  const all = await dbGetAll('transactions');
+  const el  = document.getElementById('txn-list');
+  if (!all.length) {
+    el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><p>No transactions yet.</p></div>`;
+    return;
+  }
+  all.sort((a, b) => b.createdAt - a.createdAt);
+  el.innerHTML = all.map(t => `
+    <div class="log-item">
+      <div class="log-left">
+        <div class="log-ticker">${t.ticker} <span class="tag tag-${t.action}">${t.action}</span> <span class="tag tag-${t.market.toLowerCase()}">${t.market}</span></div>
+        <div class="log-detail">${t.date} · ${t.units} units @ ${fmt(t.price, t.market)}</div>
+        ${t.notes ? `<div class="log-detail" style="color:var(--text3);">${t.notes}</div>` : ''}
+      </div>
+      <div class="log-right">
+        <div class="log-amount ${t.action === 'buy' ? 'neg' : 'pos'}">${t.action === 'buy' ? '-' : '+'}${fmt(t.units * t.price, t.market)}</div>
+        <div class="tag" style="background:rgba(99,102,241,0.12);color:#a5b4fc;">${t.type}</div>
+        <button class="btn btn-danger" onclick="deleteTxn(${t.id})">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+async function deleteTxn(id) {
+  await dbDelete('transactions', id);
+  renderTxnLog();
+  showToast('Transaction deleted');
+}
+
+// ── DIVIDENDS ─────────────────────────────────────────────────────────────────
+async function addDividend() {
+  const ticker = document.getElementById('div-ticker').value.trim().toUpperCase();
+  const market = document.getElementById('div-market').value;
+  const amount = parseFloat(document.getElementById('div-amount').value);
+  const date   = document.getElementById('div-date').value || today();
+  const notes  = document.getElementById('div-notes').value.trim();
+
+  if (!ticker || isNaN(amount) || amount <= 0) {
+    showToast('Please fill in all required fields', true); return;
+  }
+
+  await dbAdd('dividends', { ticker, market, amount, date, notes, createdAt: Date.now() });
+  showToast(`Dividend for ${ticker} logged!`);
+
+  document.getElementById('div-ticker').value = '';
+  document.getElementById('div-amount').value = '';
+  document.getElementById('div-notes').value  = '';
+  document.getElementById('div-date').value   = today().slice(0, 7);
+}
+
+async function renderDivLog() {
+  const all = await dbGetAll('dividends');
+  const el  = document.getElementById('div-list');
+  if (!all.length) {
+    el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p>No dividends logged yet.</p></div>`;
+    return;
+  }
+  all.sort((a, b) => b.createdAt - a.createdAt);
+  el.innerHTML = all.map(d => `
+    <div class="log-item">
+      <div class="log-left">
+        <div class="log-ticker">${d.ticker} <span class="tag tag-div">Dividend</span> <span class="tag tag-${d.market.toLowerCase()}">${d.market}</span></div>
+        <div class="log-detail">${d.date}</div>
+        ${d.notes ? `<div class="log-detail" style="color:var(--text3);">${d.notes}</div>` : ''}
+      </div>
+      <div class="log-right">
+        <div class="log-amount pos">+${fmt(d.amount, d.market)}</div>
+        <button class="btn btn-danger" onclick="deleteDiv(${d.id})">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+async function deleteDiv(id) {
+  await dbDelete('dividends', id);
+  renderDivLog();
+  showToast('Dividend deleted');
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+async function renderDashboard() {
+  const el = document.getElementById('dashboard-content');
+  const [txns, divs] = await Promise.all([dbGetAll('transactions'), dbGetAll('dividends')]);
+
+  if (!txns.length) {
+    el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18M9 17V9m4 8v-4m4 4V5"/></svg><p>No transactions yet.<br>Add stocks in the Transactions tab.</p></div>`;
+    return;
+  }
+
+  // Build holdings + track realised gains
+  const holdings = {};
+  const realisedGain = {}; // realised gain per ticker from sells
+
+  for (const t of txns) {
+    if (!holdings[t.ticker]) holdings[t.ticker] = { ticker: t.ticker, market: t.market, type: t.type, units: 0, costBasis: 0 };
+    const h = holdings[t.ticker];
+    if (t.action === 'buy') {
+      h.costBasis += t.units * t.price;
+      h.units     += t.units;
+    } else {
+      const avg     = h.units ? h.costBasis / h.units : 0;
+      const realised = (t.price - avg) * t.units; // gain/loss on this sell
+      realisedGain[t.ticker] = (realisedGain[t.ticker] || 0) + realised;
+      h.costBasis  -= avg * t.units;
+      h.units      -= t.units;
+    }
+  }
+
+  const divMap = {};
+  for (const d of divs) divMap[d.ticker] = (divMap[d.ticker] || 0) + d.amount;
+
+  // Get div tax per ticker from most recent buy transaction
+  const divTaxMap = {};
+  for (const t of txns) {
+    if (t.type === 'dividend' && t.divTax != null) {
+      divTaxMap[t.ticker] = t.divTax; // last written wins (all buys should be same)
+    }
+  }
+
+  const active = Object.values(holdings).filter(h => h.units > 0.00001);
+  if (!active.length) { el.innerHTML = `<div class="empty"><p>All positions closed.</p></div>`; return; }
+
+  // Show skeleton while fetching prices
+  el.innerHTML = skeletonDashboard('Total Portfolio Value');
+
+  // Fetch live prices
+  const prices = await fetchLivePrices(active);
+  const hasPrices = Object.keys(prices).length > 0 && !prices.error;
+
+  const divStocks = active.filter(h => h.type === 'dividend');
+  const grwStocks = active.filter(h => h.type === 'growth');
+
+  function calcStock(h) {
+    const yahooSym   = toYahooSymbol(h.ticker, h.market);
+    const quote      = hasPrices ? prices[yahooSym] : null;
+    const livePrice  = quote?.price  ?? null;
+    const divYield   = quote?.divYield ?? null;  // TTM yield e.g. 0.065
+    const divRate    = quote?.divRate  ?? null;  // TTM div per share
+    const avgCost    = h.units ? h.costBasis / h.units : 0;
+    const curVal     = livePrice ? livePrice * h.units : null;
+    const unrealised = curVal !== null ? curVal - h.costBasis : null;
+    const realised   = realisedGain[h.ticker] || 0;
+    const pl         = unrealised !== null ? unrealised + realised : null;
+    const plPct      = pl !== null && h.costBasis ? (pl / h.costBasis * 100) : null;
+    // Est annual DV = divRate per share × units held, after withholding tax
+    const taxRate     = (divTaxMap[h.ticker] || 0) / 100;
+    const rawEstDV    = divRate !== null ? divRate * h.units : (divYield !== null && curVal !== null ? divYield * curVal : null);
+    const estAnnualDV = rawEstDV !== null ? rawEstDV * (1 - taxRate) : null;
+    const netDivYield = divYield !== null ? divYield * (1 - taxRate) : null;
+    return { livePrice, avgCost, curVal, unrealised, realised, pl, plPct, divYield: netDivYield, estAnnualDV };
+  }
+
+  function buildDivRows(stocks) {
+    return stocks.map(h => {
+      const { livePrice, avgCost, curVal, unrealised, realised, pl, plPct, divYield, estAnnualDV } = calcStock(h);
+      const dvRecv     = divMap[h.ticker] || 0;
+      const capGain    = unrealised !== null ? unrealised + realised : null; // unrealised + realised from sells
+      const totalPL    = capGain !== null ? capGain + dvRecv : null;
+      const totalPLPct = totalPL !== null && h.costBasis ? (totalPL / h.costBasis * 100) : null;
+      const dvYieldPct = divYield !== null ? (divYield * 100).toFixed(2) + '%' : '—';
+      const cur = h.market;
+      return `
+      <div class="stock-row row-div">
+        <div class="ticker-wrap">
+          ${tickerBadge(h.ticker, h.market)}
+          <div>
+            <div class="s-name">${h.market === 'MY' ? h.ticker + '.KL' : h.ticker}</div>
+            <div class="s-units">${h.market === 'MY' ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
+          </div>
+        </div>
+        <div>
+          <div class="cell-main ${totalPL !== null ? cc(totalPL) : 'dim'}">${totalPL !== null ? sgn(totalPL, cur) : '—'}</div>
+          <div class="cell-pct ${totalPLPct !== null ? cc(totalPLPct) : 'dim'}">${totalPLPct !== null ? pct(totalPLPct) : 'no price'}</div>
+        </div>
+        <div>
+          <div class="cell-main ${capGain !== null ? cc(capGain) : 'dim'}">${capGain !== null ? sgn(capGain, cur) : '—'}</div>
+          <div class="cell-sub ${dvRecv > 0 ? 'pos' : 'dim'}">${dvRecv > 0 ? '+'+fmt(dvRecv, cur) : 'no div yet'}</div>
+        </div>
+        <div>
+          <div class="cell-main neu">${livePrice ? fmt(livePrice, cur) : '—'}</div>
+          <div class="cell-sub dim">${fmt(avgCost, cur)} avg</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function buildGrwRows(stocks) {
+    return stocks.map(h => {
+      const { livePrice, avgCost, curVal, unrealised, realised, pl, plPct } = calcStock(h);
+      const cur = h.market;
+      return `
+      <div class="stock-row row-grow">
+        <div class="ticker-wrap">
+          ${tickerBadge(h.ticker, h.market)}
+          <div>
+            <div class="s-name">${h.market === 'MY' ? h.ticker + '.KL' : h.ticker}</div>
+            <div class="s-units">${h.market === 'MY' ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
+          </div>
+        </div>
+        <div>
+          <div class="cell-main ${pl !== null ? cc(pl) : 'dim'}">${pl !== null ? sgn(pl, cur) : '—'}</div>
+          <div class="cell-pct ${plPct !== null ? cc(plPct) : 'dim'}">${plPct !== null ? pct(plPct) : 'no price'}</div>
+        </div>
+        <div>
+          <div class="cell-main neu">${livePrice ? fmt(livePrice, cur) : '—'}</div>
+          <div class="cell-sub dim">${fmt(avgCost, cur)} avg</div>
+        </div>
+        <div>
+          <div class="cell-main ${curVal !== null ? 'neu' : 'dim'}">${curVal !== null ? fmt(curVal, cur, 2) : '—'}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Totals — convert everything to MYR using live rate
+  const rate = cachedRate || 0;
+  const toRM = (val, market) => market === 'US' ? (val ?? 0) * rate : (val ?? 0);
+
+  if (!rate) {
+    console.warn('Exchange rate missing — USD values will show as 0');
+  }
+
+  const myVal  = active.filter(h=>h.market==='MY').reduce((s,h)=>{ const {curVal}=calcStock(h); return s+(curVal??h.costBasis); },0);
+  const usVal  = active.filter(h=>h.market==='US').reduce((s,h)=>{ const {curVal}=calcStock(h); return s+(curVal??h.costBasis); },0);
+
+  // P/L = unrealised + realised + dividends received (all converted to RM)
+  const totalPLRM = active.reduce((s,h)=>{
+    const {unrealised, realised} = calcStock(h);
+    const capGainRM = toRM((unrealised??0) + realised, h.market);
+    const dvRM      = toRM(divMap[h.ticker] || 0, h.market);
+    return s + capGainRM + dvRM;
+  }, 0);
+
+  const totalValRM = myVal + (usVal * rate);
+  const totalCost  = active.reduce((s,h) => s + toRM(h.costBasis, h.market), 0);
+  const totalPLPct = totalCost ? (totalPLRM / totalCost * 100) : 0;
+
+  const now = new Date().toLocaleString('en-MY',{dateStyle:'medium',timeStyle:'short'});
+  let html = '';
+
+  // ── Hero — matches old design exactly
+  html += `
+  <div class="hero" style="position:relative;">
+    <div class="hero-label">Total Portfolio Value</div>
+    <div class="hero-amount">${fmt(totalValRM,'MY')}</div>
+    <div class="hero-row">
+      <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+      <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
+      <span class="hero-badge">USD→MYR: ${rate ? rate.toFixed(2) : '—'}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+      <span style="font-size:10px;color:#7a9adc;">${now}</span>
+      <button onclick="priceCache={};priceCacheTime=0;renderDashboard()" style="background:rgba(59,130,246,0.2);border:none;color:#7ab4ff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;">↻ Refresh</button>
+    </div>
+    <div id="year-select-wrap" style="position:absolute;top:12px;right:14px;"></div>
+  </div>`;
+
+  if (!hasPrices) {
+    html += `<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--orange);">
+      ⚠️ Live prices unavailable. Deploy the Cloudflare Worker and update WORKER_URL in the code.
+    </div>`;
+  }
+
+  // Dividend section
+  if (divStocks.length) {
+
+    const divCurVal  = divStocks.reduce((s,h)=>{ const {curVal}=calcStock(h); return s + toRM(curVal ?? h.costBasis, h.market); },0);
+    const divCostVal = divStocks.reduce((s,h)=> s + toRM(h.costBasis, h.market), 0);
+    const divPL      = divStocks.reduce((s,h)=>{ const {unrealised,realised}=calcStock(h); const dv=toRM(divMap[h.ticker]||0, h.market); return s + toRM((unrealised??0)+realised, h.market) + dv; },0);
+    const divPLPct   = divCostVal ? (divPL/divCostVal*100) : 0;
+    const divEstAnnual = divStocks.reduce((s,h)=>{ const {estAnnualDV}=calcStock(h); return s + toRM(estAnnualDV??0, h.market); },0);
+    const divEstYieldPct = divCurVal ? (divEstAnnual/divCurVal*100) : 0;
+
+    html += `<div class="acc-section">
+      <div class="acc-head">
+        <div class="acc-head-row" style="align-items:baseline;">
+          <div class="acc-type">Dividend Acc</div>
+          <div class="acc-ann-label">Est. Annual DV</div>
+        </div>
+        <div class="acc-head-row" style="align-items:baseline;margin-top:2px;">
+          <div class="acc-val">RM${divCurVal.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+          <div class="acc-ann-val">RM${divEstAnnual > 0 ? divEstAnnual.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}</div>
+        </div>
+        <div class="acc-head-row" style="align-items:baseline;margin-top:4px;">
+          <div class="acc-pl" style="margin-top:0;">
+            <span class="${cc(divPL)}">${divPL >= 0 ? '+' : '-'}RM${Math.abs(divPL).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+            <span class="${cc(divPLPct)}">${divPLPct>=0?'+':''}${divPLPct.toFixed(2)}%</span>
+          </div>
+          <div class="acc-ann-pct">${divEstYieldPct > 0 ? divEstYieldPct.toFixed(2)+'%' : ''}</div>
+        </div>
+      </div>
+      <div class="col-head col-div"><span>STOCKS</span><span>P/L (%)</span><span>CAP GAIN / DV</span><span>LIVE / AVG</span></div>
+      ${buildDivRows(divStocks)}
+    </div>`;
+  }
+
+  // Growth section
+  if (grwStocks.length) {
+    const grwCurVal  = grwStocks.reduce((s,h)=>{ const {curVal}=calcStock(h); return s+(curVal??h.costBasis); },0);
+    const grwCostVal = grwStocks.reduce((s,h)=>s+h.costBasis,0);
+    const grwPL      = grwStocks.reduce((s,h)=>{ const {pl}=calcStock(h); return s+(pl??0); },0);
+    const grwPLPct   = grwCostVal ? (grwPL/grwCostVal*100) : 0;
+    const cur = grwStocks[0].market;
+    html += `<div class="acc-section">
+      <div class="acc-head">
+        <div class="acc-head-row" style="align-items:baseline;">
+          <div class="acc-type">Growth Acc</div>
+        </div>
+        <div class="acc-head-row" style="align-items:baseline;margin-top:2px;">
+          <div class="acc-val">${fmt(grwCurVal,cur)}</div>
+        </div>
+        <div class="acc-pl" style="margin-top:4px;">
+          <span class="${cc(grwPL)}">${grwPL>=0?'+':'-'}${cur==='MY'?'RM':'$'}${Math.abs(grwPL).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+          <span class="${cc(grwPLPct)}">${grwPLPct>=0?'+':''}${grwPLPct.toFixed(2)}%</span>
+        </div>
+      </div>
+      <div class="col-head col-grow"><span>STOCKS</span><span>P/L (%)</span><span>LIVE / AVG</span><span>VALUE</span></div>
+      ${buildGrwRows(grwStocks)}
+    </div>`;
+  }
+
+  el.innerHTML = html;
+  populateYearSelector(txns, 'current');
+}
+
+// ── IMPORT ────────────────────────────────────────────────────────────────────
+let importRows = [];
+
+function downloadTemplate() {
+  const csv = `date,ticker,market,action,type,units,price,div_tax\n2024-01-15,AAPL,US,buy,growth,10,180.00,\n2024-01-15,JEPQ,US,buy,dividend,100,45.00,30\n2024-02-01,1155,MY,buy,dividend,200,9.50,0\n`;
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'folio-template.csv'; a.click();
+}
+
+function excelDateToISO(val) {
+  // If it's already a date string, return as-is
+  if (typeof val === 'string' && val.includes('-')) return val.trim();
+  // Excel serial number: days since 1900-01-01 (with Lotus 1-2-3 bug offset)
+  const num = parseFloat(val);
+  if (!isNaN(num) && num > 1000) {
+    const date = new Date((num - 25569) * 86400 * 1000);
+    return date.toISOString().split('T')[0];
+  }
+  return String(val).trim();
+}
+
+function parseImportRow(row) {
+  // row: [date, ticker, market, action, type, units, price, div_tax?]
+  const [rawDate, rawTicker, market, action, type, units, price, divTax] = row;
+  const errors = [];
+  const date   = excelDateToISO(rawDate);
+  const ticker = String(rawTicker ?? '').trim().toUpperCase();
+
+  if (!date || date === 'NaN-NaN-NaN') errors.push('missing/invalid date');
+  if (!ticker) errors.push('missing ticker');
+  const mkt = String(market||'').trim().toUpperCase();
+  if (!['US','MY'].includes(mkt)) errors.push(`market must be US or MY`);
+  const act = String(action||'').trim().toLowerCase();
+  if (!['buy','sell'].includes(act)) errors.push(`action must be buy or sell`);
+  const typ = String(type||'').trim().toLowerCase();
+  if (!['growth','dividend'].includes(typ)) errors.push(`type must be growth or dividend`);
+  const u = parseFloat(units);
+  if (isNaN(u) || u <= 0) errors.push('invalid units');
+  const p = parseFloat(price);
+  if (isNaN(p) || p <= 0) errors.push('invalid price');
+  const tax = parseFloat(divTax) || 0;
+  return {
+    valid: errors.length === 0,
+    errors,
+    data: {
+      date,
+      ticker,
+      market: mkt,
+      action: act,
+      type: typ,
+      units: u,
+      price: p,
+      divTax: tax,
+      createdAt: new Date(date).getTime() || Date.now(),
+    }
+  };
+}
+
+function handleImportFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const isCsv = file.name.endsWith('.csv');
+  const reader = new FileReader();
+
+  reader.onload = (e) => {
+    let rows = [];
+    if (isCsv) {
+      const text = e.target.result;
+      rows = text.trim().split('\n').map(line => {
+        // handle quoted fields
+        const cells = []; let cur = ''; let inQ = false;
+        for (let ch of line) {
+          if (ch === '"') { inQ = !inQ; }
+          else if (ch === ',' && !inQ) { cells.push(cur.trim()); cur = ''; }
+          else cur += ch;
+        }
+        cells.push(cur.trim());
+        return cells;
+      });
+    } else {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: true });
+    }
+
+    // Skip header row if first cell looks like a label
+    if (rows.length && isNaN(rows[0][0]) && String(rows[0][0]).toLowerCase().includes('date')) {
+      rows = rows.slice(1);
+    }
+    rows = rows.filter(r => r.some(c => c !== '' && c !== null && c !== undefined));
+
+    importRows = rows.map((r, i) => ({ rowNum: i + 2, ...parseImportRow(r) }));
+    renderImportPreview();
+  };
+
+  if (isCsv) reader.readAsText(file);
+  else reader.readAsArrayBuffer(file);
+}
+
+function renderImportPreview() {
+  const preview = document.getElementById('import-preview');
+  const list    = document.getElementById('import-preview-list');
+  const validCount = importRows.filter(r => r.valid).length;
+  const errCount   = importRows.filter(r => !r.valid).length;
+
+  preview.style.display = 'block';
+  document.getElementById('import-confirm-btn').textContent = `Import ${validCount} rows`;
+
+  list.innerHTML = importRows.map(r => `
+    <div style="background:${r.valid ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)'};border:1px solid ${r.valid ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'};border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:11px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-weight:700;color:var(--text);">Row ${r.rowNum}: ${r.data?.ticker || '?'}</span>
+        <span style="color:${r.valid ? 'var(--green)' : 'var(--red)'};">${r.valid ? '✓ Valid' : '✗ Error'}</span>
+      </div>
+      ${r.valid
+        ? `<div style="color:var(--text2);margin-top:2px;">${r.data.date} · ${r.data.action} ${r.data.units} @ ${r.data.market==='MY'?'RM':'$'}${r.data.price} · ${r.data.type}${r.data.divTax ? ` · ${r.data.divTax}% tax` : ''}</div>`
+        : `<div style="color:var(--red);margin-top:2px;">${r.errors.join(', ')}</div>`
+      }
+    </div>`).join('');
+
+  if (errCount > 0) {
+    list.innerHTML += `<div style="font-size:11px;color:var(--text2);margin-top:4px;">⚠️ ${errCount} row(s) with errors will be skipped.</div>`;
+  }
+}
+
+async function confirmImport() {
+  const valid = importRows.filter(r => r.valid).map(r => r.data);
+  if (!valid.length) { showToast('No valid rows to import', true); return; }
+
+  // Type/market conflict check
+  const existing = await dbGetAll('transactions');
+  const conflicts = [];
+  for (const row of valid) {
+    const prev = existing.find(t => t.ticker === row.ticker);
+    if (prev && (prev.type !== row.type || prev.market !== row.market)) {
+      conflicts.push(`${row.ticker} (existing: ${prev.type}/${prev.market}, import: ${row.type}/${row.market})`);
+    }
+  }
+  if (conflicts.length) {
+    showToast(`Conflict: ${conflicts.join('; ')}`, true); return;
+  }
+
+  for (const row of valid) await dbAdd('transactions', row);
+  showToast(`✓ Imported ${valid.length} transactions!`);
+  importRows = [];
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('import-file').value = '';
+  switchSeg('txn', 'log');
+}
+
+function cancelImport() {
+  importRows = [];
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('import-file').value = '';
+}
+
+// ── DV SUMMARY ────────────────────────────────────────────────────────────────
+async function renderDVSummary() {
+  const el = document.getElementById('dvsummary-content');
+  const [txns, divs] = await Promise.all([dbGetAll('transactions'), dbGetAll('dividends')]);
+
+  if (!txns.length) {
+    el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18M9 17V9m4 8v-4m4 4V5"/></svg><p>No transactions yet.</p></div>`;
+    return;
+  }
+
+  // Populate year dropdown from dividend data years (past years only)
+  const sel = document.getElementById('dvsummary-year');
+  const thisYear = new Date().getFullYear();
+  const divYears = [...new Set(divs.map(d => parseInt((d.date||'').slice(0,4))).filter(y => !isNaN(y) && y > 0 && y < thisYear))].sort((a,b) => b-a);
+  // Preserve selected value before rebuilding options
+  const prevVal = sel.value;
+  // Rebuild past year options (keep "Current Year" only)
+  Array.from(sel.options).forEach(o => { if (o.value !== 'current') o.remove(); });
+  for (const y of divYears) {
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = String(y);
+    sel.appendChild(opt);
+  }
+  // Restore selection
+  sel.value = prevVal;
+
+  // Determine selected year
+  const selVal = sel.value;
+  const currentYear = selVal === 'current' ? thisYear : parseInt(selVal);
+  const cutoff = selVal === 'current' ? Date.now() : new Date(`${currentYear}-12-31T23:59:59`).getTime();
+
+  // Build holdings up to cutoff date
+  const holdings = {};
+  const realisedGain = {};
+  for (const t of txns) {
+    if (new Date(t.date).getTime() > cutoff) continue;
+    if (!holdings[t.ticker]) holdings[t.ticker] = { ticker: t.ticker, market: t.market, type: t.type, units: 0, costBasis: 0 };
+    const h = holdings[t.ticker];
+    if (t.action === 'buy') { h.costBasis += t.units * t.price; h.units += t.units; }
+    else {
+      const avg = h.units ? h.costBasis / h.units : 0;
+      realisedGain[t.ticker] = (realisedGain[t.ticker] || 0) + (t.price - avg) * t.units;
+      h.costBasis -= avg * t.units; h.units -= t.units;
+    }
+  }
+
+  const divTaxMap = {};
+  for (const t of txns) { if (t.type === 'dividend' && t.divTax != null) divTaxMap[t.ticker] = t.divTax; }
+
+  const active = Object.values(holdings).filter(h => h.units > 0.00001 && h.type === 'dividend');
+  if (!active.length) { el.innerHTML = `<div class="empty"><p>No dividend stocks found.</p></div>`; return; }
+
+  // Show loading
+  el.innerHTML = skeletonDashboard('DV Summary');
+
+  const prices = await fetchLivePrices(active);
+  const hasPrices = Object.keys(prices).length > 0 && !prices.error;
+  const rate = cachedRate || 0;
+  const toRM = (val, market) => market === 'US' ? (val ?? 0) * rate : (val ?? 0);
+
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // Dividends received per ticker (all time) and per month (current year only)
+  const divMap = {};
+  const divMapThisYear = {};
+  const monthlyTotals = Array(12).fill(0);
+  for (const d of divs) {
+    divMap[d.ticker] = (divMap[d.ticker] || 0) + d.amount;
+    const y = parseInt((d.date || '').slice(0, 4));
+    const m = parseInt((d.date || '').slice(5, 7)) - 1;
+    if (y === currentYear && m >= 0 && m < 12) {
+      divMapThisYear[d.ticker] = (divMapThisYear[d.ticker] || 0) + d.amount;
+      monthlyTotals[m] += toRM(d.amount, d.market);
+    }
+  }
+
+  // Per-stock calc
+  const stockRows = active.map(h => {
+    const yahooSym  = toYahooSymbol(h.ticker, h.market);
+    const quote     = hasPrices ? prices[yahooSym] : null;
+    const livePrice = quote?.price ?? null;
+    const divYield  = quote?.divYield ?? null;
+    const divRate   = quote?.divRate  ?? null;
+    const curVal    = livePrice ? livePrice * h.units : null;
+    const taxRate   = (divTaxMap[h.ticker] || 0) / 100;
+    const rawEstDV  = divRate !== null ? divRate * h.units : (divYield !== null && curVal !== null ? divYield * curVal : null);
+    const estAnnDV  = rawEstDV !== null ? rawEstDV * (1 - taxRate) : null;
+    const netYield  = divYield !== null ? divYield * (1 - taxRate) : null;
+    const dvRecv    = divMap[h.ticker] || 0;
+    const dvRecvThisYear = divMapThisYear[h.ticker] || 0;
+    const costBasis = h.costBasis;
+    const unrealised = curVal !== null ? curVal - costBasis : null;
+    const realised  = realisedGain[h.ticker] || 0;
+    const plInclDV  = (unrealised ?? 0) + realised + dvRecv;
+    return { ...h, livePrice, curVal, netYield, estAnnDV, dvRecv, dvRecvThisYear, plInclDV, costBasis };
+  });
+
+  // Totals in RM
+  const totalAssets   = stockRows.reduce((s, r) => s + toRM(r.curVal ?? r.costBasis, r.market), 0);
+  const totalCost     = stockRows.reduce((s, r) => s + toRM(r.costBasis, r.market), 0);
+  const totalPLInclDV = stockRows.reduce((s, r) => s + toRM(r.plInclDV, r.market), 0);
+  const totalPLExclDV = stockRows.reduce((s, r) => s + toRM((r.curVal ?? r.costBasis) - r.costBasis + (realisedGain[r.ticker]||0), r.market), 0);
+  const totalDVThisYear = monthlyTotals.reduce((s, v) => s + v, 0);
+  const totalEstAnnDV = stockRows.reduce((s, r) => s + toRM(r.estAnnDV ?? 0, r.market), 0);
+  const totalDVYield  = totalAssets ? (totalEstAnnDV / totalAssets * 100) : 0;
+
+  // Bar chart
+  const maxVal = Math.max(...monthlyTotals, 1);
+  const chartH = 120;
+  const barW = 18; const barGap = 6;
+  const chartW = (barW + barGap) * 12 - barGap;
+  const bars = monthlyTotals.map((v, i) => {
+    const h = v > 0 ? Math.max((v / maxVal) * chartH, 4) : 0;
+    const x = i * (barW + barGap);
+    const color = v > 0 ? '#3b82f6' : '#1e2d45';
+    return `<g>
+      <rect x="${x}" y="${chartH - h}" width="${barW}" height="${h}" rx="3" fill="${color}"/>
+      ${v > 0 ? `<text x="${x + barW/2}" y="${chartH - h - 4}" text-anchor="middle" font-size="7" fill="#7a8aaa">RM${v>=1000?(v/1000).toFixed(1)+'k':v.toFixed(0)}</text>` : ''}
+      <text x="${x + barW/2}" y="${chartH + 12}" text-anchor="middle" font-size="8" fill="#4a5a7a">${MONTHS[i]}</text>
+    </g>`;
+  }).join('');
+
+  // Y-axis labels
+  const yLabels = [0, 0.25, 0.5, 0.75, 1].map(f => {
+    const val = maxVal * f;
+    const y = chartH - f * chartH;
+    return `<text x="-4" y="${y + 3}" text-anchor="end" font-size="7" fill="#4a5a7a">${val>=1000?(val/1000).toFixed(1)+'k':val.toFixed(0)}</text>
+    <line x1="0" y1="${y}" x2="${chartW}" y2="${y}" stroke="#1e2d45" stroke-width="0.5" stroke-dasharray="3,3"/>`;
+  }).join('');
+
+  // Stock breakdown rows
+  const breakdownRows = stockRows.map(r => {
+    const dvYieldStr = r.netYield !== null ? (r.netYield * 100).toFixed(2) + '%' : '#N/A';
+    const estAnnStr  = r.estAnnDV !== null ? 'RM' + toRM(r.estAnnDV, r.market).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) : '#N/A';
+    const dvRecvRM   = toRM(r.dvRecvThisYear, r.market);
+    const name = r.market === 'MY' ? r.ticker + '.KL' : r.ticker;
+    const [bg, fg] = badgeColor(r.ticker);
+    return `
+    <div style="display:grid;grid-template-columns:1.4fr 1.2fr 0.8fr 1fr;column-gap:6px;padding:10px 14px;border-top:1px solid var(--border);background:var(--card);align-items:center;">
+      <div style="display:flex;align-items:center;gap:7px;">
+        <div style="width:34px;height:24px;border-radius:6px;background:${bg};color:${fg};font-size:${name.length<=4?'7':'5.5'}px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${name}</div>
+        <div style="font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${name}</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:11px;font-weight:600;" class="pos">+RM${dvRecvRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:11px;font-weight:600;" class="${r.netYield !== null ? 'ora' : 'dim'}">${dvYieldStr}</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:11px;font-weight:600;" class="${r.estAnnDV !== null ? 'ora' : 'dim'}">${estAnnStr}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = `
+    <!-- Header stats -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+        <div style="font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;">Total Dividend Assets</div>
+        <div style="font-size:16px;font-weight:700;">RM${totalAssets.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;">
+        <div style="font-size:10px;color:var(--text2);">P/L include DV</div>
+        <div style="font-size:13px;font-weight:600;" class="${cc(totalPLInclDV)}">${totalPLInclDV>=0?'+':'-'}RM${Math.abs(totalPLInclDV).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--border);padding-top:8px;">
+        <div style="font-size:10px;color:var(--text2);">P/L excl DV</div>
+        <div style="font-size:13px;font-weight:600;" class="${cc(totalPLExclDV)}">${totalPLExclDV>=0?'+':'-'}RM${Math.abs(totalPLExclDV).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+      </div>
+    </div>
+
+    <!-- DV received this year -->
+    <div style="background:linear-gradient(135deg,#0f1f45,#1a2f60);border:1px solid #1e3a7a;border-radius:var(--radius);padding:12px 14px;margin-bottom:8px;text-align:center;">
+      <div style="font-size:10px;color:#7a9adc;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">DV Received ${currentYear}</div>
+      <div style="font-size:26px;font-weight:800;color:#10b981;">RM${totalDVThisYear.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+    </div>
+
+    <!-- Yield + Est Annual cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Dividend Yield %</div>
+        <div style="font-size:22px;font-weight:800;" class="ora">${totalDVYield > 0 ? totalDVYield.toFixed(2)+'%' : '—'}</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;">
+        <div style="font-size:10px;color:var(--text2);margin-bottom:4px;">Est Annual DV</div>
+        <div style="font-size:18px;font-weight:800;" class="ora">RM${totalEstAnnDV > 0 ? totalEstAnnDV.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}) : '—'}</div>
+      </div>
+    </div>
+
+    <!-- Bar chart -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">
+        <div style="font-size:12px;font-weight:600;">${currentYear} Monthly Distribution</div>
+        <div style="font-size:11px;color:var(--text2);">Total: RM${totalDVThisYear.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+      </div>
+      <svg viewBox="-28 -16 ${chartW + 32} ${chartH + 28}" width="100%" style="overflow:visible;">
+        ${yLabels}
+        ${bars}
+      </svg>
+    </div>
+
+    <!-- Breakdown table -->
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;">
+      <div style="padding:10px 14px;border-bottom:1px solid var(--border);">
+        <div style="font-size:12px;font-weight:600;">Dividends Breakdown ${currentYear}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1.2fr 0.8fr 1fr;column-gap:6px;padding:6px 14px;background:#111827;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;font-weight:600;text-align:center;white-space:nowrap;">
+        <span style="text-align:left;">Stocks</span><span>DV Received</span><span>DV %</span><span>Est. Ann DV</span>
+      </div>
+      ${breakdownRows}
+    </div>
+  `;
+}
+
+// ── YEAR SELECTOR ─────────────────────────────────────────────────────────────
+let cachedTxns = [];
+let historicalPriceCache = {};
+
+function populateYearSelector(txns, currentVal) {
+  cachedTxns = txns;
+  const wrap = document.getElementById('year-select-wrap');
+  if (!wrap) return;
+  const thisYear = new Date().getFullYear();
+  const years = txns.map(t => parseInt((t.date || '').slice(0, 4))).filter(y => !isNaN(y) && y > 0);
+  if (!years.length) return;
+  const minYear = Math.min(...years);
+  // All past years from minYear up to last year
+  const pastYears = [];
+  for (let y = thisYear - 1; y >= minYear; y--) pastYears.push(y);
+  if (!pastYears.length) return;
+  let opts = '<option value="current">Live</option>';
+  for (const y of pastYears) opts += `<option value="${y}">${y}</option>`;
+  wrap.innerHTML = `<select onchange="onYearChange()" style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:5px 10px;color:var(--text);font-size:11px;font-weight:700;outline:none;-webkit-appearance:none;cursor:pointer;text-align:center;text-align-last:center;height:28px;line-height:normal;">${opts}</select>`;
+  wrap.querySelector('select').value = currentVal || 'current';
+}
+
+let selectedYear = 'current';
+
+function onYearChange() {
+  const sel = document.querySelector('#year-select-wrap select');
+  if (!sel) return;
+  selectedYear = sel.value;
+  if (selectedYear === 'current') renderDashboard();
+  else renderDashboardHistorical(parseInt(selectedYear));
+}
+
+async function fetchHistoricalPrices(symbols, year) {
+  const key = `${year}:${symbols.sort().join(',')}`;
+  if (historicalPriceCache[key]) return historicalPriceCache[key];
+  try {
+    const resp = await fetch(`${WORKER_URL}/history?symbols=${symbols.join(',')}&year=${year}`);
+    const data = await resp.json();
+    historicalPriceCache[key] = data;
+    return data;
+  } catch (e) {
+    console.warn('Historical price fetch failed:', e);
+    return {};
+  }
+}
+
+async function renderDashboardHistorical(year) {
+  const el = document.getElementById('dashboard-content');
+  const [txns, divs] = await Promise.all([dbGetAll('transactions'), dbGetAll('dividends')]);
+
+  const cutoff = new Date(`${year}-12-31T23:59:59`).getTime();
+
+  // Build holdings as of Dec 31 of selected year
+  const holdings = {};
+  const realisedGain = {};
+  for (const t of txns) {
+    const tDate = new Date(t.date).getTime();
+    if (tDate > cutoff) continue; // ignore transactions after year end
+    if (!holdings[t.ticker]) holdings[t.ticker] = { ticker: t.ticker, market: t.market, type: t.type, units: 0, costBasis: 0 };
+    const h = holdings[t.ticker];
+    if (t.action === 'buy') { h.costBasis += t.units * t.price; h.units += t.units; }
+    else {
+      const avg = h.units ? h.costBasis / h.units : 0;
+      realisedGain[t.ticker] = (realisedGain[t.ticker] || 0) + (t.price - avg) * t.units;
+      h.costBasis -= avg * t.units; h.units -= t.units;
+    }
+  }
+
+  // Dividends received in selected year only
+  const divMap = {};
+  for (const d of divs) {
+    const dYear = parseInt((d.date || '').slice(0, 4));
+    if (dYear === year) divMap[d.ticker] = (divMap[d.ticker] || 0) + d.amount;
+  }
+
+  const divTaxMap = {};
+  for (const t of txns) { if (t.type === 'dividend' && t.divTax != null) divTaxMap[t.ticker] = t.divTax; }
+
+  const active = Object.values(holdings).filter(h => h.units > 0.00001);
+  if (!active.length) {
+    el.innerHTML = `<div class="empty"><p>No holdings in ${year}.</p></div>`;
+    return;
+  }
+
+  el.innerHTML = skeletonDashboard(`Portfolio Value — ${year} Year End`);
+
+  // Fetch year-end closing prices + current data for DV yield
+  const symbols = active.map(h => toYahooSymbol(h.ticker, h.market));
+  const [histPrices, livePrices] = await Promise.all([
+    fetchHistoricalPrices(symbols, year),
+    fetchLivePrices(active),
+  ]);
+
+  // Also fetch historical USD/MYR rate for Dec 31 of that year
+  let histRate = cachedRate || 0;
+  try {
+    const rateResp = await fetch(`${WORKER_URL}/history?symbols=MYR%3DX&year=${year}`);
+    const rateData = await rateResp.json();
+    if (rateData['MYR=X']?.price) histRate = rateData['MYR=X'].price;
+  } catch (_) {}
+
+  const rate = histRate || cachedRate || 0;
+  const toRM = (val, market) => market === 'US' ? (val ?? 0) * rate : (val ?? 0);
+
+  const divStocks = active.filter(h => h.type === 'dividend');
+  const grwStocks = active.filter(h => h.type === 'growth');
+
+  function calcHistStock(h) {
+    const yahooSym   = toYahooSymbol(h.ticker, h.market);
+    const livePrice  = histPrices[yahooSym]?.price ?? null;
+    // DV yield from current live data
+    const liveQuote  = livePrices[yahooSym];
+    const divYield   = liveQuote?.divYield ?? null;
+    const divRate    = liveQuote?.divRate  ?? null;
+    const avgCost    = h.units ? h.costBasis / h.units : 0;
+    const curVal     = livePrice ? livePrice * h.units : null;
+    const unrealised = curVal !== null ? curVal - h.costBasis : null;
+    const realised   = realisedGain[h.ticker] || 0;
+    const pl         = unrealised !== null ? unrealised + realised : null;
+    const plPct      = pl !== null && h.costBasis ? (pl / h.costBasis * 100) : null;
+    const taxRate    = (divTaxMap[h.ticker] || 0) / 100;
+    // Est DV based on units held at year end × current rate
+    const rawEstDV   = divRate !== null ? divRate * h.units : (divYield !== null && curVal !== null ? divYield * curVal : null);
+    const estAnnualDV = rawEstDV !== null ? rawEstDV * (1 - taxRate) : null;
+    const netDivYield = divYield !== null ? divYield * (1 - taxRate) : null;
+    return { livePrice, avgCost, curVal, unrealised, realised, pl, plPct, divYield: netDivYield, estAnnualDV };
+  }
+
+  function buildDivRowsHist(stocks) {
+    return stocks.map(h => {
+      const { livePrice, avgCost, curVal, unrealised, realised, divYield, estAnnualDV } = calcHistStock(h);
+      const dvRecv     = divMap[h.ticker] || 0;
+      const capGain    = unrealised !== null ? unrealised + realised : null;
+      const totalPL    = capGain !== null ? capGain + dvRecv : null;
+      const totalPLPct = totalPL !== null && h.costBasis ? (totalPL / h.costBasis * 100) : null;
+      const dvYieldPct = divYield !== null ? (divYield * 100).toFixed(2) + '%' : '—';
+      const cur = h.market;
+      return `
+      <div class="stock-row row-div">
+        <div class="ticker-wrap">
+          ${tickerBadge(h.ticker, h.market)}
+          <div>
+            <div class="s-name">${h.market === 'MY' ? h.ticker + '.KL' : h.ticker}</div>
+            <div class="s-units">${h.market === 'MY' ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
+          </div>
+        </div>
+        <div>
+          <div class="cell-main ${totalPL !== null ? cc(totalPL) : 'dim'}">${totalPL !== null ? sgn(totalPL, cur) : '—'}</div>
+          <div class="cell-pct ${totalPLPct !== null ? cc(totalPLPct) : 'dim'}">${totalPLPct !== null ? pct(totalPLPct) : 'no price'}</div>
+        </div>
+        <div>
+          <div class="cell-main ${capGain !== null ? cc(capGain) : 'dim'}">${capGain !== null ? sgn(capGain, cur) : '—'}</div>
+          <div class="cell-sub ${dvRecv > 0 ? 'pos' : 'dim'}">${dvRecv > 0 ? '+'+fmt(dvRecv, cur) : 'no div yet'}</div>
+        </div>
+        <div>
+          <div class="cell-main neu">${livePrice ? fmt(livePrice, cur) : '—'}</div>
+          <div class="cell-sub dim">${fmt(avgCost, cur)} avg</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function buildGrwRowsHist(stocks) {
+    return stocks.map(h => {
+      const { livePrice, avgCost, curVal, unrealised, realised, pl, plPct } = calcHistStock(h);
+      const cur = h.market;
+      return `
+      <div class="stock-row row-grow">
+        <div class="ticker-wrap">
+          ${tickerBadge(h.ticker, h.market)}
+          <div>
+            <div class="s-name">${h.market === 'MY' ? h.ticker + '.KL' : h.ticker}</div>
+            <div class="s-units">${h.market === 'MY' ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
+          </div>
+        </div>
+        <div>
+          <div class="cell-main ${pl !== null ? cc(pl) : 'dim'}">${pl !== null ? sgn(pl, cur) : '—'}</div>
+          <div class="cell-pct ${plPct !== null ? cc(plPct) : 'dim'}">${plPct !== null ? pct(plPct) : 'no price'}</div>
+        </div>
+        <div>
+          <div class="cell-main neu">${livePrice ? fmt(livePrice, cur) : '—'}</div>
+          <div class="cell-sub dim">${fmt(avgCost, cur)} avg</div>
+        </div>
+        <div>
+          <div class="cell-main ${curVal !== null ? 'neu' : 'dim'}">${curVal !== null ? fmt(curVal, cur, 2) : '—'}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Totals
+  const myVal     = active.filter(h=>h.market==='MY').reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
+  const usVal     = active.filter(h=>h.market==='US').reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
+  const totalValRM = myVal + (usVal * rate);
+  const totalPLRM  = active.reduce((s,h)=>{
+    const {unrealised,realised}=calcHistStock(h);
+    return s + toRM((unrealised??0)+realised, h.market) + toRM(divMap[h.ticker]||0, h.market);
+  },0);
+  const totalCost  = active.reduce((s,h) => s + toRM(h.costBasis, h.market), 0);
+  const totalPLPct = totalCost ? (totalPLRM / totalCost * 100) : 0;
+
+  let html = '';
+
+  html += `
+  <div class="hero" style="position:relative;">
+    <div class="hero-label">Portfolio Value — ${year} Year End</div>
+    <div class="hero-amount">${fmt(totalValRM,'MY')}</div>
+    <div class="hero-row">
+      <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+      <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
+      <span class="hero-badge">USD→MYR: ${rate ? rate.toFixed(2) : '—'}</span>
+    </div>
+    <div style="font-size:10px;color:#7a9adc;margin-top:6px;">Closing prices: 31 Dec ${year}</div>
+    <div id="year-select-wrap" style="position:absolute;top:12px;right:14px;"></div>
+  </div>`;
+
+  if (divStocks.length) {
+    const divCurVal  = divStocks.reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+toRM(curVal??h.costBasis,h.market); },0);
+    const divCostVal = divStocks.reduce((s,h)=>s+toRM(h.costBasis,h.market),0);
+    const divPL      = divStocks.reduce((s,h)=>{ const {unrealised,realised}=calcHistStock(h); return s+toRM((unrealised??0)+realised,h.market)+toRM(divMap[h.ticker]||0,h.market); },0);
+    const divPLPct   = divCostVal ? (divPL/divCostVal*100) : 0;
+    const divEstAnnual = divStocks.reduce((s,h)=>{ const {estAnnualDV}=calcHistStock(h); return s+toRM(estAnnualDV??0,h.market); },0);
+    const divEstYieldPct = divCurVal ? (divEstAnnual/divCurVal*100) : 0;
+    html += `<div class="acc-section">
+      <div class="acc-head">
+        <div class="acc-head-row" style="align-items:baseline;">
+          <div class="acc-type">Dividend Acc</div>
+          <div class="acc-ann-label">Est. Annual DV</div>
+        </div>
+        <div class="acc-head-row" style="align-items:baseline;margin-top:2px;">
+          <div class="acc-val">RM${divCurVal.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+          <div class="acc-ann-val">RM${divEstAnnual>0?divEstAnnual.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</div>
+        </div>
+        <div class="acc-head-row" style="align-items:baseline;margin-top:4px;">
+          <div class="acc-pl" style="margin-top:0;">
+            <span class="${cc(divPL)}">${divPL>=0?'+':'-'}RM${Math.abs(divPL).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+            <span class="${cc(divPLPct)}">${divPLPct>=0?'+':''}${divPLPct.toFixed(2)}%</span>
+          </div>
+          <div class="acc-ann-pct">${divEstYieldPct>0?divEstYieldPct.toFixed(2)+'%':''}</div>
+        </div>
+      </div>
+      <div class="col-head col-div"><span>STOCKS</span><span>P/L (%)</span><span>CAP GAIN / DV</span><span>LIVE / AVG</span></div>
+      ${buildDivRowsHist(divStocks)}
+    </div>`;
+  }
+
+  if (grwStocks.length) {
+    const grwCurVal  = grwStocks.reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
+    const grwCostVal = grwStocks.reduce((s,h)=>s+h.costBasis,0);
+    const grwPL      = grwStocks.reduce((s,h)=>{ const {pl}=calcHistStock(h); return s+(pl??0); },0);
+    const grwPLPct   = grwCostVal ? (grwPL/grwCostVal*100) : 0;
+    const cur = grwStocks[0].market;
+    html += `<div class="acc-section">
+      <div class="acc-head">
+        <div class="acc-head-row" style="align-items:baseline;">
+          <div class="acc-type">Growth Acc</div>
+        </div>
+        <div class="acc-head-row" style="align-items:baseline;margin-top:2px;">
+          <div class="acc-val">${fmt(grwCurVal,cur)}</div>
+        </div>
+        <div class="acc-pl" style="margin-top:4px;">
+          <span class="${cc(grwPL)}">${grwPL>=0?'+':'-'}${cur==='MY'?'RM':'$'}${Math.abs(grwPL).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+          <span class="${cc(grwPLPct)}">${grwPLPct>=0?'+':''}${grwPLPct.toFixed(2)}%</span>
+        </div>
+      </div>
+      <div class="col-head col-grow"><span>STOCKS</span><span>P/L (%)</span><span>CLOSE / AVG</span><span>VALUE</span></div>
+      ${buildGrwRowsHist(grwStocks)}
+    </div>`;
+  }
+
+  el.innerHTML = html;
+  populateYearSelector(txns, String(year));
+}
+
+// ── DIVIDEND IMPORT ───────────────────────────────────────────────────────────
+let divImportRows = [];
+
+function downloadDivTemplate() {
+  const csv = `ticker,market,amount,month\nJEPQ,US,150.00,2025-03\n1155,MY,891.00,2025-02\n5176,MY,645.88,2025-01\n`;
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'dividends-template.csv'; a.click();
+}
+
+function parseMonthToYYYYMM(val) {
+  if (!val && val !== 0) return null;
+  const s = String(val).trim();
+
+  // Excel serial number
+  if (/^\d{4,5}$/.test(s) || (typeof val === 'number' && val > 1000)) {
+    const n = typeof val === 'number' ? val : parseInt(s);
+    const d = new Date((n - 25569) * 86400 * 1000);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  }
+
+  // YYYY-MM or YYYY/MM
+  if (/^\d{4}[-\/]\d{1,2}$/.test(s)) {
+    const [y, m] = s.split(/[-\/]/);
+    return `${y}-${m.padStart(2,'0')}`;
+  }
+
+  // MM-YYYY or MM/YYYY
+  if (/^\d{1,2}[-\/]\d{4}$/.test(s)) {
+    const [m, y] = s.split(/[-\/]/);
+    return `${y}-${m.padStart(2,'0')}`;
+  }
+
+  // Mon-YYYY or Mon YYYY (e.g. Mar-2025, March 2025)
+  const months = {jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12'};
+  const mMatch = s.match(/([a-zA-Z]+)[\s\-\/](\d{4})/);
+  if (mMatch) {
+    const mKey = mMatch[1].toLowerCase().slice(0,3);
+    if (months[mKey]) return `${mMatch[2]}-${months[mKey]}`;
+  }
+  // YYYY Mon (e.g. 2025 Mar)
+  const mMatch2 = s.match(/(\d{4})[\s\-\/]([a-zA-Z]+)/);
+  if (mMatch2) {
+    const mKey = mMatch2[2].toLowerCase().slice(0,3);
+    if (months[mKey]) return `${mMatch2[1]}-${months[mKey]}`;
+  }
+
+  // YYYY-MM-DD — just take year-month
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s.slice(0, 7);
+
+  return null;
+}
+
+function parseDivImportRow(row) {
+  const [rawTicker, market, amount, rawMonth] = row;
+  const errors = [];
+  const ticker = String(rawTicker ?? '').trim().toUpperCase();
+  const mkt    = String(market ?? '').trim().toUpperCase();
+  const amt    = parseFloat(amount);
+  const month  = parseMonthToYYYYMM(rawMonth);
+
+  if (!ticker) errors.push('missing ticker');
+  if (!['US','MY'].includes(mkt)) errors.push('market must be US or MY');
+  if (isNaN(amt) || amt <= 0) errors.push('invalid amount');
+  if (!month) errors.push(`invalid month: "${rawMonth}" — use YYYY-MM`);
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    data: { ticker, market: mkt, amount: amt, date: month, notes: '', createdAt: month ? new Date(month+'-01').getTime() : Date.now() }
+  };
+}
+
+function handleDivImportFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const isCsv = file.name.endsWith('.csv');
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    let rows = [];
+    if (isCsv) {
+      rows = e.target.result.trim().split('\n').map(line => {
+        const cells = []; let cur = ''; let inQ = false;
+        for (let ch of line) {
+          if (ch === '"') { inQ = !inQ; }
+          else if (ch === ',' && !inQ) { cells.push(cur.trim()); cur = ''; }
+          else cur += ch;
+        }
+        cells.push(cur.trim()); return cells;
+      });
+    } else {
+      const wb = XLSX.read(e.target.result, { type: 'array' });
+      rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '', raw: true });
+    }
+    // Skip header
+    if (rows.length && isNaN(rows[0][0]) && String(rows[0][0]).toLowerCase().includes('ticker')) rows = rows.slice(1);
+    rows = rows.filter(r => r.some(c => c !== '' && c !== null && c !== undefined));
+    divImportRows = rows.map((r, i) => ({ rowNum: i + 2, ...parseDivImportRow(r) }));
+    renderDivImportPreview();
+  };
+  if (isCsv) reader.readAsText(file);
+  else reader.readAsArrayBuffer(file);
+}
+
+function renderDivImportPreview() {
+  const preview = document.getElementById('div-import-preview');
+  const list    = document.getElementById('div-import-preview-list');
+  const validCount = divImportRows.filter(r => r.valid).length;
+  const errCount   = divImportRows.filter(r => !r.valid).length;
+  preview.style.display = 'block';
+  document.getElementById('div-import-confirm-btn').textContent = `Import ${validCount} rows`;
+  list.innerHTML = divImportRows.map(r => `
+    <div style="background:${r.valid?'rgba(16,185,129,0.06)':'rgba(239,68,68,0.06)'};border:1px solid ${r.valid?'rgba(16,185,129,0.2)':'rgba(239,68,68,0.2)'};border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:11px;">
+      <div style="display:flex;justify-content:space-between;">
+        <span style="font-weight:700;color:var(--text);">Row ${r.rowNum}: ${r.data?.ticker||'?'}</span>
+        <span style="color:${r.valid?'var(--green)':'var(--red)'};">${r.valid?'✓ Valid':'✗ Error'}</span>
+      </div>
+      ${r.valid
+        ? `<div style="color:var(--text2);margin-top:2px;">${r.data.date} · ${r.data.market==='MY'?'RM':'$'}${r.data.amount} · ${r.data.market}</div>`
+        : `<div style="color:var(--red);margin-top:2px;">${r.errors.join(', ')}</div>`}
+    </div>`).join('');
+  if (errCount > 0) list.innerHTML += `<div style="font-size:11px;color:var(--text2);margin-top:4px;">⚠️ ${errCount} row(s) with errors will be skipped.</div>`;
+}
+
+async function confirmDivImport() {
+  const valid = divImportRows.filter(r => r.valid).map(r => r.data);
+  if (!valid.length) { showToast('No valid rows to import', true); return; }
+  for (const row of valid) await dbAdd('dividends', row);
+  showToast(`✓ Imported ${valid.length} dividends!`);
+  divImportRows = [];
+  document.getElementById('div-import-preview').style.display = 'none';
+  document.getElementById('div-import-file').value = '';
+  switchSeg('div', 'log');
+}
+
+function cancelDivImport() {
+  divImportRows = [];
+  document.getElementById('div-import-preview').style.display = 'none';
+  document.getElementById('div-import-file').value = '';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+openDB().then(async () => {
+  document.getElementById('txn-date').value = today();
+  document.getElementById('div-date').value = today().slice(0, 7);
+  await renderDashboard();
+
+  // Auto-fill type + market when ticker already exists
+  document.getElementById('txn-ticker').addEventListener('blur', async function() {
+    const ticker = this.value.trim().toUpperCase();
+    if (!ticker) return;
+    const existing = await dbGetAll('transactions');
+    const prev = existing.find(t => t.ticker === ticker);
+    if (prev) {
+      document.getElementById('txn-market').value = prev.market;
+      document.getElementById('txn-type').value   = prev.type;
+      toggleDivTax();
+      if (prev.type === 'dividend' && prev.divTax != null) {
+        document.getElementById('txn-tax').value = prev.divTax;
+      }
+      showToast(`${ticker}: auto-set to ${prev.type} / ${prev.market}${prev.divTax ? `, ${prev.divTax}% tax` : ''}`);
+    }
+  });
+});
+</script>
+</body>
+</html>
