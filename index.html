@@ -511,7 +511,6 @@ async function fetchLivePrices(holdings) {
 
   // Always fetch rate if we don't have it yet, even on cache hit
   if (!cachedRate || !cachedSgdRate) {
-  if (!cachedRate) {
     try {
       const rateResp = await fetch(`${WORKER_URL}/rate`);
       const rateData = await rateResp.json();
@@ -969,7 +968,8 @@ async function renderDashboard() {
   // Totals — convert everything to MYR using live rate
   const rate = cachedRate || 0;
   const sgdRate = cachedSgdRate || 0;
-  const toRM = (val, market) => market === 'US' ? (val ?? 0) * rate : (val ?? 0);
+  const toRM = (val, market) =>
+    market === 'US' ? (val ?? 0) * rate :
     market === 'SG' ? (val ?? 0) * sgdRate :
     (val ?? 0);
 
