@@ -1924,6 +1924,7 @@ function renderDivImportPreview() {
   if (errCount > 0) {
     list.innerHTML += `<div style="font-size:11px;color:var(--text2);margin-top:4px;">⚠️ ${errCount} row(s) with errors will be skipped.</div>`;
   }
+}
 
 async function confirmDivImport() {
   const btn = document.getElementById('div-import-confirm-btn');
