@@ -517,7 +517,7 @@ async function fetchLivePrices(holdings) {
   
       if (rateData.usdMyr && rateData.usdMyr > 1) cachedRate = rateData.usdMyr;
       if (rateData.sgdMyr && rateData.sgdMyr > 1) cachedSgdRate = rateData.sgdMyr;
-    } catch(e) {}
+    } catch (e) {}
   }
 
   if (cacheValid) return priceCache;
