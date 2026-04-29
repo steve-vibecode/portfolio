@@ -1565,9 +1565,11 @@ async function renderDashboardHistorical(year) {
   let histRate = cachedRate || 0;
   let histSgdRate = cachedSgdRate || 0;
   try {
-    const rateResp = await fetch(`${WORKER_URL}/history?symbols=MYR%3DX&year=${year}`);
+    const rateResp = await fetch(`${WORKER_URL}/history?symbols=MYR%3DX,SGDMYR%3DX&year=${year}`);
     const rateData = await rateResp.json();
-    if (rateData['MYR=X']?.price) histRate = rateData['MYR=X'].price;
+  
+    if (rateData['MYR=X']?.price) {
+      histRate = rateData['MYR=X'].price;
     }
   
     if (rateData['SGDMYR=X']?.price) {
