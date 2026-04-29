@@ -502,18 +502,22 @@ function toYahooSymbol(ticker, market) {
 // Price + rate cache (5 min TTL)
 let priceCache = {};
 let priceCacheTime = 0;
-let cachedRate = null;
+let cachedRate = null;     // USD → MYR
+let cachedSgdRate = null;  // SGD → MYR
 
 async function fetchLivePrices(holdings) {
   const now = Date.now();
   const cacheValid = now - priceCacheTime < 5 * 60 * 1000 && Object.keys(priceCache).length;
 
   // Always fetch rate if we don't have it yet, even on cache hit
+  if (!cachedRate || !cachedSgdRate) {
   if (!cachedRate) {
     try {
       const rateResp = await fetch(`${WORKER_URL}/rate`);
       const rateData = await rateResp.json();
-      if (rateData.rate && rateData.rate > 1) cachedRate = rateData.rate;
+  
+      if (rateData.usdMyr && rateData.usdMyr > 1) cachedRate = rateData.usdMyr;
+      if (rateData.sgdMyr && rateData.sgdMyr > 1) cachedSgdRate = rateData.sgdMyr;
     } catch(e) {}
   }
 
@@ -528,7 +532,8 @@ async function fetchLivePrices(holdings) {
     ]);
     const data = await priceResp.json();
     const rateData = await rateResp.json();
-    if (rateData.rate && rateData.rate > 1) cachedRate = rateData.rate;
+    if (rateData.usdMyr && rateData.usdMyr > 1) cachedRate = rateData.usdMyr;
+    if (rateData.sgdMyr && rateData.sgdMyr > 1) cachedSgdRate = rateData.sgdMyr;
     priceCache = data;
     priceCacheTime = now;
     return data;
@@ -963,7 +968,10 @@ async function renderDashboard() {
 
   // Totals — convert everything to MYR using live rate
   const rate = cachedRate || 0;
+  const sgdRate = cachedSgdRate || 0;
   const toRM = (val, market) => market === 'US' ? (val ?? 0) * rate : (val ?? 0);
+    market === 'SG' ? (val ?? 0) * sgdRate :
+    (val ?? 0);
 
   if (!rate) {
     console.warn('Exchange rate missing — USD values will show as 0');
@@ -980,7 +988,14 @@ async function renderDashboard() {
     return s + capGainRM + dvRM;
   }, 0);
 
-  const totalValRM = myVal + (usVal * rate);
+  const sgVal = active
+    .filter(h => h.market === 'SG')
+    .reduce((s, h) => {
+      const { curVal } = calcStock(h);
+      return s + (curVal ?? h.costBasis);
+    }, 0);
+  
+  const totalValRM = myVal + (usVal * rate) + (sgVal * sgdRate);
   const totalCost  = active.reduce((s,h) => s + toRM(h.costBasis, h.market), 0);
   const totalPLPct = totalCost ? (totalPLRM / totalCost * 100) : 0;
 
@@ -995,7 +1010,10 @@ async function renderDashboard() {
     <div class="hero-row">
       <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
       <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
-      <span class="hero-badge">USD→MYR: ${rate ? rate.toFixed(2) : '—'}</span>
+      <span class="hero-badge">
+        USD→MYR: ${rate ? rate.toFixed(2) : '—'}<br>
+        SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}
+      </span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
       <span style="font-size:10px;color:#7a9adc;">${now}</span>
@@ -1059,7 +1077,7 @@ async function renderDashboard() {
           <div class="acc-val">${fmt(grwCurVal,cur)}</div>
         </div>
         <div class="acc-pl" style="margin-top:4px;">
-          <span class="${cc(grwPL)}">${grwPL>=0?'+':'-'}${cur==='MY'?'RM':'$'}${Math.abs(grwPL).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+          <span class="${cc(grwPL)}">${grwPL>=0?'+':'-'}${cur === 'MY' ? 'RM' : cur === 'SG' ? 'S$' : '$'}${Math.abs(grwPL).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
           <span class="${cc(grwPLPct)}">${grwPLPct>=0?'+':''}${grwPLPct.toFixed(2)}%</span>
         </div>
       </div>
@@ -1545,14 +1563,25 @@ async function renderDashboardHistorical(year) {
 
   // Also fetch historical USD/MYR rate for Dec 31 of that year
   let histRate = cachedRate || 0;
+  let histSgdRate = cachedSgdRate || 0;
   try {
     const rateResp = await fetch(`${WORKER_URL}/history?symbols=MYR%3DX&year=${year}`);
     const rateData = await rateResp.json();
     if (rateData['MYR=X']?.price) histRate = rateData['MYR=X'].price;
+    }
+  
+    if (rateData['SGDMYR=X']?.price) {
+      histSgdRate = rateData['SGDMYR=X'].price;
+    }
   } catch (_) {}
 
   const rate = histRate || cachedRate || 0;
-  const toRM = (val, market) => market === 'US' ? (val ?? 0) * rate : (val ?? 0);
+  const sgdRate = histSgdRate || cachedSgdRate || 0;
+  
+  const toRM = (val, market) =>
+    market === 'US' ? (val ?? 0) * rate :
+    market === 'SG' ? (val ?? 0) * sgdRate :
+    (val ?? 0);
 
   const divStocks = active.filter(h => h.type === 'dividend');
   const grwStocks = active.filter(h => h.type === 'growth');
@@ -1651,11 +1680,19 @@ async function renderDashboardHistorical(year) {
   // Totals
   const myVal     = active.filter(h=>h.market==='MY').reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
   const usVal     = active.filter(h=>h.market==='US').reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
-  const totalValRM = myVal + (usVal * rate);
-  const totalPLRM  = active.reduce((s,h)=>{
-    const {unrealised,realised}=calcHistStock(h);
-    return s + toRM((unrealised??0)+realised, h.market) + toRM(divMap[h.ticker]||0, h.market);
-  },0);
+  const sgVal     = active.filter(h=>h.market==='SG').reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
+  const totalValRM =
+    myVal +
+    (usVal * rate) +
+    (sgVal * sgdRate);
+  const totalPLRM = active.reduce((s, h) => {
+    const { unrealised, realised } = calcHistStock(h);
+    return (
+      s +
+      toRM((unrealised ?? 0) + realised, h.market) +
+      toRM(divMap[h.ticker] || 0, h.market)
+    );
+  }, 0);
   const totalCost  = active.reduce((s,h) => s + toRM(h.costBasis, h.market), 0);
   const totalPLPct = totalCost ? (totalPLRM / totalCost * 100) : 0;
 
@@ -1668,7 +1705,10 @@ async function renderDashboardHistorical(year) {
     <div class="hero-row">
       <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
       <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
-      <span class="hero-badge">USD→MYR: ${rate ? rate.toFixed(2) : '—'}</span>
+            <span class="hero-badge">
+              USD→MYR: ${rate ? rate.toFixed(2) : '—'}<br>
+              SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}
+            </span>
     </div>
     <div style="font-size:10px;color:#7a9adc;margin-top:6px;">Closing prices: 31 Dec ${year}</div>
     <div id="year-select-wrap" style="position:absolute;top:12px;right:14px;"></div>
@@ -1719,7 +1759,15 @@ async function renderDashboardHistorical(year) {
           <div class="acc-val">${fmt(grwCurVal,cur)}</div>
         </div>
         <div class="acc-pl" style="margin-top:4px;">
-          <span class="${cc(grwPL)}">${grwPL>=0?'+':'-'}${cur==='MY'?'RM':'$'}${Math.abs(grwPL).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+          <span class="${cc(grwPL)}">
+            ${grwPL >= 0 ? '+' : '-'}
+            ${
+              cur === 'MY' ? 'RM' :
+              cur === 'SG' ? 'S$' :
+              '$'
+            }
+            ${Math.abs(grwPL).toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
           <span class="${cc(grwPLPct)}">${grwPLPct>=0?'+':''}${grwPLPct.toFixed(2)}%</span>
         </div>
       </div>
@@ -1849,9 +1897,14 @@ function renderDivImportPreview() {
         <span style="font-weight:700;color:var(--text);">Row ${r.rowNum}: ${r.data?.ticker||'?'}</span>
         <span style="color:${r.valid?'var(--green)':'var(--red)'};">${r.valid?'✓ Valid':'✗ Error'}</span>
       </div>
-      ${r.valid
-        ? `<div style="color:var(--text2);margin-top:2px;">${r.data.date} · ${r.data.market==='MY'?'RM':'$'}${r.data.amount} · ${r.data.market}</div>`
-        : `<div style="color:var(--red);margin-top:2px;">${r.errors.join(', ')}</div>`}
+            ${r.valid
+        ? `<div style="color:var(--text2);margin-top:2px;">
+            ${r.data.date} · ${
+              r.data.market === 'MY' ? 'RM' :
+              r.data.market === 'SG' ? 'S$' :
+              '$'
+            }${r.data.amount} · ${r.data.market}
+          </div>`
     </div>`).join('');
   if (errCount > 0) list.innerHTML += `<div style="font-size:11px;color:var(--text2);margin-top:4px;">⚠️ ${errCount} row(s) with errors will be skipped.</div>`;
 }
