@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Road to Forty-Five</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/prop-types/15.8.1/prop-types.min.js"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/recharts@2.12.7/umd/Recharts.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; }
+  body {
+    background: #0a1520;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #e8dcc4;
+    font-size: 13px;
+    -webkit-font-smoothing: antialiased;
+  }
+  input, textarea, button, select { font-family: inherit; }
+  input:focus, textarea:focus { outline: none; }
+  .panel {
+    background: #0f1d2c;
+    border: 1px solid #1f3548;
+    padding: 12px 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .panel-tag {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: #d4a574;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .panel-title {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 17px;
+    margin: 0 0 8px 0;
+    font-weight: 500;
+    color: #e8dcc4;
+    line-height: 1.1;
+    letter-spacing: -0.3px;
+  }
+  .display-serif { font-family: 'Fraunces', Georgia, serif; }
+  .milestone-row { transition: all 0.15s; cursor: pointer; }
+  .milestone-row:hover { background: rgba(212, 165, 116, 0.1) !important; }
+  .phase-tab { transition: all 0.2s; cursor: pointer; }
+  .phase-tab:hover { background: rgba(212, 165, 116, 0.12) !important; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #1f3548; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #d4a574; }
+  .scroll-y { overflow-y: auto; min-height: 0; flex: 1; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .gold { color: #d4a574; }
+  .muted { color: #8a9bab; }
+  .pos { color: #7ba87b; }
+  .neg { color: #c97b7b; }
+  .edit-input {
+    background: #0a1520;
+    border: 1px solid #d4a574;
+    color: #e8dcc4;
+    padding: 2px 6px;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 11px;
+    width: 100%;
+  }
+  .btn-icon {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 11px;
+    padding: 1px 4px;
+    line-height: 1;
+  }
+  .btn-save { color: #7ba87b; border: 1px solid #7ba87b; }
+  .btn-cancel { color: #8a9bab; border: 1px solid #8a9bab; }
+  .btn-edit { color: #d4a574; }
+  .btn-delete { color: #c97b5e; }
+  .btn-add {
+    background: transparent; border: 1px dashed #1f3548;
+    color: #8a9bab; cursor: pointer; font-size: 10px;
+    font-family: 'Fraunces', Georgia, serif;
+    padding: 3px 10px; margin-top: 4px; width: 100%;
+    letter-spacing: 0.5px;
+  }
+  .btn-add:hover { border-color: #d4a574; color: #d4a574; }
+
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  .spinner { animation: spin 1s linear infinite; display: inline-block; }
+</style>
+</head>
+<body>
+<div id="root">
+  <div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#d4a574;font-family:Inter,sans-serif;font-size:16px;">
+    Loading dashboard...
+  </div>
+</div>
+
+<script type="text/babel" data-presets="react">
+const {
+  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
+} = Recharts;
+const { useState, useEffect, useCallback } = React;
+
+const SUPABASE_URL = 'https://gslybwjzsfprkjgximqe.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzbHlid2p6c2ZwcmtqZ3hpbXFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNTI4MDYsImV4cCI6MjA5MjkyODgwNn0.nFwMWPWQPQGBGv4OPa358UOUeU2pGzAS6U7xMBh8y9w';
+const WORKER_URL = 'https://folio-price.stevetest181.workers.dev';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const TARGET = 1600000;
+const RETIREMENT_AGE = 45;
+const TARGET_YIELD = 0.06;
+const STORAGE_KEY = "retirement_dashboard_v3";
+
+const c = {
+  bg: "#0a1520", panel: "#0f1d2c", panel2: "#142536",
+  border: "#1f3548", text: "#e8dcc4", muted: "#8a9bab",
+  gold: "#d4a574", goldDim: "#b89968", teal: "#5a8a8a",
+  rust: "#c97b5e", green: "#7ba87b",
+};
+
+const DEFAULT_SETTINGS = {
+  age: 31,
+  monthlyContribution: 4000,
+  milestones: {
+    "first_500k": false,
+    "phase1_60pct": false,
+    "age_38_transition": false,
+    "first_million": false,
+    "age_40_trim": false,
+    "age_42_rotation": false,
+    "target_reached": false,
+  },
+};
+
+function toYahooSymbol(ticker, market) {
+  if (market !== 'MY') return ticker;
+  return ticker.toUpperCase().endsWith('.KL') ? ticker : `${ticker}.KL`;
+}
+
+function App() {
+  const [settings, setSettings] = useState(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
+    } catch (e) { return DEFAULT_SETTINGS; }
+  });
+
+  const [transactions, setTransactions] = useState([]);
+  const [dividends, setDividends] = useState([]);
+  const [prices, setPrices] = useState({});
+  const [fxRate, setFxRate] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [error, setError] = useState(null);
+  const [fireTargets, setFireTargets] = useState([]);
+  const [savings, setSavings] = useState([]);
+  const [emergencyFund, setEmergencyFund] = useState([]);
+  const [investments, setInvestments] = useState([]);
+  const [liabilities, setLiabilities] = useState([]);
+
+  // Editing state: { table, id } or { table, 'new' }
+  const [editing, setEditing] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [saving, setSaving] = useState(false);
+
+  const startEdit = (table, row) => {
+    setEditing({ table, id: row.id });
+    setEditForm({ ...row });
+  };
+  const startAdd = (table, defaults) => {
+    setEditing({ table, id: 'new' });
+    setEditForm(defaults);
+  };
+  const cancelEdit = () => { setEditing(null); setEditForm({}); };
+
+  const commitEdit = async () => {
+    if (!editing) return;
+    setSaving(true);
+    try {
+      const { table, id } = editing;
+      if (id === 'new') {
+        const { id: _id, ...payload } = editForm;
+        const { data, error } = await sb.from(table).insert([payload]).select();
+        if (error) throw error;
+      } else {
+        const { error } = await sb.from(table).update(editForm).eq('id', id);
+        if (error) throw error;
+      }
+      await fetchData();
+      cancelEdit();
+    } catch (e) { alert('Save failed: ' + e.message); }
+    finally { setSaving(false); }
+  };
+
+  const deleteRow = async (table, id) => {
+    if (!confirm('Delete this row?')) return;
+    setSaving(true);
+    try {
+      const { error } = await sb.from(table).delete().eq('id', id);
+      if (error) throw error;
+      await fetchData();
+    } catch (e) { alert('Delete failed: ' + e.message); }
+    finally { setSaving(false); }
+  };
+
+  const [previewPhase, setPreviewPhase] = useState(null);
+  const [activeTab, setActiveTab] = useState("holdings");
+
+  const [checkedTargets, setCheckedTargets] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("checkedTargets") || "{}");
+    } catch {
+      return {};
+    }
+  });
+
+  const toggleTarget = (key) => {
+    const next = { ...checkedTargets, [key]: !checkedTargets[key] };
+    setCheckedTargets(next);
+    localStorage.setItem("checkedTargets", JSON.stringify(next));
+  };
+
+  const targetCellStyle = (checked, color) => ({
+    textAlign: "right",
+    fontSize: 11,
+    color: checked ? c.muted : color,
+    textDecoration: checked ? "line-through" : "none",
+    opacity: checked ? 0.5 : 1,
+    cursor: "pointer",
+  });
+
+  const saveSettings = (newSettings) => {
+    setSettings(newSettings);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newSettings)); } catch (e) {}
+  };
+
+  const fetchData = useCallback(async () => {
+    setRefreshing(true);
+    setError(null);
+    try {
+      const [txnRes, divRes, fireRes, savRes, emgRes, invRes, liabRes] = await Promise.all([
+        sb.from('transactions').select('*').order('created_at', { ascending: true }),
+        sb.from('dividends').select('*').order('created_at', { ascending: true }),
+        sb.from('fire_targets').select('*').order('id', { ascending: true }),
+        sb.from('savings').select('*'),
+        sb.from('emergency_fund').select('*'),
+        sb.from('investments').select('*'),
+        sb.from('liabilities').select('*'),
+      ]);
+
+      if (txnRes.error) throw new Error('Supabase txn: ' + txnRes.error.message);
+      if (divRes.error) throw new Error('Supabase div: ' + divRes.error.message);
+      if (fireRes.error) throw new Error('Supabase fire_targets: ' + fireRes.error.message);
+
+      setSavings(savRes.data || []);
+      setEmergencyFund(emgRes.data || []);
+      setInvestments(invRes.data || []);
+      setLiabilities(liabRes.data || []);
+
+      const txns = (txnRes.data || []).map(r => ({
+        id: r.id, ticker: r.ticker, market: r.market, action: r.action,
+        type: r.type, units: parseFloat(r.units), price: parseFloat(r.price),
+        date: r.date, divTax: r.div_tax || 0,
+      }));
+      const divs = (divRes.data || []).map(r => ({
+        id: r.id, ticker: r.ticker, market: r.market,
+        amount: parseFloat(r.amount), date: r.date,
+      }));
+
+      setTransactions(txns);
+      setDividends(divs);
+      setFireTargets(fireRes.data || []);
+
+      const holdings = {};
+      for (const t of txns) {
+        if (!holdings[t.ticker]) holdings[t.ticker] = { ticker: t.ticker, market: t.market, units: 0 };
+        if (t.action === 'buy') holdings[t.ticker].units += t.units;
+        else holdings[t.ticker].units -= t.units;
+      }
+      const active = Object.values(holdings).filter(h => h.units > 0.00001);
+      const symbols = active.map(h => toYahooSymbol(h.ticker, h.market));
+
+      if (symbols.length) {
+        const [priceResp, rateResp] = await Promise.all([
+          fetch(`${WORKER_URL}/price?symbols=${symbols.join(',')}`),
+          fetch(`${WORKER_URL}/rate`),
+        ]);
+        const priceData = await priceResp.json();
+        const rateData = await rateResp.json();
+        setPrices(priceData || {});
+        const usdMyr = rateData.usdMyr || rateData.rate;
+        if (usdMyr && usdMyr > 1) setFxRate(usdMyr);
+      }
+
+      setLastUpdated(new Date());
+    } catch (err) {
+      console.error(err);
+      setError(err.message);
+    } finally {
+      setRefreshing(false);
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  const holdings = {};
+  for (const t of transactions) {
+    if (!holdings[t.ticker]) {
+      holdings[t.ticker] = { ticker: t.ticker, market: t.market, type: t.type, units: 0, costBasis: 0 };
+    }
+    const h = holdings[t.ticker];
+    if (t.action === 'buy') {
+      h.costBasis += t.units * t.price;
+      h.units += t.units;
+    } else {
+      const avg = h.units ? h.costBasis / h.units : 0;
+      h.costBasis -= avg * t.units;
+      h.units -= t.units;
+    }
+  }
+  const active = Object.values(holdings).filter(h => h.units > 0.00001);
+
+  const toMYR = (val, market) => market === 'US' ? (val || 0) * fxRate : (val || 0);
+
+  const calcStock = (h) => {
+    const sym = toYahooSymbol(h.ticker, h.market);
+    const livePrice = prices[sym]?.price ?? null;
+    const avgCost = h.units ? h.costBasis / h.units : 0;
+    const curVal = livePrice ? livePrice * h.units : null;
+    const curValRM = curVal !== null ? toMYR(curVal, h.market) : toMYR(h.costBasis, h.market);
+    return { livePrice, avgCost, curVal, curValRM };
+  };
+
+  const dividendStocks = active.filter(h => h.type === 'dividend');
+  const growthStocks = active.filter(h => h.type === 'growth');
+
+  const dividendTotal = dividendStocks.reduce((s, h) => s + calcStock(h).curValRM, 0);
+  const growthTotal = growthStocks.reduce((s, h) => s + calcStock(h).curValRM, 0);
+  const totalValue = dividendTotal + growthTotal;
+  const totalCalc = dividendTotal + growthTotal;
+  const growthPct = totalCalc > 0 ? (growthTotal / totalCalc) * 100 : 0;
+  const dividendPct = 100 - growthPct;
+
+  const yearsRemaining = RETIREMENT_AGE - settings.age;
+  const progressPct = (totalValue / TARGET) * 100;
+
+  let autoPhase = 1;
+  if (settings.age > 40) autoPhase = 3;
+  else if (settings.age > 35) autoPhase = 2;
+  const phase = previewPhase || autoPhase;
+  const phaseMonthly = phase === 1 ? 6000 : phase === 2 ? 4000 : 0;
+
+  const phaseLabels = { 1: "Aggressive Accumulation", 2: "Transition", 3: "Income Rotation" };
+  const phaseColors = { 1: c.gold, 2: c.goldDim, 3: c.rust };
+
+  const yearlyPlan = [
+    { age: 31, phase: 1, dividendValue: 140000, growthValue: 128000, total: 268000, growthPct: 48, dividendPct: 52, annualDividend: 8400 },
+    { age: 32, phase: 1, dividendValue: 148400, growthValue: 210240, total: 358640, growthPct: 59, dividendPct: 41, annualDividend: 8904 },
+    { age: 33, phase: 1, dividendValue: 157304, growthValue: 299059, total: 456363, growthPct: 66, dividendPct: 34, annualDividend: 9438 },
+    { age: 34, phase: 1, dividendValue: 166742, growthValue: 394984, total: 561726, growthPct: 70, dividendPct: 30, annualDividend: 10005 },
+    { age: 35, phase: 1, dividendValue: 176747, growthValue: 498583, total: 675329, growthPct: 74, dividendPct: 26, annualDividend: 10605 },
+    { age: 36, phase: 2, dividendValue: 211352, growthValue: 562469, total: 773821, growthPct: 73, dividendPct: 27, annualDividend: 12681 },
+    { age: 37, phase: 2, dividendValue: 248032, growthValue: 631467, total: 879499, growthPct: 72, dividendPct: 28, annualDividend: 14882 },
+    { age: 38, phase: 2, dividendValue: 286915, growthValue: 705984, total: 992899, growthPct: 71, dividendPct: 29, annualDividend: 17215 },
+    { age: 39, phase: 2, dividendValue: 328130, growthValue: 786463, total: 1114592, growthPct: 71, dividendPct: 29, annualDividend: 19688 },
+    { age: 40, phase: 2, dividendValue: 371817, growthValue: 873379, total: 1245197, growthPct: 70, dividendPct: 30, annualDividend: 22309 },
+    { age: 41, phase: 3, dividendValue: 594126, growthValue: 727250, total: 1321376, growthPct: 55, dividendPct: 45, annualDividend: 35647 },
+    { age: 42, phase: 3, dividendValue: 829773, growthValue: 569430, total: 1399204, growthPct: 41, dividendPct: 59, annualDividend: 49786 },
+    { age: 43, phase: 3, dividendValue: 1079560, growthValue: 398984, total: 1478545, growthPct: 27, dividendPct: 73, annualDividend: 64773 },
+    { age: 44, phase: 3, dividendValue: 1344333, growthValue: 214903, total: 1559237, growthPct: 14, dividendPct: 86, annualDividend: 80660 },
+    { age: 45, phase: 3, dividendValue: 1639897, growthValue: 0, total: 1639897, growthPct: 0, dividendPct: 100, annualDividend: 98393 },
+  ];
+
+  const projectionData = yearlyPlan.map(r => ({ age: r.age, value: r.total }));
+  const finalProjection = yearlyPlan[yearlyPlan.length - 1].total;
+
+  const allocationData = [
+    { name: "Growth", value: growthPct, fill: c.gold },
+    { name: "Dividend", value: dividendPct, fill: c.teal },
+  ];
+
+  const targetAllocation = [
+    { phase: "Now", growth: Math.round(growthPct), dividend: Math.round(dividendPct) },
+    { phase: "35", growth: 100, dividend: 0 },
+    { phase: "40", growth: 50, dividend: 50 },
+    { phase: "45", growth: 0, dividend: 100 },
+  ];
+
+  const monthlyPlans = {
+    1: [
+      { ticker: "VWRA", name: "VWRA", amount: 3000, note: "VWRA" },
+      { ticker: "GROWTH", name: "MSFT / NVDA / META / AAPL rotation", amount: 3000, note: "MSFT / NVDA / META / AAPL rotation" },
+    ],
+    2: [
+      { ticker: "VWRA", name: "VWRA", amount: 1000, note: "VWRA" },
+      { ticker: "GROWTH", name: "MSFT / NVDA / META / AAPL rotation", amount: 1000, note: "MSFT / NVDA / META / AAPL rotation" },
+      { ticker: "JEPQ", name: "JEPQ", amount: 1000, note: "JEPQ" },
+      { ticker: "DIV", name: "MAYBANK / SUNREIT rotation", amount: 1000, note: "MAYBANK / SUNREIT rotation" },
+    ],
+    3: [
+      { ticker: "ROTATE", name: "Growth → Dividend Rotation", amount: 0, note: "Gradually reduce growth allocation until age 45 = 100% dividend" },
+    ],
+  };
+
+  const phaseAdvice = {
+    1: "RM6K/month. 100% Growth allocation. Focus on capital accumulation. Dividends from Dividend stocks reinvested.",
+    2: "RM4K/month. Still 50/50 split. Maintain discipline — no chasing growth. Build dividend base while continuing selective growth exposure until age 40.",
+    3: "Gradually rotate Growth → Dividend from age 40 to 45. Reduce growth exposure yearly until 100% dividend at 45. No abrupt selling — smooth transition.",
+  };
+
+  const milestones = [
+    { key: "phase1_60pct", label: "Growth bucket reaches 70%", target: null },
+    { key: "age_38_transition", label: "Switch to 50/50 contributions", target: null },
+    { key: "first_500k", label: "Cross RM500K portfolio", target: 500000 },
+    { key: "first_million", label: "Cross RM1,000,000", target: 1000000 },
+    { key: "age_42_rotation", label: "Age 40: Begin Growth → Dividend rotation", target: null },
+    { key: "target_reached", label: "Reach RM1.6M target", target: 1600000 },
+  ];
+
+  const toggleMilestone = (key) => {
+    saveSettings({ ...settings, milestones: { ...settings.milestones, [key]: !settings.milestones[key] } });
+  };
+
+  const lastUpdatedStr = lastUpdated
+    ? lastUpdated.toLocaleString('en-MY', { dateStyle: 'medium', timeStyle: 'short' })
+    : '—';
+
+  const dividendRows = dividendStocks.map(h => {
+    const { livePrice, avgCost, curVal, curValRM } = calcStock(h);
+    return { ...h, livePrice, avgCost, curVal, curValRM };
+  });
+  const growthRows = growthStocks.map(h => {
+    const { livePrice, avgCost, curVal, curValRM } = calcStock(h);
+    return { ...h, livePrice, avgCost, curVal, curValRM };
+  });
+
+  return (
+    <div style={{
+      height: "100vh", width: "100vw",
+      background: `linear-gradient(135deg, ${c.bg} 0%, #0d1a26 100%)`,
+      display: "grid",
+      gridTemplateRows: "auto 1fr auto",
+      padding: "10px 16px",
+      gap: 6,
+    }}>
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "3px 6px", borderBottom: `1px solid ${c.border}` }}>
+        <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
+          <div className="mono" style={{ fontSize: 9, letterSpacing: 2.5, color: c.gold, fontWeight: 500 }}>◆ PORTFOLIO LEDGER</div>
+          <h1 className="display-serif" style={{ fontSize: 24, fontWeight: 500, margin: 0, letterSpacing: -0.5 }}>
+            The Road to <span className="gold" style={{ fontStyle: "italic" }}>Forty-Five</span>
+          </h1>
+          <div className="mono" style={{ fontSize: 9, letterSpacing: 2.5, fontWeight: 500 }}>14yr · RM1.6M @ 6%</div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          {error && <span style={{ color: c.rust, fontSize: 10 }}>⚠ {error}</span>}
+          <span className="mono muted" style={{ fontSize: 9, letterSpacing: 1 }}>SYNCED</span>
+          <span className="gold mono" style={{ fontSize: 10 }}>{lastUpdatedStr}</span>
+          <button onClick={fetchData} disabled={refreshing} style={{
+            background: refreshing ? c.panel2 : "transparent",
+            color: c.gold, border: `1px solid ${c.gold}`,
+            padding: "3px 12px", fontSize: 9, letterSpacing: 1.5,
+            cursor: refreshing ? "wait" : "pointer",
+            fontFamily: "JetBrains Mono, monospace", fontWeight: 500,
+          }}>
+            {refreshing ? <span className="spinner">⟳</span> : "↻"} {refreshing ? "SYNCING..." : "REFRESH"}
+          </button>
+        </div>
+      </header>
+
+      {loading ? (
+        <div className="display-serif" style={{ display: "flex", alignItems: "center", justifyContent: "center", color: c.gold, fontSize: 16 }}>
+          <span className="spinner" style={{ marginRight: 12 }}>⟳</span>
+          Connecting to Supabase + fetching live prices...
+        </div>
+      ) : (
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(12, 1fr)",
+        gridTemplateRows: "0.92fr 0.92fr",
+        gap: 8,
+        minHeight: 0,
+      }}>
+        <div className="panel" style={{ gridColumn: "span 5", padding: "16px 22px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <div className="panel-tag">CURRENT PORTFOLIO VALUE</div>
+            <div className="mono muted" style={{ fontSize: 10 }}>{progressPct.toFixed(2)}% TO TARGET</div>
+          </div>
+          <div className="gold display-serif" style={{ fontSize: 44, fontWeight: 400, letterSpacing: -1.5, lineHeight: 1.1, marginTop: 4 }}>
+            RM{totalValue.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+          </div>
+          <div className="panel-tag" style={{ color: "white" }}>
+            of RM{TARGET.toLocaleString()} — RM{(TARGET - totalValue).toLocaleString("en-US", { maximumFractionDigits: 0 })} remaining
+          </div>
+          <div style={{ position: "relative", height: 6, background: c.panel2, marginBottom: 12 }}>
+            <div style={{
+              position: "absolute", left: 0, top: 0, height: "100%",
+              width: `${Math.min(progressPct, 100)}%`,
+              background: `linear-gradient(90deg, ${c.goldDim}, ${c.gold})`,
+              transition: "width 0.6s ease",
+            }} />
+            {[25, 50, 75].map(pct => (
+              <div key={pct} style={{ position: "absolute", left: `${pct}%`, top: -2, bottom: -2, width: 1, background: c.border }} />
+            ))}
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, paddingTop: 8, borderTop: `1px solid ${c.border}` }}>
+            <Stat label="AGE" value={settings.age} />
+            <Stat label="YRS LEFT" value={yearsRemaining} />
+            <Stat label="MONTHLY" value={`RM${(4000/1000)}K–${(6000/1000)}K`} />
+            <Stat label="EST @ 45" value={`RM${(finalProjection/1000).toFixed(0)}K`} />
+          </div>
+        </div>
+
+        <div className="panel" style={{ gridColumn: "span 4" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div className="panel-tag">PHASE {previewPhase ? "(PREVIEW)" : "(LIVE)"}</div>
+            {previewPhase && (
+              <button onClick={() => setPreviewPhase(null)} style={{
+                background: "transparent", color: c.gold, border: `1px solid ${c.gold}`,
+                padding: "1px 6px", fontSize: 8, letterSpacing: 1, cursor: "pointer",
+                fontFamily: "JetBrains Mono, monospace",
+              }}>← LIVE</button>
+            )}
+          </div>
+          <div style={{ display: "flex", gap: 4, marginTop: 6, marginBottom: 8 }}>
+            {[1, 2, 3].map(p => {
+              const isActive = p === phase;
+              const isAuto = p === autoPhase && !previewPhase;
+              return (
+                <div key={p} className="phase-tab" onClick={() => setPreviewPhase(p === autoPhase ? null : p)} style={{
+                  flex: 1, padding: "8px 4px", textAlign: "center",
+                  background: isActive ? phaseColors[p] : c.panel2,
+                  color: isActive ? c.bg : c.muted,
+                  border: `1px solid ${isActive ? phaseColors[p] : c.border}`,
+                  fontFamily: "JetBrains Mono, monospace", fontSize: 11,
+                  fontWeight: 600, letterSpacing: 1, position: "relative",
+                }}>
+                  {p === 1 ? "I" : p === 2 ? "II" : "III"}
+                  {isAuto && <div style={{ position: "absolute", top: 1, right: 3, fontSize: 7, color: isActive ? c.bg : c.gold }}>●</div>}
+                </div>
+              );
+            })}
+          </div>
+          <div className="display-serif" style={{ fontSize: 16, fontWeight: 500, color: phaseColors[phase], marginBottom: 6, fontStyle: "italic" }}>
+            {phaseLabels[phase]}
+          </div>
+          <div className="display-serif" style={{ fontSize: 12, lineHeight: 1.5, flex: 1, color: "white" }}>
+            {phaseAdvice[phase]}
+          </div>
+        </div>
+
+        <div className="panel" style={{ gridColumn: "span 3" }}>
+          <div className="panel-tag">CURRENT ALLOCATION</div>
+          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 0 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={allocationData} cx="50%" cy="50%" innerRadius="50%" outerRadius="80%" dataKey="value" stroke="none">
+                  {allocationData.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, fontFamily: "JetBrains Mono, monospace" }}>
+            <div><span style={{ color: c.gold }}>● </span>GROWTH {growthPct.toFixed(0)}%</div>
+            <div><span style={{ color: c.teal }}>● </span>DIVIDEND {dividendPct.toFixed(0)}%</div>
+          </div>
+        </div>
+
+        <div className="panel" style={{ gridColumn: "span 5" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <div>
+              <div className="panel-tag">◆ PROJECTION</div>
+              <h2 className="panel-title" style={{ fontStyle: "italic" }}>The Compound Curve</h2>
+            </div>
+            <div className="display-serif" style={{ fontSize: 11, color: "white" }}>Returns: Growth 8%, Dividend 6%.</div>
+          </div>
+          <div style={{ flex: 1, minHeight: 0 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={projectionData} margin={{ top: 5, right: 10, bottom: 5, left: -10 }}>
+                <defs>
+                  <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={c.gold} stopOpacity={0.4} />
+                    <stop offset="100%" stopColor={c.gold} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid stroke={c.border} strokeDasharray="2 4" vertical={false} />
+                <XAxis dataKey="age" stroke={c.muted} style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10 }} />
+                <YAxis stroke={c.muted} style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10 }} tickFormatter={(v) => `${(v / 1000).toFixed(0)}K`} />
+                <Tooltip contentStyle={{ background: c.panel2, border: `1px solid ${c.gold}`, fontFamily: "JetBrains Mono, monospace", fontSize: 11 }} labelStyle={{ color: c.gold }} formatter={(v) => `RM${v.toLocaleString()}`} labelFormatter={(v) => `Age ${v}`} />
+                <ReferenceLine y={TARGET} stroke={c.rust} strokeDasharray="4 4" label={{ value: "TARGET", fill: c.rust, fontSize: 10, fontFamily: "JetBrains Mono, monospace", position: "insideTopRight" }} />
+                <Area type="monotone" dataKey="value" stroke={c.gold} strokeWidth={2} fill="url(#goldGrad)" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="panel" style={{ gridColumn: "span 4" }}>
+          <div className="panel-tag">
+            ◆ MONTHLY DEPLOYMENT
+            {previewPhase && <span style={{ color: c.rust, marginLeft: 6 }}>· PREVIEW</span>}
+          </div>
+          <h2 className="panel-title" style={{ fontStyle: "italic" }}>
+            Phase {phase === 1 ? "I" : phase === 2 ? "II" : "III"} · 
+            {phaseMonthly > 0 ? `RM${phaseMonthly.toLocaleString()}/mo` : "No contribution"}
+          </h2>
+          <div className="display-serif" style={{ display: "flex", flexDirection: "column", gap: 5, color: "white" }}>
+            {monthlyPlans[phase].map((item, i) => (
+              <div key={i} style={{
+                display: "grid", gridTemplateColumns: "70px 1fr auto", gap: 10, alignItems: "center",
+                padding: "7px 10px", background: c.panel2, borderLeft: `2px solid ${phaseColors[phase]}`,
+              }}>
+                <div className="mono gold" style={{ fontSize: 11, fontWeight: 600 }}>{item.ticker}</div>
+                <div style={{ fontSize: 12 }}>{item.name}</div>
+                <div className="mono gold" style={{ fontSize: 13, fontWeight: 500 }}>RM{item.amount.toLocaleString()}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="panel" style={{ gridColumn: "span 3" }}>
+          <div className="panel-tag">◆ EVOLUTION</div>
+          <h2 className="panel-title" style={{ fontStyle: "italic" }}>Allocation Path</h2>
+          <div style={{ flex: 1, minHeight: 0 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={targetAllocation} stackOffset="expand" margin={{ top: 5, right: 5, bottom: 5, left: -25 }}>
+                <CartesianGrid stroke={c.border} strokeDasharray="2 4" vertical={false} />
+                <XAxis dataKey="phase" stroke={c.muted} style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10 }} />
+                <YAxis stroke={c.muted} style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10 }} tickFormatter={(v) => `${(v * 100).toFixed(0)}%`} />
+                <Tooltip contentStyle={{ background: c.panel2, border: `1px solid ${c.gold}`, fontFamily: "JetBrains Mono, monospace", fontSize: 11 }} labelStyle={{ color: c.gold }} />
+                <Bar dataKey="growth" stackId="a" fill={c.gold} />
+                <Bar dataKey="dividend" stackId="a" fill={c.teal} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          <div style={{ display: "flex", justifyContent: "center", gap: 20, fontSize: 10, fontFamily: "JetBrains Mono, monospace", color: c.muted }}>
+            <div><span style={{ color: c.gold }}>■</span> GROWTH</div>
+            <div><span style={{ color: c.teal }}>■</span> DIVIDEND</div>
+          </div>
+        </div>
+      </div>
+      )}
+
+      {/* ── BOTTOM PANEL ──────────────────────────────────────────────────────── */}
+      <div className="panel" style={{ height: 300, padding: 0 }}>
+        <div style={{ display: "flex", borderBottom: `1px solid ${c.border}` }}>
+          {[
+            { id: "holdings", label: "HOLDINGS / MILESTONE" },
+            { id: "plan", label: "YEARLY PLAN / FIRE PROGRESS" },
+            { id: "networth", label: "NET WORTH" },
+          ].map(t => (
+            <div key={t.id} className="phase-tab" onClick={() => setActiveTab(t.id)} style={{
+              padding: "10px 24px", fontSize: 10, letterSpacing: 1.5,
+              fontFamily: "JetBrains Mono, monospace", fontWeight: 500,
+              color: activeTab === t.id ? c.gold : c.muted,
+              borderBottom: `2px solid ${activeTab === t.id ? c.gold : "transparent"}`,
+              background: activeTab === t.id ? c.panel2 : "transparent",
+            }}>{t.label}</div>
+          ))}
+          <div style={{ marginLeft: "auto", padding: "10px 16px", fontSize: 10, fontFamily: "JetBrains Mono, monospace", color: c.muted }}>
+            {activeTab === "holdings" && `live from Supabase · USD/MYR ${fxRate ? fxRate.toFixed(4) : '—'} · click milestone to mark complete`}
+            {activeTab === "plan" && "year-by-year targets · click any value to strike through"}
+            {activeTab === "networth" && "assets vs liabilities · live from Supabase"}
+          </div>
+        </div>
+
+        <div style={{ flex: 1, padding: "8px 12px", overflow: "hidden", display: "flex", flexDirection: "column", minHeight: 0 }}>
+
+          {activeTab === "holdings" && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0, flex: 1, minHeight: 0 }}>
+              {/* Left half: two holdings tables side by side */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0, paddingRight: 12, borderRight: `1px solid ${c.border}` }}>
+                <div style={{ paddingRight: 16, borderRight: `1px solid ${c.border}` }}>
+                  <HoldingsTable title="DIVIDEND ACCOUNT" rows={dividendRows} totalRM={dividendTotal} color={c.teal} fxRate={fxRate} />
+                </div>
+                <div style={{ paddingLeft: 16 }}>
+                  <HoldingsTable title="GROWTH ACCOUNT" rows={growthRows} totalRM={growthTotal} color={c.gold} fxRate={fxRate} />
+                </div>
+              </div>
+              {/* Right half: milestones */}
+              <div style={{ display: "flex", flexDirection: "column", minHeight: 0, paddingLeft: 12 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", paddingBottom: 5, borderBottom: `1px solid ${c.border}`, marginBottom: 5 }}>
+                  <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: c.gold, fontWeight: 600 }}>MILESTONES</div>
+                </div>
+                <div className="scroll-y" style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                  {milestones.map((m) => {
+                    const checked = settings.milestones[m.key];
+                    return (
+                      <div key={m.key} className="display-serif milestone-row" onClick={() => toggleMilestone(m.key)} style={{
+                        display: "flex", alignItems: "center", gap: 10, padding: "7px 10px",
+                        background: checked ? `${c.gold}15` : c.panel2,
+                        borderLeft: `2px solid ${checked ? c.gold : c.border}`,
+                      }}>
+                        <div style={{
+                          width: 15, height: 15, flexShrink: 0,
+                          border: `1.5px solid ${checked ? c.gold : c.muted}`,
+                          background: checked ? c.gold : "transparent",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 10, color: c.bg, fontWeight: 700,
+                        }}>{checked && "✓"}</div>
+                        <div style={{
+                          flex: 1, fontSize: 13,
+                          color: checked ? c.gold : c.text,
+                          textDecoration: checked ? "line-through" : "none",
+                          lineHeight: 1.3,
+                        }}>{m.label}</div>
+                        {m.target && (
+                          <div className="mono muted" style={{ fontSize: 11, flexShrink: 0 }}>RM{(m.target/1000).toFixed(0)}K</div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "plan" && (
+            <div style={{ display: "flex", gap: 0, flex: 1, minHeight: 0 }}>
+
+              {/* LEFT 50%: Yearly Plan */}
+              <div style={{ flex: 1, display: "flex", gap: 14, paddingRight: 16, borderRight: `1px solid ${c.border}`, minHeight: 0, overflow: "hidden" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, width: 220, flexShrink: 0 }}>
+                  <ControlInput label="CURRENT AGE" value={settings.age} onChange={(v) => saveSettings({ ...settings, age: parseInt(v) || 31 })} />
+                  <div style={{ background: c.panel2, padding: "8px 12px", borderLeft: `2px solid ${c.gold}`, fontSize: 11, color: c.muted, lineHeight: 1.7, fontStyle: "italic", whiteSpace: "nowrap" }}>
+                    Phase I: RM6K/mo · 100% Growth<br />
+                    Phase II: RM4K/mo · 50/50<br />
+                    Phase III: Rotate → 100% Dividend<br />
+                    Returns: Growth 8%, Div 6%
+                  </div>
+                </div>
+                <div className="scroll-y" style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "32px 28px 1fr 1fr 1fr 52px", gap: 0, fontSize: 9, letterSpacing: 1, color: c.muted, fontFamily: "JetBrains Mono, monospace", padding: "3px 2px", fontWeight: 600, borderBottom: `1px solid ${c.border}`, position: "sticky", top: 0, background: c.panel }}>
+                    <div style={{ paddingRight: 10 }}>AGE</div><div style={{ paddingRight: 10 }}>PH</div>
+                    <div style={{ textAlign: "right", paddingRight: 20 }}>TOTAL</div>
+                    <div style={{ textAlign: "right", paddingRight: 20 }}>GROWTH</div>
+                    <div style={{ textAlign: "right", paddingRight: 20 }}>DIVIDEND</div>
+                    <div style={{ textAlign: "right" }}>SPLIT</div>
+                  </div>
+                  {yearlyPlan.map((row, i) => {
+                    const pColor = phaseColors[row.phase];
+                    const isCurrent = row.age === settings.age;
+                    const totalKey = `total-${row.age}`;
+                    const growthKey = `growth-${row.age}`;
+                    const divKey = `dividend-${row.age}`;
+                    return (
+                      <div key={i} style={{
+                        display: "grid", gridTemplateColumns: "32px 28px 1fr 1fr 1fr 52px", gap: 0,
+                        padding: "4px 2px", borderBottom: `1px solid ${c.border}40`, alignItems: "center",
+                        background: isCurrent ? `${c.gold}10` : "transparent",
+                        borderLeft: isCurrent ? `2px solid ${c.gold}` : "2px solid transparent",
+                      }}>
+                        <div className="mono" style={{ fontSize: 12, color: isCurrent ? c.gold : c.text, paddingRight: 10 }}>{row.age}{isCurrent ? "●" : ""}</div>
+                        <div className="mono" style={{ fontSize: 10, color: pColor, paddingRight: 10 }}>{row.phase === 1 ? "I" : row.phase === 2 ? "II" : "III"}</div>
+                        <div className="mono" onClick={() => toggleTarget(totalKey)} style={{ ...targetCellStyle(checkedTargets[totalKey], c.gold), paddingRight: 20 }}>RM{(row.total/1000).toFixed(0)}K</div>
+                        <div className="mono" onClick={() => toggleTarget(growthKey)} style={{ ...targetCellStyle(checkedTargets[growthKey], c.gold), paddingRight: 20 }}>RM{(row.growthValue/1000).toFixed(0)}K</div>
+                        <div className="mono" onClick={() => toggleTarget(divKey)} style={{ ...targetCellStyle(checkedTargets[divKey], c.teal), paddingRight: 20 }}>RM{(row.dividendValue/1000).toFixed(0)}K</div>
+                        <div className="mono muted" style={{ textAlign: "right", fontSize: 10 }}>{row.growthPct}/{row.dividendPct}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* RIGHT 50%: 3 columns — Portfolio | Income | Commitment */}
+              <div style={{ flex: 1, paddingLeft: 16, display: "flex", gap: 0, minHeight: 0, overflow: "hidden" }}>
+
+                {/* Col 1: Portfolio stats */}
+                <div style={{ flexShrink: 0, width: 170, paddingRight: 16, borderRight: `1px solid ${c.border}` }}>
+                  <div className="panel-tag" style={{ marginBottom: 10 }}>◆ FIRE PROGRESS</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    {[
+                      { label: "Target Portfolio",  val: `RM${TARGET.toLocaleString()}`,                                               bar: null },
+                      { label: "Current Portfolio", val: `RM${totalValue.toLocaleString("en-US",{maximumFractionDigits:0})}`,          bar: Math.min(progressPct,100) },
+                      { label: "Progress",          val: `${progressPct.toFixed(2)}%`,                                                 bar: null },
+                      { label: "Remaining",         val: `RM${(TARGET-totalValue).toLocaleString("en-US",{maximumFractionDigits:0})}`, bar: null },
+                    ].map((item, i) => (
+                      <div key={i}>
+                        <div className="display-serif muted" style={{ fontSize: 9, letterSpacing: 1, marginBottom: 2 }}>{item.label.toUpperCase()}</div>
+                        <div className="display-serif" style={{ fontSize: 13, color: c.gold, fontWeight: 600 }}>{item.val}</div>
+                        {item.bar !== null && <div style={{ height: 3, background: c.panel2, marginTop: 4 }}><div style={{ width: `${item.bar}%`, height: "100%", background: c.gold }} /></div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Col 2: Income stats */}
+                <div style={{ flexShrink: 0, width: 170, paddingLeft: 16, paddingRight: 16, borderRight: `1px solid ${c.border}` }}>
+                  <div className="panel-tag" style={{ marginBottom: 10 }}>◆ INCOME PROGRESS</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                    {[
+                      { label: "Target Annual Income", val: "RM96,000",                                                                                       bar: null },
+                      { label: "Est Annual Dividends", val: `RM${(dividendTotal*0.06).toLocaleString("en-US",{maximumFractionDigits:0})}`,                     bar: Math.min((dividendTotal*0.06)/96000*100,100) },
+                      { label: "Income Progress",      val: `${((dividendTotal*0.06)/96000*100).toFixed(2)}%`,                                                 bar: null },
+                      { label: "Income Remaining",     val: `RM${Math.max(0,96000-(dividendTotal*0.06)).toLocaleString("en-US",{maximumFractionDigits:0})}`,   bar: null },
+                    ].map((item, i) => (
+                      <div key={i}>
+                        <div className="display-serif muted" style={{ fontSize: 9, letterSpacing: 1, marginBottom: 2 }}>{item.label.toUpperCase()}</div>
+                        <div className="display-serif" style={{ fontSize: 13, color: c.gold, fontWeight: 600 }}>{item.val}</div>
+                        {item.bar !== null && <div style={{ height: 3, background: c.panel2, marginTop: 4 }}><div style={{ width: `${item.bar}%`, height: "100%", background: c.gold }} /></div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Col 3: Retirement Commitment — editable */}
+                <div style={{ flex: 1, paddingLeft: 16, display: "flex", flexDirection: "column", minHeight: 0 }}>
+                  <div className="panel-tag" style={{ marginBottom: 6 }}>◆ RETIREMENT COMMITMENT</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 90px 1fr 44px", gap: 0, fontSize: 9, letterSpacing: 1.2, color: c.muted, fontFamily: "'Fraunces', Georgia, serif", padding: "3px 0", borderBottom: `1px solid ${c.border}`, fontWeight: 600 }}>
+                    <div>CATEGORY</div><div>ANNUAL</div><div>NOTES</div><div></div>
+                  </div>
+                  <div className="scroll-y" style={{ flex: 1 }}>
+                    {fireTargets.map((row) => {
+                      const isEditing = editing?.table === 'fire_targets' && editing?.id === row.id;
+                      if (isEditing) return (
+                        <div key={row.id} style={{ display: "grid", gridTemplateColumns: "1fr 90px 1fr 44px", gap: 4, padding: "3px 0", borderBottom: `1px solid ${c.border}40`, alignItems: "center" }}>
+                          <input className="edit-input" value={editForm.category||''} onChange={e=>setEditForm(f=>({...f,category:e.target.value}))} placeholder="Category" />
+                          <input className="edit-input" type="number" value={editForm.annual_amount||''} onChange={e=>setEditForm(f=>({...f,annual_amount:e.target.value}))} placeholder="Amount" />
+                          <input className="edit-input" value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
+                          <div style={{display:"flex",gap:2}}>
+                            <button className="btn-icon btn-save" onClick={commitEdit} disabled={saving}>✓</button>
+                            <button className="btn-icon btn-cancel" onClick={cancelEdit}>✕</button>
+                          </div>
+                        </div>
+                      );
+                      return (
+                        <div key={row.id} className="milestone-row" style={{ display: "grid", gridTemplateColumns: "1fr 90px 1fr 44px", gap: 0, padding: "4px 0", borderBottom: `1px solid ${c.border}40`, alignItems: "center" }}>
+                          <div className="display-serif" style={{ fontSize: 12, color: c.text }}>{row.category}</div>
+                          <div className="display-serif gold" style={{ fontSize: 12 }}>RM{Number(row.annual_amount||0).toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                          <div className="display-serif muted" style={{ fontSize: 11 }}>{row.notes||"—"}</div>
+                          <div style={{display:"flex",gap:2}}>
+                            <button className="btn-icon btn-edit" onClick={()=>startEdit('fire_targets',row)}>✎</button>
+                            <button className="btn-icon btn-delete" onClick={()=>deleteRow('fire_targets',row.id)}>✕</button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {editing?.table==='fire_targets' && editing?.id==='new' ? (
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 90px 1fr 44px", gap: 4, padding: "3px 0", borderBottom: `1px solid ${c.border}40`, alignItems: "center" }}>
+                        <input className="edit-input" value={editForm.category||''} onChange={e=>setEditForm(f=>({...f,category:e.target.value}))} placeholder="Category" />
+                        <input className="edit-input" type="number" value={editForm.annual_amount||''} onChange={e=>setEditForm(f=>({...f,annual_amount:e.target.value}))} placeholder="Amount" />
+                        <input className="edit-input" value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
+                        <div style={{display:"flex",gap:2}}>
+                          <button className="btn-icon btn-save" onClick={commitEdit} disabled={saving}>✓</button>
+                          <button className="btn-icon btn-cancel" onClick={cancelEdit}>✕</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button className="btn-add" onClick={()=>startAdd('fire_targets',{category:'',annual_amount:'',notes:''})}>+ Add row</button>
+                    )}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 90px 1fr 44px", gap: 0, padding: "4px 0", borderTop: `1px solid ${c.gold}`, alignItems: "center", marginTop: 3 }}>
+                      <div className="display-serif" style={{ fontSize: 12, fontWeight: 600, color: c.gold }}>TOTAL</div>
+                      <div className="display-serif" style={{ fontSize: 12, fontWeight: 600, color: c.green }}>RM{fireTargets.reduce((s,r)=>s+Number(r.annual_amount||0),0).toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                      <div className="display-serif muted" style={{ fontSize: 11 }}>Annual commitment</div>
+                      <div></div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+          )}
+
+          {activeTab === "networth" && (() => {
+            const toRM = (amt, cur) => cur === 'USD' ? (parseFloat(amt)||0) * fxRate : (parseFloat(amt)||0);
+
+            const efTotal = emergencyFund.reduce((s, r) => s + toRM(r.amount, r.currency), 0);
+            const investTotal = investments.reduce((s, r) => s + toRM(r.amount, r.currency), 0);
+            const stocksTotal = totalValue;
+            const totalAssets = efTotal + investTotal + stocksTotal;
+
+            const hirePurchase = liabilities.find(r => /hire.purchase/i.test(r.name) || /asnb/i.test(r.notes||''));
+            const hirePurchaseAmt = hirePurchase ? (parseFloat(hirePurchase.outstanding)||0) : 0;
+            const totalLiabilitiesGross = liabilities.reduce((s, r) => s + (parseFloat(r.outstanding)||0), 0);
+            const totalLiabilities = totalLiabilitiesGross - hirePurchaseAmt;
+            const netWorth = totalAssets - totalLiabilities;
+
+            const assetGroups = [
+              { label: "EMERGENCY FUND", color: c.teal, rows: emergencyFund.map(r => ({ name: r.asset, val: toRM(r.amount, r.currency) })), total: efTotal },
+              { label: "INVESTMENTS", color: c.gold, rows: investments.map(r => ({ name: r.name, val: toRM(r.amount, r.currency), note: r.category })), total: investTotal },
+              { label: "STOCK PORTFOLIO", color: c.gold, rows: [{ name: "Dividend Stocks", val: dividendTotal }, { name: "Growth Stocks", val: growthTotal }], total: stocksTotal },
+            ];
+
+            const sf = { fontFamily: "'Fraunces', Georgia, serif" };
+            const hdr = { ...sf, fontSize: 9, letterSpacing: 1.5, fontWeight: 600 };
+
+            // Editable asset sub-table (ef / investments)
+            const AssetSection = ({ label, color, tableName, rows, total, fields }) => (
+              <div style={{ marginBottom: 6 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 1 }}>
+                  <div style={{ ...hdr, color }}>{label}</div>
+                  <div style={{ ...sf, fontSize: 11, color, fontWeight: 600 }}>RM{total.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                </div>
+                {rows.map((row) => {
+                  const isEd = editing?.table === tableName && editing?.id === row.id;
+                  if (isEd) return (
+                    <div key={row.id} style={{ display: "flex", gap: 4, padding: "2px 0", borderBottom: `1px solid ${c.border}20`, flexWrap: "wrap" }}>
+                      {fields.map(f => (
+                        <input key={f.key} className="edit-input" style={{ width: f.w||80 }} type={f.type||"text"} value={editForm[f.key]||''} onChange={e=>setEditForm(p=>({...p,[f.key]:e.target.value}))} placeholder={f.label} />
+                      ))}
+                      <button className="btn-icon btn-save" onClick={commitEdit} disabled={saving}>✓</button>
+                      <button className="btn-icon btn-cancel" onClick={cancelEdit}>✕</button>
+                    </div>
+                  );
+                  return (
+                    <div key={row.id} className="milestone-row" style={{ display: "grid", gridTemplateColumns: "1fr auto 36px", gap: 8, padding: "1px 4px", borderBottom: `1px solid ${c.border}20`, alignItems: "center" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <div style={{ ...sf, fontSize: 12, color: c.text }}>{row.name||row.asset||row.account}</div>
+                        {row.note && <div style={{ ...sf, fontSize: 9, color: c.muted }}>{row.note}</div>}
+                        {row.category && <div style={{ ...sf, fontSize: 9, color: c.muted }}>{row.category}</div>}
+                      </div>
+                      <div style={{ ...sf, fontSize: 12, color: c.text }}>RM{(row.valRM||0).toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                      <div style={{ display:"flex", gap:2 }}>
+                        <button className="btn-icon btn-edit" onClick={()=>startEdit(tableName, row.raw)}>✎</button>
+                        <button className="btn-icon btn-delete" onClick={()=>deleteRow(tableName, row.raw.id)}>✕</button>
+                      </div>
+                    </div>
+                  );
+                })}
+                {editing?.table===tableName && editing?.id==='new' ? (
+                  <div style={{ display: "flex", gap: 4, padding: "2px 0", flexWrap: "wrap" }}>
+                    {fields.map(f => (
+                      <input key={f.key} className="edit-input" style={{ width: f.w||80 }} type={f.type||"text"} value={editForm[f.key]||''} onChange={e=>setEditForm(p=>({...p,[f.key]:e.target.value}))} placeholder={f.label} />
+                    ))}
+                    <button className="btn-icon btn-save" onClick={commitEdit} disabled={saving}>✓</button>
+                    <button className="btn-icon btn-cancel" onClick={cancelEdit}>✕</button>
+                  </div>
+                ) : (
+                  <button className="btn-add" onClick={()=>startAdd(tableName, fields.reduce((a,f)=>({...a,[f.key]:''}),{}))}>+ Add</button>
+                )}
+              </div>
+            );
+
+            const efRows = emergencyFund.map(r => ({ ...r, name: r.asset, valRM: toRM(r.amount, r.currency), note: null, raw: r }));
+            const invRows = investments.map(r => ({ ...r, valRM: toRM(r.amount, r.currency), raw: r }));
+
+            return (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 0, flex: 1, minHeight: 0 }}>
+
+                {/* COL 1: Assets — editable */}
+                <div style={{ paddingRight: 16, borderRight: `1px solid ${c.border}`, display: "flex", flexDirection: "column", minHeight: 0 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, alignItems: "baseline", paddingBottom: 3, borderBottom: `1px solid ${c.border}`, marginBottom: 4 }}>
+                    <div style={{ ...hdr, color: c.teal }}>◆ TOTAL ASSETS</div>
+                    <div style={{ ...sf, fontSize: 13, color: c.teal, fontWeight: 600 }}>RM{totalAssets.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                  </div>
+                  <div className="scroll-y" style={{ flex: 1 }}>
+                    <AssetSection label="EMERGENCY FUND" color={c.teal} tableName="emergency_fund" total={efTotal}
+                      rows={efRows}
+                      fields={[
+                        {key:'asset', label:'Asset', w:100},
+                        {key:'amount', label:'Amount', w:80, type:'number'},
+                        {key:'currency', label:'MYR/USD', w:60},
+                      ]} />
+                    <AssetSection label="INVESTMENTS" color={c.gold} tableName="investments" total={investTotal}
+                      rows={invRows}
+                      fields={[
+                        {key:'name', label:'Name', w:100},
+                        {key:'amount', label:'Amount', w:80, type:'number'},
+                        {key:'currency', label:'MYR/USD', w:60},
+                        {key:'category', label:'Category', w:80},
+                        {key:'notes', label:'Notes', w:80},
+                      ]} />
+                    {/* Stocks — read only, derived from transactions */}
+                    <div style={{ marginBottom: 4 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 1 }}>
+                        <div style={{ ...hdr, color: c.gold }}>STOCK PORTFOLIO</div>
+                        <div style={{ ...sf, fontSize: 11, color: c.gold, fontWeight: 600 }}>RM{stocksTotal.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                      </div>
+                      {[{name:"Dividend Stocks", val:dividendTotal},{name:"Growth Stocks",val:growthTotal}].map((r,i)=>(
+                        <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, padding: "1px 4px", borderBottom: `1px solid ${c.border}20` }}>
+                          <div style={{ ...sf, fontSize: 12, color: c.text }}>{r.name}</div>
+                          <div style={{ ...sf, fontSize: 12, color: c.text }}>RM{r.val.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                        </div>
+                      ))}
+                      <div style={{ ...sf, fontSize: 9, color: c.muted, fontStyle:"italic", marginTop:2 }}>From transactions — edit via Holdings tab</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* COL 2: Liabilities — editable */}
+                <div style={{ paddingLeft: 16, paddingRight: 16, borderRight: `1px solid ${c.border}`, display: "flex", flexDirection: "column", minHeight: 0 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, alignItems: "baseline", paddingBottom: 3, borderBottom: `1px solid ${c.border}`, marginBottom: 4 }}>
+                    <div style={{ ...hdr, color: c.rust }}>◆ TOTAL LIABILITIES</div>
+                    <div style={{ ...sf, fontSize: 13, color: c.rust, fontWeight: 600 }}>RM{totalLiabilities.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 86px 70px 46px 36px", gap: 6, ...hdr, color: c.muted, padding: "2px 0", borderBottom: `1px solid ${c.border}30`, marginBottom: 2 }}>
+                    <div>NAME</div><div style={{textAlign:"right"}}>OUTSTANDING</div><div style={{textAlign:"right"}}>SAVED UP</div><div style={{textAlign:"right"}}>PCT</div><div></div>
+                  </div>
+                  <div className="scroll-y" style={{ flex: 1 }}>
+                    {liabilities.map((row) => {
+                      const outstanding = parseFloat(row.outstanding)||0;
+                      const savedUp = parseFloat(row.saved_up)||0;
+                      const pct = parseFloat(row.progress_pct)||(outstanding>0?(savedUp/outstanding)*100:0);
+                      const isCovered = row === hirePurchase;
+                      const isEd = editing?.table==='liabilities' && editing?.id===row.id;
+                      if (isEd) return (
+                        <div key={row.id} style={{ display: "flex", gap: 4, padding: "3px 0", borderBottom: `1px solid ${c.border}20`, flexWrap: "wrap" }}>
+                          <input className="edit-input" style={{width:90}} value={editForm.name||''} onChange={e=>setEditForm(f=>({...f,name:e.target.value}))} placeholder="Name" />
+                          <input className="edit-input" style={{width:80}} type="number" value={editForm.outstanding||''} onChange={e=>setEditForm(f=>({...f,outstanding:e.target.value}))} placeholder="Outstanding" />
+                          <input className="edit-input" style={{width:80}} type="number" value={editForm.saved_up||''} onChange={e=>setEditForm(f=>({...f,saved_up:e.target.value}))} placeholder="Saved up" />
+                          <input className="edit-input" style={{width:60}} type="number" value={editForm.progress_pct||''} onChange={e=>setEditForm(f=>({...f,progress_pct:e.target.value}))} placeholder="Pct%" />
+                          <input className="edit-input" style={{width:100}} value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
+                          <button className="btn-icon btn-save" onClick={commitEdit} disabled={saving}>✓</button>
+                          <button className="btn-icon btn-cancel" onClick={cancelEdit}>✕</button>
+                        </div>
+                      );
+                      return (
+                        <div key={row.id} className="milestone-row" style={{ display: "grid", gridTemplateColumns: "1fr 86px 70px 46px 36px", gap: 6, padding: "3px 0", borderBottom: `1px solid ${c.border}20`, alignItems: "start" }}>
+                          <div>
+                            <div style={{ ...sf, fontSize: 12, color: c.text }}>
+                              {row.name}{isCovered && <span style={{ ...sf, fontSize: 9, color: c.teal, marginLeft: 6 }}>ASNB</span>}
+                            </div>
+                            {row.notes && <div style={{ ...sf, fontSize: 9, color: c.muted, fontStyle: "italic" }}>{row.notes}</div>}
+                          </div>
+                          <div style={{ ...sf, textAlign: "right", fontSize: 12, color: isCovered ? c.muted : c.rust, textDecoration: isCovered ? "line-through" : "none" }}>RM{outstanding.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                          <div style={{ ...sf, textAlign: "right", fontSize: 12, color: c.green }}>RM{savedUp.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                          <div style={{ ...sf, textAlign: "right", fontSize: 12, color: pct>=100?c.green:c.gold }}>{pct.toFixed(1)}%</div>
+                          <div style={{ display:"flex", gap:2 }}>
+                            <button className="btn-icon btn-edit" onClick={()=>startEdit('liabilities',row)}>✎</button>
+                            <button className="btn-icon btn-delete" onClick={()=>deleteRow('liabilities',row.id)}>✕</button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {editing?.table==='liabilities' && editing?.id==='new' ? (
+                      <div style={{ display: "flex", gap: 4, padding: "3px 0", flexWrap: "wrap" }}>
+                        <input className="edit-input" style={{width:90}} value={editForm.name||''} onChange={e=>setEditForm(f=>({...f,name:e.target.value}))} placeholder="Name" />
+                        <input className="edit-input" style={{width:80}} type="number" value={editForm.outstanding||''} onChange={e=>setEditForm(f=>({...f,outstanding:e.target.value}))} placeholder="Outstanding" />
+                        <input className="edit-input" style={{width:80}} type="number" value={editForm.saved_up||''} onChange={e=>setEditForm(f=>({...f,saved_up:e.target.value}))} placeholder="Saved up" />
+                        <input className="edit-input" style={{width:60}} type="number" value={editForm.progress_pct||''} onChange={e=>setEditForm(f=>({...f,progress_pct:e.target.value}))} placeholder="Pct%" />
+                        <input className="edit-input" style={{width:100}} value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
+                        <button className="btn-icon btn-save" onClick={commitEdit} disabled={saving}>✓</button>
+                        <button className="btn-icon btn-cancel" onClick={cancelEdit}>✕</button>
+                      </div>
+                    ) : (
+                      <button className="btn-add" onClick={()=>startAdd('liabilities',{name:'',outstanding:'',saved_up:'',progress_pct:'',notes:''})}>+ Add liability</button>
+                    )}
+                  </div>
+                </div>
+
+                {/* COL 3: Net Worth */}
+                <div style={{ paddingLeft: 16, display: "flex", flexDirection: "column", gap: 10, justifyContent: "center" }}>
+                  <div style={{ ...hdr, color: c.gold }}>◆ NET WORTH</div>
+                  {[
+                    { label: "TOTAL ASSETS", val: totalAssets, color: c.teal },
+                    { label: "TOTAL LIABILITIES (NET)", val: totalLiabilities, color: c.rust },
+                  ].map((item, i) => (
+                    <div key={i}>
+                      <div style={{ ...sf, fontSize: 9, color: c.muted, letterSpacing: 1, marginBottom: 1 }}>{item.label}</div>
+                      <div style={{ ...sf, fontSize: 14, color: item.color, fontWeight: 600 }}>RM{item.val.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                    </div>
+                  ))}
+                  <div style={{ borderTop: `1px solid ${c.gold}`, paddingTop: 6 }}>
+                    <div style={{ ...sf, fontSize: 9, color: c.muted, letterSpacing: 1, marginBottom: 2 }}>NET WORTH</div>
+                    <div style={{ ...sf, fontSize: 22, color: netWorth>=0?c.green:c.rust, fontWeight: 700, fontStyle: "italic" }}>
+                      {netWorth<0?"-":""}RM{Math.abs(netWorth).toLocaleString("en-US",{maximumFractionDigits:0})}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ height: 6, background: c.panel2, display: "flex", marginBottom: 3 }}>
+                      <div style={{ width: `${Math.min((totalAssets/Math.max(totalAssets+totalLiabilities,1))*100,100)}%`, height:"100%", background: c.teal }} />
+                      <div style={{ flex:1, height:"100%", background: c.rust }} />
+                    </div>
+                    <div style={{ display:"flex", justifyContent:"space-between" }}>
+                      <div style={{ ...sf, fontSize: 9, color: c.teal }}>Assets {((totalAssets/Math.max(totalAssets+totalLiabilities,1))*100).toFixed(1)}%</div>
+                      <div style={{ ...sf, fontSize: 9, color: c.rust }}>Liab {((totalLiabilities/Math.max(totalAssets+totalLiabilities,1))*100).toFixed(1)}%</div>
+                    </div>
+                  </div>
+                  <div style={{ ...sf, fontSize: 10, color: c.muted, fontStyle: "italic", lineHeight: 1.5, borderTop: `1px solid ${c.border}`, paddingTop: 6 }}>
+                    {netWorth>=0 ? `Assets exceed liabilities by RM${netWorth.toLocaleString("en-US",{maximumFractionDigits:0})}.` : `Liabilities exceed assets by RM${Math.abs(netWorth).toLocaleString("en-US",{maximumFractionDigits:0})}. Keep building.`}
+                  </div>
+                </div>
+
+              </div>
+            );
+          })()}
+        </div>
+      </div>
+
+      <footer style={{ display: "flex", justifyContent: "space-between", padding: "1px 8px", fontSize: 9, fontFamily: "JetBrains Mono, monospace", color: c.muted, borderTop: `1px solid ${c.border}`, fontWeight: 500 }}>
+        <div>{transactions.length} TXNS · {dividends.length} DIV PAYMENTS · {active.length} POSITIONS</div>
+        <div className="display-serif" style={{ fontStyle: "italic", fontFamily: "Fraunces, serif", fontSize: 12, fontWeight: 400 }}>
+          "Compound interest is the eighth wonder of the world."
+        </div>
+        <div>NOT FINANCIAL ADVICE</div>
+      </footer>
+    </div>
+  );
+}
+
+function Stat({ label, value }) {
+  return (
+    <div>
+      <div className="mono muted" style={{ fontSize: 9, letterSpacing: 1.5, marginBottom: 2, fontWeight: 500 }}>{label}</div>
+      <div style={{ fontSize: 17, fontWeight: 500, color: c.text }}>{value}</div>
+    </div>
+  );
+}
+
+function HoldingsTable({ title, rows, totalRM, color, fxRate }) {
+  const cols = "1fr 1fr 1fr 1fr";
+  const rowStyle = { display: "grid", gridTemplateColumns: cols, gap: 8 };
+  return (
+    <div style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
+      <div style={{ ...rowStyle, alignItems: "baseline", paddingBottom: 5, borderBottom: `1px solid ${c.border}`, marginBottom: 5 }}>
+        <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color, fontWeight: 600, gridColumn: "1 / 4" }}>{title}</div>
+        <div className="mono gold" style={{ fontSize: 13, fontWeight: 600, textAlign: "right" }}>RM{totalRM.toLocaleString("en-US", { maximumFractionDigits: 0 })}</div>
+      </div>
+      <div style={{ ...rowStyle, fontSize: 10, letterSpacing: 1.2, color: c.muted, fontFamily: "JetBrains Mono, monospace", padding: "3px 0 5px", fontWeight: 500 }}>
+        <div>TICKER</div>
+        <div style={{ textAlign: "right" }}>SHARES</div>
+        <div style={{ textAlign: "right" }}>LIVE</div>
+        <div style={{ textAlign: "right" }}>VAL (RM)</div>
+      </div>
+      <div className="scroll-y" style={{ minHeight: 0 }}>
+        {rows.length === 0 && (
+          <div className="muted" style={{ fontSize: 13, padding: "12px 0", textAlign: "center", fontStyle: "italic" }}>No positions</div>
+        )}
+        {rows.map((h, i) => {
+          const cur = h.market === 'MY' ? 'RM' : '$';
+          return (
+            <div key={i} style={{ ...rowStyle, padding: "6px 0", borderBottom: `1px solid ${c.border}40`, alignItems: "center" }}>
+              <div style={{ fontSize: 14, fontStyle: "italic", color: c.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{h.ticker}</div>
+              <div className="mono muted" style={{ textAlign: "right", fontSize: 12 }}>
+                {h.market === 'MY' ? h.units.toLocaleString('en', { maximumFractionDigits: 0 }) : h.units.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              <div className="mono" style={{ textAlign: "right", fontSize: 12, color: h.livePrice ? c.text : c.muted }}>
+                {h.livePrice ? `${cur}${h.livePrice.toFixed(2)}` : '—'}
+              </div>
+              <div className="mono gold" style={{ textAlign: "right", fontSize: 13, fontWeight: 600 }}>
+                RM{h.curValRM.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ControlInput({ label, value, onChange, type = "number" }) {
+  return (
+    <div>
+      <div className="mono muted" style={{ fontSize: 9, letterSpacing: 1.5, marginBottom: 4, fontWeight: 500 }}>{label}</div>
+      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} style={{
+        width: "100%", background: c.panel2, border: `1px solid ${c.border}`,
+        color: c.gold, padding: "8px 12px", fontFamily: "JetBrains Mono, monospace", fontSize: 14, fontWeight: 500,
+      }} />
+    </div>
+  );
+}
+
+try {
+  if (typeof Recharts === 'undefined') {
+    document.getElementById('root').innerHTML = '<div style="padding:40px;color:#c97b5e;font-family:Inter,sans-serif;">Recharts library failed to load.</div>';
+  } else if (typeof supabase === 'undefined') {
+    document.getElementById('root').innerHTML = '<div style="padding:40px;color:#c97b5e;font-family:Inter,sans-serif;">Supabase library failed to load.</div>';
+  } else {
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  }
+} catch (err) {
+  document.getElementById('root').innerHTML = '<div style="padding:40px;color:#c97b5e;font-family:Inter,sans-serif;white-space:pre-wrap;">ERROR: ' + err.message + '\n\n' + err.stack + '</div>';
+}
+</script>
+</body>
+</html>
