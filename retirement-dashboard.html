@@ -23,15 +23,28 @@
   }
   input, textarea, button, select { font-family: inherit; }
   input:focus, textarea:focus { outline: none; }
+
+  /* ── Panels ── */
   .panel {
-    background: #0f1d2c;
+    background: linear-gradient(145deg, #0f1d2c 0%, #0c1925 100%);
     border: 1px solid #1f3548;
     padding: 12px 16px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     min-height: 0;
+    position: relative;
+    transition: border-color 0.3s;
   }
+  .panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(212,165,116,0.03) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .panel:hover { border-color: #2a4a60; }
+
   .panel-tag {
     font-size: 9px;
     letter-spacing: 1.5px;
@@ -50,49 +63,174 @@
     letter-spacing: -0.3px;
   }
   .display-serif { font-family: 'Fraunces', Georgia, serif; }
-  .milestone-row { transition: all 0.15s; cursor: pointer; }
-  .milestone-row:hover { background: rgba(212, 165, 116, 0.1) !important; }
+
+  /* ── Rows & Tabs ── */
+  .milestone-row {
+    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
+    cursor: pointer;
+  }
+  .milestone-row:hover {
+    background: rgba(212,165,116,0.08) !important;
+    transform: translateX(2px);
+    box-shadow: inset 2px 0 0 #d4a574;
+  }
   .phase-tab { transition: all 0.2s; cursor: pointer; }
-  .phase-tab:hover { background: rgba(212, 165, 116, 0.12) !important; }
-  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  .phase-tab:hover { background: rgba(212,165,116,0.12) !important; }
+
+  /* ── Scrollbars ── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #1f3548; border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: #d4a574; }
   .scroll-y { overflow-y: auto; min-height: 0; flex: 1; }
+
+  /* ── Type ── */
   .mono { font-family: 'JetBrains Mono', monospace; }
   .gold { color: #d4a574; }
   .muted { color: #8a9bab; }
   .pos { color: #7ba87b; }
   .neg { color: #c97b7b; }
+
+  /* ── Animated number counter ── */
+  @keyframes countUp {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .count-anim { animation: countUp 0.5s ease forwards; }
+
+  /* ── Edit inputs ── */
   .edit-input {
-    background: #0a1520;
+    background: rgba(10,21,32,0.9);
     border: 1px solid #d4a574;
+    border-radius: 2px;
     color: #e8dcc4;
-    padding: 2px 6px;
+    padding: 3px 7px;
     font-family: 'Fraunces', Georgia, serif;
     font-size: 11px;
-    width: 100%;
+    transition: box-shadow 0.2s, border-color 0.2s;
   }
+  .edit-input:focus {
+    border-color: #e8c890;
+    box-shadow: 0 0 0 2px rgba(212,165,116,0.2);
+  }
+
+  /* ── Buttons ── */
   .btn-icon {
     background: transparent;
     border: none;
     cursor: pointer;
     font-size: 11px;
-    padding: 1px 4px;
+    padding: 2px 5px;
     line-height: 1;
+    border-radius: 2px;
+    transition: all 0.15s;
+    opacity: 0;
   }
-  .btn-save { color: #7ba87b; border: 1px solid #7ba87b; }
-  .btn-cancel { color: #8a9bab; border: 1px solid #8a9bab; }
-  .btn-edit { color: #d4a574; }
-  .btn-delete { color: #c97b5e; }
+  .milestone-row:hover .btn-icon,
+  .edit-row .btn-icon { opacity: 1; }
+  .btn-save { color: #7ba87b; border: 1px solid #7ba87b36; }
+  .btn-save:hover { background: rgba(123,168,123,0.15); border-color: #7ba87b; }
+  .btn-cancel { color: #8a9bab; border: 1px solid #8a9bab36; }
+  .btn-cancel:hover { background: rgba(138,155,171,0.15); }
+  .btn-edit { color: #d4a574; border: 1px solid transparent; }
+  .btn-edit:hover { background: rgba(212,165,116,0.15); border-color: #d4a57436; }
+  .btn-delete { color: #c97b5e; border: 1px solid transparent; }
+  .btn-delete:hover { background: rgba(201,123,94,0.15); border-color: #c97b5e36; }
   .btn-add {
-    background: transparent; border: 1px dashed #1f3548;
-    color: #8a9bab; cursor: pointer; font-size: 10px;
+    background: transparent;
+    border: 1px dashed #1f3548;
+    color: #8a9bab;
+    cursor: pointer;
+    font-size: 10px;
     font-family: 'Fraunces', Georgia, serif;
-    padding: 3px 10px; margin-top: 4px; width: 100%;
+    padding: 4px 10px;
+    margin-top: 5px;
+    width: 100%;
     letter-spacing: 0.5px;
+    border-radius: 2px;
+    transition: all 0.2s;
   }
-  .btn-add:hover { border-color: #d4a574; color: #d4a574; }
+  .btn-add:hover { border-color: #d4a574; color: #d4a574; background: rgba(212,165,116,0.05); }
+
+  /* ── Edit row slide-in ── */
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .edit-row { animation: slideIn 0.18s ease forwards; }
+
+  /* ── Save flash ── */
+  @keyframes saveFlash {
+    0%   { background: rgba(123,168,123,0.25); }
+    100% { background: transparent; }
+  }
+  .save-flash { animation: saveFlash 0.8s ease forwards; }
+
+  /* ── Gold shimmer on large numbers ── */
+  @keyframes shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  .gold-shimmer {
+    background: linear-gradient(90deg, #d4a574 0%, #f0c98a 40%, #d4a574 60%, #b89968 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+  }
+
+  /* ── Tab underline animate ── */
+  .tab-active-line {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: #d4a574;
+    transform-origin: left;
+    animation: tabLine 0.25s ease forwards;
+  }
+  @keyframes tabLine {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+
+  /* ── Progress bar fill ── */
+  .bar-fill {
+    height: 100%;
+    transition: width 1s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* ── Glow on hover for stat boxes ── */
+  .stat-box {
+    transition: all 0.2s;
+    padding: 4px 6px;
+    border-radius: 3px;
+  }
+  .stat-box:hover {
+    background: rgba(212,165,116,0.06);
+    box-shadow: inset 0 0 0 1px rgba(212,165,116,0.15);
+  }
+
+  /* ── Pulse dot ── */
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.8); }
+  }
+  .pulse { animation: pulse 2s ease-in-out infinite; display: inline-block; }
+
+  /* ── Fade in for tab content ── */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .tab-content { animation: fadeInUp 0.22s ease forwards; }
+
+  /* ── Net worth negative shake ── */
+  @keyframes softPulseRed {
+    0%, 100% { text-shadow: 0 0 0 transparent; }
+    50%       { text-shadow: 0 0 12px rgba(201,123,94,0.4); }
+  }
+  .neg-glow { animation: softPulseRed 3s ease-in-out infinite; }
 
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   .spinner { animation: spin 1s linear infinite; display: inline-block; }
@@ -110,7 +248,34 @@ const {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
 } = Recharts;
-const { useState, useEffect, useCallback } = React;
+const { useState, useEffect, useCallback, useRef, useMemo } = React;
+
+// ── Animated counter ──────────────────────────────────────────────────────────
+function AnimatedNumber({ value, prefix = "", suffix = "", decimals = 0, style = {}, className = "" }) {
+  const [display, setDisplay] = useState(value);
+  const prev = useRef(value);
+  const raf = useRef(null);
+  useEffect(() => {
+    const start = prev.current;
+    const end = value;
+    if (start === end) return;
+    const duration = 700;
+    const startTime = performance.now();
+    const tick = (now) => {
+      const t = Math.min((now - startTime) / duration, 1);
+      const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+      setDisplay(start + (end - start) * ease);
+      if (t < 1) raf.current = requestAnimationFrame(tick);
+      else { setDisplay(end); prev.current = end; }
+    };
+    raf.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf.current);
+  }, [value]);
+  const formatted = decimals > 0
+    ? display.toLocaleString("en-US", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+    : Math.round(display).toLocaleString("en-US");
+  return <span className={className} style={style}>{prefix}{formatted}{suffix}</span>;
+}
 
 const SUPABASE_URL = 'https://gslybwjzsfprkjgximqe.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzbHlid2p6c2ZwcmtqZ3hpbXFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNTI4MDYsImV4cCI6MjA5MjkyODgwNn0.nFwMWPWQPQGBGv4OPa358UOUeU2pGzAS6U7xMBh8y9w';
@@ -466,7 +631,7 @@ function App() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           {error && <span style={{ color: c.rust, fontSize: 10 }}>⚠ {error}</span>}
-          <span className="mono muted" style={{ fontSize: 9, letterSpacing: 1 }}>SYNCED</span>
+          <span className="mono muted" style={{ fontSize: 9, letterSpacing: 1 }}><span className="pulse" style={{ color: c.green }}>●</span> LIVE</span>
           <span className="gold mono" style={{ fontSize: 10 }}>{lastUpdatedStr}</span>
           <button onClick={fetchData} disabled={refreshing} style={{
             background: refreshing ? c.panel2 : "transparent",
@@ -498,18 +663,17 @@ function App() {
             <div className="panel-tag">CURRENT PORTFOLIO VALUE</div>
             <div className="mono muted" style={{ fontSize: 10 }}>{progressPct.toFixed(2)}% TO TARGET</div>
           </div>
-          <div className="gold display-serif" style={{ fontSize: 44, fontWeight: 400, letterSpacing: -1.5, lineHeight: 1.1, marginTop: 4 }}>
-            RM{totalValue.toLocaleString("en-US", { maximumFractionDigits: 0 })}
+          <div className="gold-shimmer display-serif" style={{ fontSize: 44, fontWeight: 400, letterSpacing: -1.5, lineHeight: 1.1, marginTop: 4 }}>
+            RM<AnimatedNumber value={totalValue} />
           </div>
           <div className="panel-tag" style={{ color: "white" }}>
             of RM{TARGET.toLocaleString()} — RM{(TARGET - totalValue).toLocaleString("en-US", { maximumFractionDigits: 0 })} remaining
           </div>
           <div style={{ position: "relative", height: 6, background: c.panel2, marginBottom: 12 }}>
-            <div style={{
-              position: "absolute", left: 0, top: 0, height: "100%",
+            <div className="bar-fill" style={{
+              position: "absolute", left: 0, top: 0,
               width: `${Math.min(progressPct, 100)}%`,
               background: `linear-gradient(90deg, ${c.goldDim}, ${c.gold})`,
-              transition: "width 0.6s ease",
             }} />
             {[25, 50, 75].map(pct => (
               <div key={pct} style={{ position: "absolute", left: `${pct}%`, top: -2, bottom: -2, width: 1, background: c.border }} />
@@ -675,7 +839,7 @@ function App() {
           </div>
         </div>
 
-        <div style={{ flex: 1, padding: "8px 12px", overflow: "hidden", display: "flex", flexDirection: "column", minHeight: 0 }}>
+        <div key={activeTab} className="tab-content" style={{ flex: 1, padding: "8px 12px", overflow: "hidden", display: "flex", flexDirection: "column", minHeight: 0 }}>
 
           {activeTab === "holdings" && (
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 0, flex: 1, minHeight: 0 }}>
@@ -824,13 +988,13 @@ function App() {
                     {fireTargets.map((row) => {
                       const isEditing = editing?.table === 'fire_targets' && editing?.id === row.id;
                       if (isEditing) return (
-                        <div key={row.id} style={{ display: "grid", gridTemplateColumns: "1fr 90px 1fr 44px", gap: 4, padding: "3px 0", borderBottom: `1px solid ${c.border}40`, alignItems: "center" }}>
+                        <div key={row.id} className="edit-row" style={{ display: "grid", gridTemplateColumns: "1fr 90px 1fr 44px", gap: 4, padding: "3px 0", borderBottom: `1px solid ${c.border}40`, alignItems: "center" }}>
                           <input className="edit-input" value={editForm.category||''} onChange={e=>setEditForm(f=>({...f,category:e.target.value}))} placeholder="Category" />
                           <input className="edit-input" type="number" value={editForm.annual_amount||''} onChange={e=>setEditForm(f=>({...f,annual_amount:e.target.value}))} placeholder="Amount" />
                           <input className="edit-input" value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
                           <div style={{display:"flex",gap:2}}>
-                            <button className="btn-icon btn-save" onClick={commitEdit} disabled={saving}>✓</button>
-                            <button className="btn-icon btn-cancel" onClick={cancelEdit}>✕</button>
+                            <button className="btn-icon btn-save" style={{opacity:1}} onClick={commitEdit} disabled={saving}>✓</button>
+                            <button className="btn-icon btn-cancel" style={{opacity:1}} onClick={cancelEdit}>✕</button>
                           </div>
                         </div>
                       );
@@ -847,13 +1011,13 @@ function App() {
                       );
                     })}
                     {editing?.table==='fire_targets' && editing?.id==='new' ? (
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 90px 1fr 44px", gap: 4, padding: "3px 0", borderBottom: `1px solid ${c.border}40`, alignItems: "center" }}>
+                      <div className="edit-row" style={{ display: "grid", gridTemplateColumns: "1fr 90px 1fr 44px", gap: 4, padding: "3px 0", borderBottom: `1px solid ${c.border}40`, alignItems: "center" }}>
                         <input className="edit-input" value={editForm.category||''} onChange={e=>setEditForm(f=>({...f,category:e.target.value}))} placeholder="Category" />
                         <input className="edit-input" type="number" value={editForm.annual_amount||''} onChange={e=>setEditForm(f=>({...f,annual_amount:e.target.value}))} placeholder="Amount" />
                         <input className="edit-input" value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
                         <div style={{display:"flex",gap:2}}>
-                          <button className="btn-icon btn-save" onClick={commitEdit} disabled={saving}>✓</button>
-                          <button className="btn-icon btn-cancel" onClick={cancelEdit}>✕</button>
+                          <button className="btn-icon btn-save" style={{opacity:1}} onClick={commitEdit} disabled={saving}>✓</button>
+                          <button className="btn-icon btn-cancel" style={{opacity:1}} onClick={cancelEdit}>✕</button>
                         </div>
                       </div>
                     ) : (
@@ -899,30 +1063,31 @@ function App() {
             // Editable asset sub-table (ef / investments)
             const AssetSection = ({ label, color, tableName, rows, total, fields }) => (
               <div style={{ marginBottom: 6 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 1 }}>
+                {/* header uses same grid as rows so total aligns with amount col */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 76px 30px", alignItems: "baseline", marginBottom: 1 }}>
                   <div style={{ ...hdr, color }}>{label}</div>
                   <div style={{ ...sf, fontSize: 11, color, fontWeight: 600 }}>RM{total.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                  <div/>
                 </div>
                 {rows.map((row) => {
                   const isEd = editing?.table === tableName && editing?.id === row.id;
                   if (isEd) return (
-                    <div key={row.id} style={{ display: "flex", gap: 4, padding: "2px 0", borderBottom: `1px solid ${c.border}20`, flexWrap: "wrap" }}>
+                    <div key={row.id} className="edit-row" style={{ display: "flex", gap: 4, padding: "3px 0", borderBottom: `1px solid ${c.border}20`, flexWrap: "wrap", alignItems: "center" }}>
                       {fields.map(f => (
                         <input key={f.key} className="edit-input" style={{ width: f.w||80 }} type={f.type||"text"} value={editForm[f.key]||''} onChange={e=>setEditForm(p=>({...p,[f.key]:e.target.value}))} placeholder={f.label} />
                       ))}
-                      <button className="btn-icon btn-save" onClick={commitEdit} disabled={saving}>✓</button>
-                      <button className="btn-icon btn-cancel" onClick={cancelEdit}>✕</button>
+                      <button className="btn-icon btn-save" style={{opacity:1}} onClick={commitEdit} disabled={saving}>✓</button>
+                      <button className="btn-icon btn-cancel" style={{opacity:1}} onClick={cancelEdit}>✕</button>
                     </div>
                   );
                   return (
-                    <div key={row.id} className="milestone-row" style={{ display: "grid", gridTemplateColumns: "1fr auto 36px", gap: 8, padding: "1px 4px", borderBottom: `1px solid ${c.border}20`, alignItems: "center" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                        <div style={{ ...sf, fontSize: 12, color: c.text }}>{row.name||row.asset||row.account}</div>
-                        {row.note && <div style={{ ...sf, fontSize: 9, color: c.muted }}>{row.note}</div>}
-                        {row.category && <div style={{ ...sf, fontSize: 9, color: c.muted }}>{row.category}</div>}
+                    <div key={row.id} className="milestone-row" style={{ display: "grid", gridTemplateColumns: "1fr 76px 30px", alignItems: "center", padding: "2px 0", borderBottom: `1px solid ${c.border}20` }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 4, minWidth: 0 }}>
+                        <div style={{ ...sf, fontSize: 12, color: c.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{row.name||row.asset||row.account}</div>
+                        {(row.note||row.category) && <div style={{ ...sf, fontSize: 9, color: c.muted, flexShrink: 0 }}>{row.note||row.category}</div>}
                       </div>
                       <div style={{ ...sf, fontSize: 12, color: c.text }}>RM{(row.valRM||0).toLocaleString("en-US",{maximumFractionDigits:0})}</div>
-                      <div style={{ display:"flex", gap:2 }}>
+                      <div style={{ display:"flex", gap:1, justifyContent:"flex-end" }}>
                         <button className="btn-icon btn-edit" onClick={()=>startEdit(tableName, row.raw)}>✎</button>
                         <button className="btn-icon btn-delete" onClick={()=>deleteRow(tableName, row.raw.id)}>✕</button>
                       </div>
@@ -930,12 +1095,12 @@ function App() {
                   );
                 })}
                 {editing?.table===tableName && editing?.id==='new' ? (
-                  <div style={{ display: "flex", gap: 4, padding: "2px 0", flexWrap: "wrap" }}>
+                  <div className="edit-row" style={{ display: "flex", gap: 4, padding: "3px 0", flexWrap: "wrap", alignItems: "center" }}>
                     {fields.map(f => (
                       <input key={f.key} className="edit-input" style={{ width: f.w||80 }} type={f.type||"text"} value={editForm[f.key]||''} onChange={e=>setEditForm(p=>({...p,[f.key]:e.target.value}))} placeholder={f.label} />
                     ))}
-                    <button className="btn-icon btn-save" onClick={commitEdit} disabled={saving}>✓</button>
-                    <button className="btn-icon btn-cancel" onClick={cancelEdit}>✕</button>
+                    <button className="btn-icon btn-save" style={{opacity:1}} onClick={commitEdit} disabled={saving}>✓</button>
+                    <button className="btn-icon btn-cancel" style={{opacity:1}} onClick={cancelEdit}>✕</button>
                   </div>
                 ) : (
                   <button className="btn-add" onClick={()=>startAdd(tableName, fields.reduce((a,f)=>({...a,[f.key]:''}),{}))}>+ Add</button>
@@ -947,13 +1112,14 @@ function App() {
             const invRows = investments.map(r => ({ ...r, valRM: toRM(r.amount, r.currency), raw: r }));
 
             return (
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 0, flex: 1, minHeight: 0 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "28% 42% 30%", gap: 0, flex: 1, minHeight: 0, overflow: "hidden" }}>
 
                 {/* COL 1: Assets — editable */}
-                <div style={{ paddingRight: 16, borderRight: `1px solid ${c.border}`, display: "flex", flexDirection: "column", minHeight: 0 }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, alignItems: "baseline", paddingBottom: 3, borderBottom: `1px solid ${c.border}`, marginBottom: 4 }}>
+                <div style={{ paddingRight: 14, borderRight: `1px solid ${c.border}`, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 76px 30px", alignItems: "baseline", paddingBottom: 3, borderBottom: `1px solid ${c.border}`, marginBottom: 4 }}>
                     <div style={{ ...hdr, color: c.teal }}>◆ TOTAL ASSETS</div>
                     <div style={{ ...sf, fontSize: 13, color: c.teal, fontWeight: 600 }}>RM{totalAssets.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                    <div/>
                   </div>
                   <div className="scroll-y" style={{ flex: 1 }}>
                     <AssetSection label="EMERGENCY FUND" color={c.teal} tableName="emergency_fund" total={efTotal}
@@ -974,14 +1140,16 @@ function App() {
                       ]} />
                     {/* Stocks — read only, derived from transactions */}
                     <div style={{ marginBottom: 4 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 1 }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 76px 30px", alignItems: "baseline", marginBottom: 1 }}>
                         <div style={{ ...hdr, color: c.gold }}>STOCK PORTFOLIO</div>
                         <div style={{ ...sf, fontSize: 11, color: c.gold, fontWeight: 600 }}>RM{stocksTotal.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                        <div/>
                       </div>
                       {[{name:"Dividend Stocks", val:dividendTotal},{name:"Growth Stocks",val:growthTotal}].map((r,i)=>(
-                        <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, padding: "1px 4px", borderBottom: `1px solid ${c.border}20` }}>
+                        <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 76px 30px", alignItems: "center", padding: "2px 0", borderBottom: `1px solid ${c.border}20` }}>
                           <div style={{ ...sf, fontSize: 12, color: c.text }}>{r.name}</div>
                           <div style={{ ...sf, fontSize: 12, color: c.text }}>RM{r.val.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                          <div/>
                         </div>
                       ))}
                       <div style={{ ...sf, fontSize: 9, color: c.muted, fontStyle:"italic", marginTop:2 }}>From transactions — edit via Holdings tab</div>
@@ -990,13 +1158,15 @@ function App() {
                 </div>
 
                 {/* COL 2: Liabilities — editable */}
-                <div style={{ paddingLeft: 16, paddingRight: 16, borderRight: `1px solid ${c.border}`, display: "flex", flexDirection: "column", minHeight: 0 }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 12, alignItems: "baseline", paddingBottom: 3, borderBottom: `1px solid ${c.border}`, marginBottom: 4 }}>
+                <div style={{ paddingLeft: 16, paddingRight: 8, borderRight: `1px solid ${c.border}`, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
+                  {/* header: same grid as rows so total aligns with last data col */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 88px 72px 48px 38px", gap: 4, alignItems: "baseline", paddingBottom: 3, borderBottom: `1px solid ${c.border}`, marginBottom: 4 }}>
                     <div style={{ ...hdr, color: c.rust }}>◆ TOTAL LIABILITIES</div>
-                    <div style={{ ...sf, fontSize: 13, color: c.rust, fontWeight: 600 }}>RM{totalLiabilities.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                    <div style={{ ...sf, fontSize: 13, color: c.rust, fontWeight: 600, gridColumn: "2 / 5", textAlign: "right" }}>RM{totalLiabilities.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                    <div/>
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 86px 70px 46px 36px", gap: 6, ...hdr, color: c.muted, padding: "2px 0", borderBottom: `1px solid ${c.border}30`, marginBottom: 2 }}>
-                    <div>NAME</div><div style={{textAlign:"right"}}>OUTSTANDING</div><div style={{textAlign:"right"}}>SAVED UP</div><div style={{textAlign:"right"}}>PCT</div><div></div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 88px 72px 48px 38px", gap: 4, ...hdr, color: c.muted, padding: "2px 0", borderBottom: `1px solid ${c.border}30`, marginBottom: 2 }}>
+                    <div>NAME</div><div style={{textAlign:"right"}}>OUTSTANDING</div><div style={{textAlign:"right"}}>SAVED UP</div><div style={{textAlign:"right", paddingRight:4}}>PCT</div><div></div>
                   </div>
                   <div className="scroll-y" style={{ flex: 1 }}>
                     {liabilities.map((row) => {
@@ -1006,18 +1176,18 @@ function App() {
                       const isCovered = row === hirePurchase;
                       const isEd = editing?.table==='liabilities' && editing?.id===row.id;
                       if (isEd) return (
-                        <div key={row.id} style={{ display: "flex", gap: 4, padding: "3px 0", borderBottom: `1px solid ${c.border}20`, flexWrap: "wrap" }}>
-                          <input className="edit-input" style={{width:90}} value={editForm.name||''} onChange={e=>setEditForm(f=>({...f,name:e.target.value}))} placeholder="Name" />
-                          <input className="edit-input" style={{width:80}} type="number" value={editForm.outstanding||''} onChange={e=>setEditForm(f=>({...f,outstanding:e.target.value}))} placeholder="Outstanding" />
-                          <input className="edit-input" style={{width:80}} type="number" value={editForm.saved_up||''} onChange={e=>setEditForm(f=>({...f,saved_up:e.target.value}))} placeholder="Saved up" />
-                          <input className="edit-input" style={{width:60}} type="number" value={editForm.progress_pct||''} onChange={e=>setEditForm(f=>({...f,progress_pct:e.target.value}))} placeholder="Pct%" />
-                          <input className="edit-input" style={{width:100}} value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
-                          <button className="btn-icon btn-save" onClick={commitEdit} disabled={saving}>✓</button>
-                          <button className="btn-icon btn-cancel" onClick={cancelEdit}>✕</button>
+                        <div key={row.id} className="edit-row" style={{ display: "flex", gap: 4, padding: "3px 0", borderBottom: `1px solid ${c.border}20`, flexWrap: "wrap", alignItems: "center" }}>
+                          <input className="edit-input" style={{width:80}} value={editForm.name||''} onChange={e=>setEditForm(f=>({...f,name:e.target.value}))} placeholder="Name" />
+                          <input className="edit-input" style={{width:76}} type="number" value={editForm.outstanding||''} onChange={e=>setEditForm(f=>({...f,outstanding:e.target.value}))} placeholder="Outstanding" />
+                          <input className="edit-input" style={{width:66}} type="number" value={editForm.saved_up||''} onChange={e=>setEditForm(f=>({...f,saved_up:e.target.value}))} placeholder="Saved up" />
+                          <input className="edit-input" style={{width:50}} type="number" value={editForm.progress_pct||''} onChange={e=>setEditForm(f=>({...f,progress_pct:e.target.value}))} placeholder="Pct%" />
+                          <input className="edit-input" style={{width:90}} value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
+                          <button className="btn-icon btn-save" style={{opacity:1}} onClick={commitEdit} disabled={saving}>✓</button>
+                          <button className="btn-icon btn-cancel" style={{opacity:1}} onClick={cancelEdit}>✕</button>
                         </div>
                       );
                       return (
-                        <div key={row.id} className="milestone-row" style={{ display: "grid", gridTemplateColumns: "1fr 86px 70px 46px 36px", gap: 6, padding: "3px 0", borderBottom: `1px solid ${c.border}20`, alignItems: "start" }}>
+                        <div key={row.id} className="milestone-row" style={{ display: "grid", gridTemplateColumns: "1fr 88px 72px 48px 38px", gap: 4, padding: "3px 0", borderBottom: `1px solid ${c.border}20`, alignItems: "start" }}>
                           <div>
                             <div style={{ ...sf, fontSize: 12, color: c.text }}>
                               {row.name}{isCovered && <span style={{ ...sf, fontSize: 9, color: c.teal, marginLeft: 6 }}>ASNB</span>}
@@ -1026,8 +1196,8 @@ function App() {
                           </div>
                           <div style={{ ...sf, textAlign: "right", fontSize: 12, color: isCovered ? c.muted : c.rust, textDecoration: isCovered ? "line-through" : "none" }}>RM{outstanding.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
                           <div style={{ ...sf, textAlign: "right", fontSize: 12, color: c.green }}>RM{savedUp.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
-                          <div style={{ ...sf, textAlign: "right", fontSize: 12, color: pct>=100?c.green:c.gold }}>{pct.toFixed(1)}%</div>
-                          <div style={{ display:"flex", gap:2 }}>
+                          <div style={{ ...sf, textAlign: "right", fontSize: 12, color: pct>=100?c.green:c.gold, paddingRight: 4 }}>{pct.toFixed(1)}%</div>
+                          <div style={{ display:"flex", gap:1, justifyContent:"flex-end", paddingLeft: 2 }}>
                             <button className="btn-icon btn-edit" onClick={()=>startEdit('liabilities',row)}>✎</button>
                             <button className="btn-icon btn-delete" onClick={()=>deleteRow('liabilities',row.id)}>✕</button>
                           </div>
@@ -1035,14 +1205,14 @@ function App() {
                       );
                     })}
                     {editing?.table==='liabilities' && editing?.id==='new' ? (
-                      <div style={{ display: "flex", gap: 4, padding: "3px 0", flexWrap: "wrap" }}>
-                        <input className="edit-input" style={{width:90}} value={editForm.name||''} onChange={e=>setEditForm(f=>({...f,name:e.target.value}))} placeholder="Name" />
-                        <input className="edit-input" style={{width:80}} type="number" value={editForm.outstanding||''} onChange={e=>setEditForm(f=>({...f,outstanding:e.target.value}))} placeholder="Outstanding" />
-                        <input className="edit-input" style={{width:80}} type="number" value={editForm.saved_up||''} onChange={e=>setEditForm(f=>({...f,saved_up:e.target.value}))} placeholder="Saved up" />
-                        <input className="edit-input" style={{width:60}} type="number" value={editForm.progress_pct||''} onChange={e=>setEditForm(f=>({...f,progress_pct:e.target.value}))} placeholder="Pct%" />
-                        <input className="edit-input" style={{width:100}} value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
-                        <button className="btn-icon btn-save" onClick={commitEdit} disabled={saving}>✓</button>
-                        <button className="btn-icon btn-cancel" onClick={cancelEdit}>✕</button>
+                      <div className="edit-row" style={{ display: "flex", gap: 4, padding: "3px 0", flexWrap: "wrap", alignItems: "center" }}>
+                        <input className="edit-input" style={{width:80}} value={editForm.name||''} onChange={e=>setEditForm(f=>({...f,name:e.target.value}))} placeholder="Name" />
+                        <input className="edit-input" style={{width:76}} type="number" value={editForm.outstanding||''} onChange={e=>setEditForm(f=>({...f,outstanding:e.target.value}))} placeholder="Outstanding" />
+                        <input className="edit-input" style={{width:66}} type="number" value={editForm.saved_up||''} onChange={e=>setEditForm(f=>({...f,saved_up:e.target.value}))} placeholder="Saved up" />
+                        <input className="edit-input" style={{width:50}} type="number" value={editForm.progress_pct||''} onChange={e=>setEditForm(f=>({...f,progress_pct:e.target.value}))} placeholder="Pct%" />
+                        <input className="edit-input" style={{width:90}} value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
+                        <button className="btn-icon btn-save" style={{opacity:1}} onClick={commitEdit} disabled={saving}>✓</button>
+                        <button className="btn-icon btn-cancel" style={{opacity:1}} onClick={cancelEdit}>✕</button>
                       </div>
                     ) : (
                       <button className="btn-add" onClick={()=>startAdd('liabilities',{name:'',outstanding:'',saved_up:'',progress_pct:'',notes:''})}>+ Add liability</button>
@@ -1051,7 +1221,7 @@ function App() {
                 </div>
 
                 {/* COL 3: Net Worth */}
-                <div style={{ paddingLeft: 16, display: "flex", flexDirection: "column", gap: 10, justifyContent: "center" }}>
+                <div style={{ paddingLeft: 16, paddingRight: 8, display: "flex", flexDirection: "column", gap: 10, justifyContent: "center", overflow: "hidden" }}>
                   <div style={{ ...hdr, color: c.gold }}>◆ NET WORTH</div>
                   {[
                     { label: "TOTAL ASSETS", val: totalAssets, color: c.teal },
@@ -1064,8 +1234,8 @@ function App() {
                   ))}
                   <div style={{ borderTop: `1px solid ${c.gold}`, paddingTop: 6 }}>
                     <div style={{ ...sf, fontSize: 9, color: c.muted, letterSpacing: 1, marginBottom: 2 }}>NET WORTH</div>
-                    <div style={{ ...sf, fontSize: 22, color: netWorth>=0?c.green:c.rust, fontWeight: 700, fontStyle: "italic" }}>
-                      {netWorth<0?"-":""}RM{Math.abs(netWorth).toLocaleString("en-US",{maximumFractionDigits:0})}
+                    <div className={netWorth < 0 ? "neg-glow" : "gold-shimmer"} style={{ ...sf, fontSize: 22, fontWeight: 700, fontStyle: "italic" }}>
+                      {netWorth<0?"-":""}RM<AnimatedNumber value={Math.abs(netWorth)} />
                     </div>
                   </div>
                   <div>
