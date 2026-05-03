@@ -201,6 +201,8 @@ nav {
 .tag-my   { background: rgba(59,130,246,0.12); color: #7ab4ff; }
 .tag-us   { background: rgba(99,102,241,0.12); color: #a5b4fc; }
 .tag-sg   { background: rgba(16,185,129,0.12); color: #6ee7b7; }
+.tag-crypto { background: rgba(245,158,11,0.12); color: #fcd34d; }
+.tag-uk    { background: rgba(239,68,68,0.12); color: #fca5a5; }
 
 /* ── EMPTY STATE ── */
 .empty { text-align: center; padding: 40px 20px; color: var(--text3); }
@@ -279,6 +281,8 @@ nav {
             <option value="US">🇺🇸 US (USD)</option>
             <option value="MY">🇲🇾 MY (MYR)</option>
             <option value="SG">🇸🇬 SG (SGD)</option>
+            <option value="CRYPTO">🪙 Crypto (USD)</option>
+            <option value="UK">🇬🇧 UK (GBP)</option>
           </select>
         </div>
       </div>
@@ -337,7 +341,7 @@ nav {
         <div style="font-family:monospace;font-size:11px;color:var(--text);">date | ticker | market | action | type | units | price | div_tax</div>
         <div style="margin-top:8px;font-size:11px;">
           • <b>date</b>: YYYY-MM-DD<br>
-          • <b>market</b>: US/MY/SG<br>
+          • <b>market</b>: US/MY/SG/Crypto/London<br>
           • <b>action</b>: buy or sell<br>
           • <b>type</b>: growth or dividend<br>
           • <b>div_tax</b>: 0–100 (optional, for dividend stocks only)
@@ -391,6 +395,8 @@ nav {
             <option value="US">🇺🇸 US (USD)</option>
             <option value="MY">🇲🇾 MY (MYR)</option>
             <option value="SG">🇸🇬 SG (SGD)</option>
+            <option value="CRYPTO">🪙 Crypto (USD)</option>
+            <option value="UK">🇬🇧 UK (GBP)</option>
           </select>
         </div>
       </div>
@@ -422,7 +428,7 @@ nav {
         <div style="font-family:monospace;font-size:11px;color:var(--text);">ticker | market | amount | month</div>
         <div style="margin-top:8px;font-size:11px;">
           • <b>ticker</b>: e.g. JEPQ, 1155<br>
-          • <b>market</b>: US/MY/SG<br>
+          • <b>market</b>: US/MY/SG/Crypto/London<br>
           • <b>amount</b>: e.g. 150.00<br>
           • <b>month</b>: YYYY-MM (e.g. 2025-03)<br>
           &nbsp;&nbsp;Also accepts: Mar-2025 · March 2025 · 03/2025 · 2025/03
@@ -496,6 +502,8 @@ const WORKER_URL = 'https://folio-price.stevetest181.workers.dev';
 function toYahooSymbol(ticker, market) {
   if (market === 'MY') return ticker.toUpperCase().endsWith('.KL') ? ticker : `${ticker}.KL`;
   if (market === 'SG') return ticker.toUpperCase().endsWith('.SI') ? ticker : `${ticker}.SI`;
+  if (market === 'CRYPTO') return ticker.endsWith('-USD') ? ticker : `${ticker}-USD`;
+  if (market === 'UK') return ticker.endsWith('.L') ? ticker : `${ticker}.L`;
   return ticker;
 }
 
@@ -504,6 +512,7 @@ let priceCache = {};
 let priceCacheTime = 0;
 let cachedRate = null;     // USD → MYR
 let cachedSgdRate = null;  // SGD → MYR
+let cachedGbpRate = null;
 
 async function fetchLivePrices(holdings) {
   const now = Date.now();
@@ -516,8 +525,10 @@ async function fetchLivePrices(holdings) {
       const rateData = await rateResp.json();
   
       if (rateData.usdMyr && rateData.usdMyr > 1) cachedRate = rateData.usdMyr;
+      else if (rateData.rate && rateData.rate > 1) cachedRate = rateData.rate;
       if (rateData.sgdMyr && rateData.sgdMyr > 1) cachedSgdRate = rateData.sgdMyr;
-    } catch (e) {}
+      if (rateData.gbpMyr && rateData.gbpMyr > 1) cachedGbpRate = rateData.gbpMyr;
+    } catch(e) {}
   }
 
   if (cacheValid) return priceCache;
@@ -532,11 +543,13 @@ async function fetchLivePrices(holdings) {
     const data = await priceResp.json();
     const rateData = await rateResp.json();
     if (rateData.usdMyr && rateData.usdMyr > 1) cachedRate = rateData.usdMyr;
+    else if (rateData.rate && rateData.rate > 1) cachedRate = rateData.rate;
     if (rateData.sgdMyr && rateData.sgdMyr > 1) cachedSgdRate = rateData.sgdMyr;
+    if (rateData.gbpMyr && rateData.gbpMyr > 1) cachedGbpRate = rateData.gbpMyr;
     priceCache = data;
     priceCacheTime = now;
     return data;
-  } catch (e) {
+  } catch(e) {
     console.warn('Price fetch failed:', e.message);
     return {};
   }
@@ -666,10 +679,7 @@ function showToast(msg, isError = false) {
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
 function fmt(n, currency, decimals = 2) {
-  const sym =
-    currency === 'MY' ? 'RM' :
-    currency === 'SG' ? 'S$' :
-    '$';
+  const sym = currency === 'MY' ? 'RM' : currency === 'SG' ? 'S$' : currency === 'UK' ? '£' : '$';
   return sym + Math.abs(n).toLocaleString('en', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
 }
 function sgn(n, currency) { return (n >= 0 ? '+' : '-') + fmt(n, currency); }
@@ -909,13 +919,8 @@ async function renderDashboard() {
         <div class="ticker-wrap">
           ${tickerBadge(h.ticker, h.market)}
           <div>
-              <div class="s-name">
-                ${h.market === 'MY' ? h.ticker + '.KL' :
-                  h.market === 'SG' ? h.ticker + '.SI' :
-                  h.ticker}
-              </div>
-            <div class="s-units">${(h.market === 'MY' || h.market === 'SG') ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
-          </div>
+              <div class="s-name">${h.market === 'MY' ? h.ticker + '.KL' : h.market === 'SG' ? h.ticker + '.SI' : h.market === 'UK' ? h.ticker + '.L' : h.ticker}</div>
+            <div class="s-units">${h.market === 'MY' || h.market === 'SG' || h.market === 'UK' ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.market === 'CRYPTO' ? h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:8}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
         </div>
         <div>
           <div class="cell-main ${totalPL !== null ? cc(totalPL) : 'dim'}">${totalPL !== null ? sgn(totalPL, cur) : '—'}</div>
@@ -968,9 +973,14 @@ async function renderDashboard() {
   // Totals — convert everything to MYR using live rate
   const rate = cachedRate || 0;
   const sgdRate = cachedSgdRate || 0;
+  const gbpRate = cachedGbpRate || 0;
   const toRM = (val, market) =>
+  const toRM = (val, market) =>
+    (market === 'US' || market === 'CRYPTO') ? (val ?? 0) * rate :
     market === 'US' ? (val ?? 0) * rate :
     market === 'SG' ? (val ?? 0) * sgdRate :
+    market === 'SG' ? (val ?? 0) * sgdRate :
+    market === 'UK' ? (val ?? 0) * gbpRate :
     (val ?? 0);
 
   if (!rate) {
@@ -978,7 +988,7 @@ async function renderDashboard() {
   }
 
   const myVal  = active.filter(h=>h.market==='MY').reduce((s,h)=>{ const {curVal}=calcStock(h); return s+(curVal??h.costBasis); },0);
-  const usVal  = active.filter(h=>h.market==='US').reduce((s,h)=>{ const {curVal}=calcStock(h); return s+(curVal??h.costBasis); },0);
+  const usVal     = active.filter(h=>h.market==='US'||h.market==='CRYPTO').reduce((s,h)=>{ const {curVal}=calcStock(h); return s+(curVal??h.costBasis); },0);
 
   // P/L = unrealised + realised + dividends received (all converted to RM)
   const totalPLRM = active.reduce((s,h)=>{
@@ -1010,10 +1020,7 @@ async function renderDashboard() {
     <div class="hero-row">
       <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
       <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
-      <span class="hero-badge">
-        USD→MYR: ${rate ? rate.toFixed(2) : '—'}<br>
-        SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}
-      </span>
+      <span class="hero-badge" style="line-height:1.6;">USD→MYR: ${rate ? rate.toFixed(2) : '—'}<br>SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}<br>GBP→MYR: ${gbpRate ? gbpRate.toFixed(2) : '—'}</span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
       <span style="font-size:10px;color:#7a9adc;">${now}</span>
@@ -1077,7 +1084,7 @@ async function renderDashboard() {
           <div class="acc-val">${fmt(grwCurVal,cur)}</div>
         </div>
         <div class="acc-pl" style="margin-top:4px;">
-          <span class="${cc(grwPL)}">${grwPL>=0?'+':'-'}${cur === 'MY' ? 'RM' : cur === 'SG' ? 'S$' : '$'}${Math.abs(grwPL).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+          <span class="${cc(grwPL)}">${grwPL>=0?'+':'-'}${cur==='MY'?'RM':cur==='SG'?'S$':cur==='UK'?'£':cur==='CRYPTO'?'$':'$'}${Math.abs(grwPL).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
           <span class="${cc(grwPLPct)}">${grwPLPct>=0?'+':''}${grwPLPct.toFixed(2)}%</span>
         </div>
       </div>
@@ -1122,7 +1129,7 @@ function parseImportRow(row) {
   if (!date || date === 'NaN-NaN-NaN') errors.push('missing/invalid date');
   if (!ticker) errors.push('missing ticker');
   const mkt = String(market||'').trim().toUpperCase();
-  if (!['US','MY','SG'].includes(mkt)) errors.push(`market must be US/MY/SG`);
+  if (!['US','MY','SG','CRYPTO','UK'].includes(mkt)) errors.push(`market must be US/MY/SG/CRYPTO/UK`);
   const act = String(action||'').trim().toLowerCase();
   if (!['buy','sell'].includes(act)) errors.push(`action must be buy or sell`);
   const typ = String(type||'').trim().toLowerCase();
@@ -1207,17 +1214,10 @@ function renderImportPreview() {
         </div>
   
         ${r.valid
-          ? `<div style="color:var(--text2);margin-top:2px;">
-              ${r.data.date} · ${
-                r.data.market === 'MY' ? 'RM' :
-                r.data.market === 'SG' ? 'S$' :
-                '$'
-              }${r.data.amount} · ${r.data.market}
-            </div>`
-          : `<div style="color:var(--red);margin-top:2px;">${r.errors.join(', ')}</div>`
-        }
-      </div>
-    `).join('');
+        ? `<div style="color:var(--text2);margin-top:2px;">${r.data.date} · ${r.data.action} ${r.data.units} @ ${r.data.market==='MY'?'RM':r.data.market==='SG'?'S$':r.data.market==='UK'?'£':'$'}${r.data.price} · ${r.data.type}${r.data.divTax ? ` · ${r.data.divTax}% tax` : ''}</div>`
+        : `<div style="color:var(--red);margin-top:2px;">${r.errors.join(', ')}</div>`
+      }
+    </div>`).join('');
   
     if (errCount > 0) {
       list.innerHTML += `<div style="font-size:11px;color:var(--text2);margin-top:4px;">⚠️ ${errCount} row(s) with errors will be skipped.</div>`;
@@ -1316,7 +1316,7 @@ async function renderDVSummary() {
   const prices = await fetchLivePrices(active);
   const hasPrices = Object.keys(prices).length > 0 && !prices.error;
   const rate = cachedRate || 0;
-  const toRM = (val, market) => market === 'US' ? (val ?? 0) * rate : (val ?? 0);
+  const toRM = (val, market) => (market === 'US' || market === 'CRYPTO') ? (val ?? 0) * rate : market === 'SG' ? (val ?? 0) * (cachedSgdRate||0) : market === 'UK' ? (val ?? 0) * (cachedGbpRate||0) : (val ?? 0);
 
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -1396,6 +1396,7 @@ async function renderDVSummary() {
     const name =
       r.market === 'MY' ? r.ticker + '.KL' :
       r.market === 'SG' ? r.ticker + '.SI' :
+      r.market === 'UK' ? r.ticker + '.L' :
       r.ticker;
     const [bg, fg] = badgeColor(r.ticker);
     return `
@@ -1572,8 +1573,9 @@ async function renderDashboardHistorical(year) {
   // Also fetch historical USD/MYR rate for Dec 31 of that year
   let histRate = cachedRate || 0;
   let histSgdRate = cachedSgdRate || 0;
+  let histGbpRate = cachedGbpRate || 0;
   try {
-    const rateResp = await fetch(`${WORKER_URL}/history?symbols=MYR%3DX,SGDMYR%3DX&year=${year}`);
+    const rateResp = await fetch(`${WORKER_URL}/history?symbols=MYR%3DX,SGDMYR%3DX,GBPMYR%3DX&year=${year}`);
     const rateData = await rateResp.json();
   
     if (rateData['MYR=X']?.price) {
@@ -1583,15 +1585,17 @@ async function renderDashboardHistorical(year) {
     if (rateData['SGDMYR=X']?.price) {
       histSgdRate = rateData['SGDMYR=X'].price;
     }
+
+    if (rateData['GBPMYR=X']?.price) histGbpRate = rateData['GBPMYR=X'].price;
+
   } catch (_) {}
 
   const rate = histRate || cachedRate || 0;
   const sgdRate = histSgdRate || cachedSgdRate || 0;
+  const gbpRate = histGbpRate || cachedGbpRate || 0;
   
-  const toRM = (val, market) =>
-    market === 'US' ? (val ?? 0) * rate :
-    market === 'SG' ? (val ?? 0) * sgdRate :
-    (val ?? 0);
+  const toRM = (val, market) => (market === 'US' || market === 'CRYPTO') ? (val ?? 0) * rate : market === 'SG' ? (val ?? 0) * (cachedSgdRate||0) : market === 'UK' ? (val ?? 0) * (cachedGbpRate||0) : (val ?? 0);
+
 
   const divStocks = active.filter(h => h.type === 'dividend');
   const grwStocks = active.filter(h => h.type === 'growth');
@@ -1631,12 +1635,8 @@ async function renderDashboardHistorical(year) {
         <div class="ticker-wrap">
           ${tickerBadge(h.ticker, h.market)}
           <div>
-            <div class="s-name">
-              ${h.market === 'MY' ? h.ticker + '.KL' :
-                h.market === 'SG' ? h.ticker + '.SI' :
-                h.ticker}
-            </div>
-            <div class="s-units">${(h.market === 'MY' || h.market === 'SG') ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
+            <div class="s-name">${h.market === 'MY' ? h.ticker + '.KL' : h.market === 'SG' ? h.ticker + '.SI' : h.market === 'UK' ? h.ticker + '.L' : h.ticker}</div>
+            <div class="s-units">${h.market === 'MY' || h.market === 'SG' || h.market === 'UK' ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.market === 'CRYPTO' ? h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:8}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
           </div>
         </div>
         <div>
@@ -1689,12 +1689,10 @@ async function renderDashboardHistorical(year) {
 
   // Totals
   const myVal     = active.filter(h=>h.market==='MY').reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
-  const usVal     = active.filter(h=>h.market==='US').reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
+  const usVal     = active.filter(h=>h.market==='US'||h.market==='CRYPTO').reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
   const sgVal     = active.filter(h=>h.market==='SG').reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
-  const totalValRM =
-    myVal +
-    (usVal * rate) +
-    (sgVal * sgdRate);
+  const ukVal     = active.filter(h=>h.market==='UK').reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
+  const totalValRM = myVal + (usVal * rate) + (sgVal * sgdRate) + (ukVal * (cachedGbpRate||0));
   const totalPLRM = active.reduce((s, h) => {
     const { unrealised, realised } = calcHistStock(h);
     return (
@@ -1715,10 +1713,7 @@ async function renderDashboardHistorical(year) {
     <div class="hero-row">
       <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
       <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
-            <span class="hero-badge">
-              USD→MYR: ${rate ? rate.toFixed(2) : '—'}<br>
-              SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}
-            </span>
+            <span class="hero-badge" style="line-height:1.6;">USD→MYR: ${rate ? rate.toFixed(2) : '—'}<br>SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}<br>GBP→MYR: ${gbpRate ? gbpRate.toFixed(2) : '—'}</span>
     </div>
     <div style="font-size:10px;color:#7a9adc;margin-top:6px;">Closing prices: 31 Dec ${year}</div>
     <div id="year-select-wrap" style="position:absolute;top:12px;right:14px;"></div>
@@ -1774,6 +1769,7 @@ async function renderDashboardHistorical(year) {
             ${
               cur === 'MY' ? 'RM' :
               cur === 'SG' ? 'S$' :
+              cur === 'UK' ? '£' :
               '$'
             }
             ${Math.abs(grwPL).toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -1852,7 +1848,7 @@ function parseDivImportRow(row) {
   const month  = parseMonthToYYYYMM(rawMonth);
 
   if (!ticker) errors.push('missing ticker');
-  if (!['US','MY','SG'].includes(mkt)) errors.push('market must be US/MY/SG');
+  if (!['US','MY','SG','CRYPTO','UK'].includes(mkt)) errors.push('market must be US/MY/SG/CRYPTO/UK');
   if (isNaN(amt) || amt <= 0) errors.push('invalid amount');
   if (!month) errors.push(`invalid month: "${rawMonth}" — use YYYY-MM`);
 
@@ -1913,6 +1909,7 @@ function renderDivImportPreview() {
             ${r.data.date} · ${
               r.data.market === 'MY' ? 'RM' :
               r.data.market === 'SG' ? 'S$' :
+              r.data.market === 'UK' ? '£' :
               '$'
             }${r.data.amount} · ${r.data.market}
           </div>`
