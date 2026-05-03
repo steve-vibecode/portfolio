@@ -1006,11 +1006,11 @@ async function renderDashboard() {
     <div class="hero-row">
       <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
       <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
-      <button onclick="priceCache={};priceCacheTime=0;renderDashboard()" style="background:rgba(59,130,246,0.2);border:none;color:#7ab4ff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;">↻ Refresh</button>
+      <span class="hero-badge" style="line-height:1.5;">USD→MYR: ${rate ? rate.toFixed(2) : '—'};  SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}<br>GBP→MYR: ${gbpRate ? gbpRate.toFixed(2) : '—'}</span>   
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
       <span style="font-size:10px;color:#7a9adc;">${now}</span>
-      <span class="hero-badge" style="line-height:1.5;">USD→MYR: ${rate ? rate.toFixed(2) : '—'};  SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}<br>GBP→MYR: ${gbpRate ? gbpRate.toFixed(2) : '—'}</span>
+      <button onclick="priceCache={};priceCacheTime=0;renderDashboard()" style="background:rgba(59,130,246,0.2);border:none;color:#7ab4ff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;">↻ Refresh</button>
     </div>
     <div id="year-select-wrap" style="position:absolute;top:12px;right:14px;"></div>
   </div>`;
