@@ -948,12 +948,8 @@ async function renderDashboard() {
         <div class="ticker-wrap">
           ${tickerBadge(h.ticker, h.market)}
           <div>
-            <div class="s-name">
-              ${h.market === 'MY' ? h.ticker + '.KL' :
-                h.market === 'SG' ? h.ticker + '.SI' :
-                h.ticker}
-            </div>
-            <div class="s-units">${(h.market === 'MY' || h.market === 'SG') ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
+            <div class="s-name">${h.market === 'MY' ? h.ticker + '.KL' : h.market === 'SG' ? h.ticker + '.SI' : h.market === 'UK' ? h.ticker + '.L' : h.ticker}</div>
+            <div class="s-units">${h.market === 'MY' || h.market === 'SG' || h.market === 'UK' ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.market === 'CRYPTO' ? h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:8}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
           </div>
         </div>
         <div>
@@ -977,8 +973,6 @@ async function renderDashboard() {
   const gbpRate = cachedGbpRate || 0;
   const toRM = (val, market) =>
     (market === 'US' || market === 'CRYPTO') ? (val ?? 0) * rate :
-    market === 'US' ? (val ?? 0) * rate :
-    market === 'SG' ? (val ?? 0) * sgdRate :
     market === 'SG' ? (val ?? 0) * sgdRate :
     market === 'UK' ? (val ?? 0) * gbpRate :
     (val ?? 0);
@@ -990,6 +984,7 @@ async function renderDashboard() {
   const myVal  = active.filter(h=>h.market==='MY').reduce((s,h)=>{ const {curVal}=calcStock(h); return s+(curVal??h.costBasis); },0);
   const usVal  = active.filter(h=>h.market==='US'||h.market==='CRYPTO').reduce((s,h)=>{ const {curVal}=calcStock(h); return s+(curVal??h.costBasis); },0);
   const ukVal     = active.filter(h=>h.market==='UK').reduce((s,h)=>{ const {curVal}=calcStock(h); return s+(curVal??h.costBasis); },0);
+  const sgVal     = active.filter(h=>h.market==='SG').reduce((s,h)=>{ const {curVal}=calcStock(h); return s+(curVal??h.costBasis); },0);
 
   // P/L = unrealised + realised + dividends received (all converted to RM)
   const totalPLRM = active.reduce((s,h)=>{
@@ -999,13 +994,6 @@ async function renderDashboard() {
     return s + capGainRM + dvRM;
   }, 0);
 
-  const sgVal = active
-    .filter(h => h.market === 'SG')
-    .reduce((s, h) => {
-      const { curVal } = calcStock(h);
-      return s + (curVal ?? h.costBasis);
-    }, 0);
-  
   const totalValRM = myVal + (usVal * rate) + (sgVal * sgdRate) + (ukVal * gbpRate);
   const totalCost  = active.reduce((s,h) => s + toRM(h.costBasis, h.market), 0);
   const totalPLPct = totalCost ? (totalPLRM / totalCost * 100) : 0;
@@ -1207,9 +1195,9 @@ function renderImportPreview() {
   preview.style.display = 'block';
   document.getElementById('import-confirm-btn').textContent = `Import ${validCount} rows`;
 
-    list.innerHTML = divImportRows.map(r => `
+    list.innerHTML = importRows.map(r => `
       <div style="background:${r.valid ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)'};border:1px solid ${r.valid ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'};border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:11px;">
-        <div style="display:flex;justify-content:space-between;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
           <span style="font-weight:700;color:var(--text);">Row ${r.rowNum}: ${r.data?.ticker || '?'}</span>
           <span style="color:${r.valid ? 'var(--green)' : 'var(--red)'};">${r.valid ? '✓ Valid' : '✗ Error'}</span>
         </div>
@@ -1317,7 +1305,9 @@ async function renderDVSummary() {
   const prices = await fetchLivePrices(active);
   const hasPrices = Object.keys(prices).length > 0 && !prices.error;
   const rate = cachedRate || 0;
-  const toRM = (val, market) => (market === 'US' || market === 'CRYPTO') ? (val ?? 0) * rate : market === 'SG' ? (val ?? 0) * (cachedSgdRate||0) : market === 'UK' ? (val ?? 0) * (cachedGbpRate||0) : (val ?? 0);
+  const sgdRate = cachedSgdRate || 0;
+  const gbpRate = cachedGbpRate || 0;
+  const toRM = (val, market) => (market === 'US' || market === 'CRYPTO') ? (val ?? 0) * rate : market === 'SG' ? (val ?? 0) * sgdRate : market === 'UK' ? (val ?? 0) * gbpRate : (val ?? 0);
 
   const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
@@ -1595,8 +1585,7 @@ async function renderDashboardHistorical(year) {
   const sgdRate = histSgdRate || cachedSgdRate || 0;
   const gbpRate = histGbpRate || cachedGbpRate || 0;
   
-  const toRM = (val, market) => (market === 'US' || market === 'CRYPTO') ? (val ?? 0) * rate : market === 'SG' ? (val ?? 0) * (cachedSgdRate||0) : market === 'UK' ? (val ?? 0) * (cachedGbpRate||0) : (val ?? 0);
-
+  const toRM = (val, market) => (market === 'US' || market === 'CRYPTO') ? (val ?? 0) * rate : market === 'SG' ? (val ?? 0) * sgdRate : market === 'UK' ? (val ?? 0) * gbpRate : (val ?? 0);
 
   const divStocks = active.filter(h => h.type === 'dividend');
   const grwStocks = active.filter(h => h.type === 'growth');
@@ -1665,12 +1654,8 @@ async function renderDashboardHistorical(year) {
         <div class="ticker-wrap">
           ${tickerBadge(h.ticker, h.market)}
           <div>
-            <div class="s-name">
-              ${h.market === 'MY' ? h.ticker + '.KL' :
-                h.market === 'SG' ? h.ticker + '.SI' :
-                h.ticker}
-            </div>
-            <div class="s-units">${(h.market === 'MY' || h.market === 'SG') ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
+            <div class="s-name">${h.market === 'MY' ? h.ticker + '.KL' : h.market === 'SG' ? h.ticker + '.SI' : h.market === 'UK' ? h.ticker + '.L' : h.ticker}</div>
+            <div class="s-units">${h.market === 'MY' || h.market === 'SG' || h.market === 'UK' ? h.units.toLocaleString('en',{maximumFractionDigits:0}) : h.market === 'CRYPTO' ? h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:8}) : h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})} shares</div>
           </div>
         </div>
         <div>
@@ -1693,7 +1678,7 @@ async function renderDashboardHistorical(year) {
   const usVal     = active.filter(h=>h.market==='US'||h.market==='CRYPTO').reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
   const sgVal     = active.filter(h=>h.market==='SG').reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
   const ukVal     = active.filter(h=>h.market==='UK').reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+(curVal??h.costBasis); },0);
-  const totalValRM = myVal + (usVal * rate) + (sgVal * sgdRate) + (ukVal * (cachedGbpRate||0));
+  const totalValRM = myVal + (usVal * rate) + (sgVal * sgdRate) + (ukVal * gbpRate);
   const totalPLRM = active.reduce((s, h) => {
     const { unrealised, realised } = calcHistStock(h);
     return (
