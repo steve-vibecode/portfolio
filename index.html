@@ -1006,7 +1006,7 @@ async function renderDashboard() {
     <div class="hero-row">
       <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
       <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
-      <span class="hero-badge" style="line-height:1.5;">USD→MYR: ${rate ? rate.toFixed(2) : '—'}; SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}<br>GBP→MYR: ${gbpRate ? gbpRate.toFixed(2) : '—'}</span>
+      <span class="hero-badge" style="line-height:1.5;">USD→MYR: ${rate ? rate.toFixed(2) : '—'};  SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}<br>GBP→MYR: ${gbpRate ? gbpRate.toFixed(2) : '—'}</span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
       <span style="font-size:10px;color:#7a9adc;">${now}</span>
@@ -1696,7 +1696,7 @@ async function renderDashboardHistorical(year) {
     <div class="hero-row">
       <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
       <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
-      <span class="hero-badge" style="line-height:1.5;">USD→MYR: ${rate ? rate.toFixed(2) : '—'}<br>SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}<br>GBP→MYR: ${gbpRate ? gbpRate.toFixed(2) : '—'}</span>
+      <span class="hero-badge" style="line-height:1.5;">USD→MYR: ${rate ? rate.toFixed(2) : '—'};  SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}<br>GBP→MYR: ${gbpRate ? gbpRate.toFixed(2) : '—'}</span>
     </div>
     <div style="font-size:10px;color:#7a9adc;margin-top:6px;">Closing prices: 31 Dec ${year}</div>
     <div id="year-select-wrap" style="position:absolute;top:12px;right:14px;"></div>
