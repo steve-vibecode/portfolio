@@ -698,10 +698,7 @@ function badgeColor(ticker) {
 
 function tickerBadge(ticker, market) {
   const [bg, fg] = badgeColor(ticker);
-  const label =
-    market === 'MY' ? ticker + '.KL' :
-    market === 'SG' ? ticker + '.SI' :
-    ticker;
+  const label = market === 'MY' ? ticker + '.KL' : market === 'SG' ? ticker + '.SI' : market === 'UK' ? ticker + '.L' : ticker;
   const fs = label.length <= 3 ? '8px' : label.length <= 4 ? '7px' : label.length <= 6 ? '6px' : '5px';
   return `<div class="ticker-badge" style="background:${bg};color:${fg};font-size:${fs};text-align:center;display:flex;align-items:center;justify-content:center;line-height:1.1;">${label}</div>`;
 }
