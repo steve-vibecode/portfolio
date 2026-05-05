@@ -1053,9 +1053,9 @@ async function renderDashboard() {
 
   // Growth section
   if (grwStocks.length) {
-    const grwCurVal  = grwStocks.reduce((s,h)=>{ const {curVal}=calcStock(h); return s+(curVal??h.costBasis); },0);
-    const grwCostVal = grwStocks.reduce((s,h)=>s+h.costBasis,0);
-    const grwPL      = grwStocks.reduce((s,h)=>{ const {pl}=calcStock(h); return s+(pl??0); },0);
+    const grwCurVal  = grwStocks.reduce((s,h)=>{ const {curVal}=calcStock(h); return s+toRM(curVal ?? h.costBasis, h.market); },0);
+    const grwCostVal = grwStocks.reduce((s,h)=>s + toRM(h.costBasis, h.market), 0);
+    const grwPL      = grwStocks.reduce((s,h)=>{ const {pl}=calcStock(h); return s + toRM(pl ?? 0, h.market);}, 0);
     const grwPLPct   = grwCostVal ? (grwPL/grwCostVal*100) : 0;
     const cur = grwStocks[0].market;
     html += `<div class="acc-section">
@@ -1064,7 +1064,7 @@ async function renderDashboard() {
           <div class="acc-type">Growth Acc</div>
         </div>
         <div class="acc-head-row" style="align-items:baseline;margin-top:2px;">
-          <div class="acc-val">${fmt(grwCurVal,cur)}</div>
+          <div class="acc-val">RM{fmt(grwCurVal,cur)}</div>
         </div>
         <div class="acc-pl" style="margin-top:4px;">
           <span class="${cc(grwPL)}">${grwPL>=0?'+':'-'}${cur==='MY'?'RM':cur==='SG'?'S$':cur==='UK'?'£':cur==='CRYPTO'?'$':'$'}${Math.abs(grwPL).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
