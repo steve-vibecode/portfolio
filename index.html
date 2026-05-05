@@ -1064,7 +1064,7 @@ async function renderDashboard() {
           <div class="acc-type">Growth Acc</div>
         </div>
         <div class="acc-head-row" style="align-items:baseline;margin-top:2px;">
-          <div class="acc-val">RM{fmt(grwCurVal,cur)}</div>
+          <div class="acc-val">RM${grwCurVal.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
         </div>
         <div class="acc-pl" style="margin-top:4px;">
           <span class="${cc(grwPL)}">${grwPL>=0?'+':'-'}${cur==='MY'?'RM':cur==='SG'?'S$':cur==='UK'?'£':cur==='CRYPTO'?'$':'$'}${Math.abs(grwPL).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
