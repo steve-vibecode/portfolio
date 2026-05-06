@@ -514,14 +514,6 @@ let cachedRate = null;
 let cachedSgdRate = null;
 let cachedGbpRate = null;
 
-let displayCurrency = localStorage.getItem('displayCurrency') || 'MYR';
-
-function setDisplayCurrency(cur) {
-  displayCurrency = cur;
-  localStorage.setItem('displayCurrency', cur);
-  renderDashboard();
-}
-
 async function fetchLivePrices(holdings) {
   const now = Date.now();
   const cacheValid = now - priceCacheTime < 5 * 60 * 1000 && Object.keys(priceCache).length;
@@ -688,34 +680,6 @@ function showToast(msg, isError = false) {
 function fmt(n, currency, decimals = 2) {
   const sym = currency === 'MY' ? 'RM' : currency === 'SG' ? 'S$' : currency === 'UK' ? '£' : '$';
   return sym + Math.abs(n).toLocaleString('en', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-}
-  
-function displayCurrencySymbol() {
-  return displayCurrency === 'MYR' ? 'RM' :
-         displayCurrency === 'USD' ? '$' :
-         displayCurrency === 'SGD' ? 'S$' :
-         displayCurrency === 'GBP' ? '£' : 'RM';
-}
-
-function myrToDisplay(val) {
-  if (displayCurrency === 'MYR') return val;
-  if (displayCurrency === 'USD') return cachedRate ? val / cachedRate : null;
-  if (displayCurrency === 'SGD') return cachedSgdRate ? val / cachedSgdRate : null;
-  if (displayCurrency === 'GBP') return cachedGbpRate ? val / cachedGbpRate : null;
-  return val;
-}
-
-function fmtDisplay(n, decimals = 2) {
-  if (n === null || n === undefined || isNaN(n)) return '—';
-  return displayCurrencySymbol() + Math.abs(n).toLocaleString('en', {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  });
-}
-
-function sgnDisplay(n) {
-  if (n === null || n === undefined || isNaN(n)) return '—';
-  return (n >= 0 ? '+' : '-') + fmtDisplay(n);
 }
 function sgn(n, currency) { return (n >= 0 ? '+' : '-') + fmt(n, currency); }
 function pct(n) { return (n >= 0 ? '+' : '') + n.toFixed(2) + '%'; }
@@ -1027,8 +991,6 @@ async function renderDashboard() {
   const totalValRM = myVal + (usVal * rate) + (sgVal * sgdRate) + (ukVal * gbpRate);
   const totalCost  = active.reduce((s,h) => s + toRM(h.costBasis, h.market), 0);
   const totalPLPct = totalCost ? (totalPLRM / totalCost * 100) : 0;
-  const totalValDisplay = myrToDisplay(totalValRM);
-  const totalPLDisplay  = myrToDisplay(totalPLRM);
 
   const now = new Date().toLocaleString('en-MY',{dateStyle:'medium',timeStyle:'short'});
   let html = '';
@@ -1036,68 +998,18 @@ async function renderDashboard() {
   // ── Hero — matches old design exactly
   html += `
   <div class="hero" style="position:relative;">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-  <div>
     <div class="hero-label">Total Portfolio Value</div>
-    <div class="hero-amount">${fmtDisplay(totalValDisplay)}</div>
-  </div>
-
-  <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-  <select onchange="setDisplayCurrency(this.value)"
-    style="
-      height:28px;
-      background:#111827;
-      border:none;
-      color:white;
-      padding:0 22px 0 10px;
-      border-radius:6px;
-      font-size:11px;
-      font-weight:800;
-      cursor:pointer;
-      outline:none;
-      appearance:auto;
-      -webkit-appearance:menulist;
-    ">
-    <option value="MYR" ${displayCurrency === 'MYR' ? 'selected' : ''}>MYR</option>
-    <option value="USD" ${displayCurrency === 'USD' ? 'selected' : ''}>USD</option>
-    <option value="SGD" ${displayCurrency === 'SGD' ? 'selected' : ''}>SGD</option>
-    <option value="GBP" ${displayCurrency === 'GBP' ? 'selected' : ''}>GBP</option>
-  </select>
-
-  <div style="
-    height:28px;
-    background:#111827;
-    color:white;
-    padding:0 10px;
-    border-radius:6px;
-    font-size:11px;
-    font-weight:800;
-    display:flex;
-    align-items:center;
-  ">
-    Live
-  </div>
-</div>
-</div>
-
+    <div class="hero-amount">${fmt(totalValRM,'MY')}</div>
     <div class="hero-row">
-      <span class="hero-gain ${cc(totalPLRM)}">${sgnDisplay(totalPLDisplay)}</span>
+      <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
       <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
-      <span class="hero-badge" style="line-height:1.5;">
-        USD→MYR: ${rate ? rate.toFixed(2) : '—'}; SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}<br>
-        GBP→MYR: ${gbpRate ? gbpRate.toFixed(2) : '—'}
-      </span>
+      <span class="hero-badge" style="line-height:1.5;">USD→MYR: ${rate ? rate.toFixed(2) : '—'};  SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}<br>GBP→MYR: ${gbpRate ? gbpRate.toFixed(2) : '—'}</span>
     </div>
-
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:8px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
       <span style="font-size:10px;color:#7a9adc;">${now}</span>
-
-        <button onclick="priceCache={};priceCacheTime=0;renderDashboard()"
-          style="background:rgba(59,130,246,0.2);border:none;color:#7ab4ff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;">
-          ↻ Refresh
-        </button>
-      </div>
+      <button onclick="priceCache={};priceCacheTime=0;renderDashboard()" style="background:rgba(59,130,246,0.2);border:none;color:#7ab4ff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;">↻ Refresh</button>
     </div>
+    <div id="year-select-wrap" style="position:absolute;top:12px;right:14px;"></div>
   </div>`;
 
   if (!hasPrices) {
@@ -1165,7 +1077,7 @@ async function renderDashboard() {
   }
 
   el.innerHTML = html;
-  // populateYearSelector(txns, 'current');
+  populateYearSelector(txns, 'current');
 }
 
 // ── IMPORT ────────────────────────────────────────────────────────────────────
