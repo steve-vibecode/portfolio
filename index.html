@@ -1036,8 +1036,26 @@ async function renderDashboard() {
   // ── Hero — matches old design exactly
   html += `
   <div class="hero" style="position:relative;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+  <div>
     <div class="hero-label">Total Portfolio Value</div>
     <div class="hero-amount">${fmtDisplay(totalValDisplay)}</div>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:6px;">
+    <select onchange="setDisplayCurrency(this.value)"
+      style="background:#111827;border:none;color:white;padding:7px 10px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;outline:none;-webkit-appearance:none;line-height:1;">
+      <option value="MYR" ${displayCurrency === 'MYR' ? 'selected' : ''}>MYR</option>
+      <option value="USD" ${displayCurrency === 'USD' ? 'selected' : ''}>USD</option>
+      <option value="SGD" ${displayCurrency === 'SGD' ? 'selected' : ''}>SGD</option>
+      <option value="GBP" ${displayCurrency === 'GBP' ? 'selected' : ''}>GBP</option>
+    </select>
+
+    <div style="background:#111827;color:white;padding:7px 10px;border-radius:6px;font-size:11px;font-weight:800;line-height:1;">
+      Live
+    </div>
+  </div>
+</div>
 
     <div class="hero-row">
       <span class="hero-gain ${cc(totalPLRM)}">${sgnDisplay(totalPLDisplay)}</span>
@@ -1050,15 +1068,6 @@ async function renderDashboard() {
 
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;gap:8px;">
       <span style="font-size:10px;color:#7a9adc;">${now}</span>
-
-      <div style="display:flex;align-items:center;gap:6px;">
-        <select onchange="setDisplayCurrency(this.value)"
-          style="background:rgba(59,130,246,0.2);border:none;color:#7ab4ff;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;outline:none;-webkit-appearance:none;">
-          <option value="MYR" ${displayCurrency === 'MYR' ? 'selected' : ''}>MYR</option>
-          <option value="USD" ${displayCurrency === 'USD' ? 'selected' : ''}>USD</option>
-          <option value="SGD" ${displayCurrency === 'SGD' ? 'selected' : ''}>SGD</option>
-          <option value="GBP" ${displayCurrency === 'GBP' ? 'selected' : ''}>GBP</option>
-        </select>
 
         <button onclick="priceCache={};priceCacheTime=0;renderDashboard()"
           style="background:rgba(59,130,246,0.2);border:none;color:#7ab4ff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;">
