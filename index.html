@@ -1043,17 +1043,39 @@ async function renderDashboard() {
   </div>
 
   <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-    <select onchange="setDisplayCurrency(this.value)"
-      style="height:28px;background:#111827;border:none;color:white;padding:0 10px;border-radius:6px;font-size:11px;font-weight:800;cursor:pointer;outline:none;-webkit-appearance:none;">
-      <option value="MYR" ${displayCurrency === 'MYR' ? 'selected' : ''}>MYR</option>
-      <option value="USD" ${displayCurrency === 'USD' ? 'selected' : ''}>USD</option>
-      <option value="SGD" ${displayCurrency === 'SGD' ? 'selected' : ''}>SGD</option>
-      <option value="GBP" ${displayCurrency === 'GBP' ? 'selected' : ''}>GBP</option>
-    </select>
+  <select onchange="setDisplayCurrency(this.value)"
+    style="
+      height:28px;
+      background:#111827;
+      border:none;
+      color:white;
+      padding:0 22px 0 10px;
+      border-radius:6px;
+      font-size:11px;
+      font-weight:800;
+      cursor:pointer;
+      outline:none;
+      appearance:auto;
+      -webkit-appearance:menulist;
+    ">
+    <option value="MYR" ${displayCurrency === 'MYR' ? 'selected' : ''}>MYR</option>
+    <option value="USD" ${displayCurrency === 'USD' ? 'selected' : ''}>USD</option>
+    <option value="SGD" ${displayCurrency === 'SGD' ? 'selected' : ''}>SGD</option>
+    <option value="GBP" ${displayCurrency === 'GBP' ? 'selected' : ''}>GBP</option>
+  </select>
 
-    <div style="height:28px;background:#111827;color:white;padding:0 10px;border-radius:6px;font-size:11px;font-weight:800;display:flex;align-items:center;">
-      Live
-    </div>
+  <div style="
+    height:28px;
+    background:#111827;
+    color:white;
+    padding:0 10px;
+    border-radius:6px;
+    font-size:11px;
+    font-weight:800;
+    display:flex;
+    align-items:center;
+  ">
+    Live
   </div>
 </div>
 
