@@ -14,41 +14,96 @@
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; }
+
+  :root {
+    --bg:          #0a1520;
+    --bg-grad:     #0d1a26;
+    --panel-bg:    linear-gradient(145deg, #0f1d2c 0%, #0c1925 100%);
+    --panel-sheen: rgba(212,165,116,0.03);
+    --panel-hover: #2a4a60;
+    --panel2:      #142536;
+    --border:      #1f3548;
+    --text:        #e8dcc4;
+    --muted:       #8a9bab;
+    --gold:        #d4a574;
+    --gold-dim:    #b89968;
+    --teal:        #5a8a8a;
+    --rust:        #c97b5e;
+    --green:       #7ba87b;
+    --input-bg:    rgba(10,21,32,0.9);
+    --tag-color:   #d4a574;
+    --chart-grid:  #1f3548;
+    --shimmer1:    #d4a574;
+    --shimmer2:    #f0c98a;
+    --shimmer3:    #b89968;
+    --bar-bg:      #142536;
+    --scrollbar:   #1f3548;
+    --sticky-bg:   #0f1d2c;
+    --white-text:  #e8dcc4;
+  }
+
+  body.light {
+    --bg:          #f5f2eb;
+    --bg-grad:     #ede8dc;
+    --panel-bg:    linear-gradient(145deg, #fffdf7 0%, #faf6ec 100%);
+    --panel-sheen: rgba(160,120,58,0.03);
+    --panel-hover: #c9a060;
+    --panel2:      #ede8d8;
+    --border:      #d4c9a8;
+    --text:        #2c2416;
+    --muted:       #7a6e5a;
+    --gold:        #a0783a;
+    --gold-dim:    #c9a060;
+    --teal:        #3a7a7a;
+    --rust:        #b05a3a;
+    --green:       #4a8a4a;
+    --input-bg:    #fffdf7;
+    --tag-color:   #a0783a;
+    --chart-grid:  #d4c9a8;
+    --shimmer1:    #a0783a;
+    --shimmer2:    #c9a060;
+    --shimmer3:    #7a5820;
+    --bar-bg:      #e8e0cc;
+    --scrollbar:   #c9b890;
+    --sticky-bg:   #fffdf7;
+    --white-text:  #3a2e1e;
+  }
+
   body {
-    background: #0a1520;
+    background: var(--bg);
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    color: #e8dcc4;
+    color: var(--text);
     font-size: 13px;
     -webkit-font-smoothing: antialiased;
+    transition: background 0.35s, color 0.35s;
   }
   input, textarea, button, select { font-family: inherit; }
   input:focus, textarea:focus { outline: none; }
 
-  /* ── Panels ── */
   .panel {
-    background: linear-gradient(145deg, #0f1d2c 0%, #0c1925 100%);
-    border: 1px solid #1f3548;
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
     padding: 12px 16px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     min-height: 0;
     position: relative;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, background 0.35s;
   }
   .panel::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(212,165,116,0.03) 0%, transparent 60%);
+    background: linear-gradient(135deg, var(--panel-sheen) 0%, transparent 60%);
     pointer-events: none;
   }
-  .panel:hover { border-color: #2a4a60; }
+  .panel:hover { border-color: var(--panel-hover); }
 
   .panel-tag {
     font-size: 9px;
     letter-spacing: 1.5px;
-    color: #d4a574;
+    color: var(--tag-color);
     font-family: 'JetBrains Mono', monospace;
     margin-bottom: 4px;
     font-weight: 500;
@@ -58,63 +113,64 @@
     font-size: 17px;
     margin: 0 0 8px 0;
     font-weight: 500;
-    color: #e8dcc4;
+    color: var(--text);
     line-height: 1.1;
     letter-spacing: -0.3px;
   }
   .display-serif { font-family: 'Fraunces', Georgia, serif; }
 
-  /* ── Rows & Tabs ── */
   .milestone-row {
     transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
     cursor: pointer;
   }
   .milestone-row:hover {
-    background: rgba(212,165,116,0.08) !important;
+    background: rgba(160,120,58,0.08) !important;
     transform: translateX(2px);
-    box-shadow: inset 2px 0 0 #d4a574;
+    box-shadow: inset 2px 0 0 var(--gold);
   }
   .phase-tab { transition: all 0.2s; cursor: pointer; }
-  .phase-tab:hover { background: rgba(212,165,116,0.12) !important; }
+  .phase-tab:hover { background: rgba(160,120,58,0.12) !important; }
 
-  /* ── Scrollbars ── */
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #1f3548; border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: #d4a574; }
+  ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
   .scroll-y { overflow-y: auto; min-height: 0; flex: 1; }
 
-  /* ── Type ── */
   .mono { font-family: 'JetBrains Mono', monospace; }
-  .gold { color: #d4a574; }
-  .muted { color: #8a9bab; }
-  .pos { color: #7ba87b; }
-  .neg { color: #c97b7b; }
+  .gold { color: var(--gold); }
+  .muted { color: var(--muted); }
+  .pos { color: var(--green); }
+  .neg { color: var(--rust); }
 
-  /* ── Animated number counter ── */
-  @keyframes countUp {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .count-anim { animation: countUp 0.5s ease forwards; }
-
-  /* ── Edit inputs ── */
-  .edit-input {
-    background: rgba(10,21,32,0.9);
-    border: 1px solid #d4a574;
+  .theme-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 3px 9px;
+    font-size: 12px;
+    cursor: pointer;
     border-radius: 2px;
-    color: #e8dcc4;
+    transition: all 0.2s;
+    line-height: 1;
+  }
+  .theme-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .edit-input {
+    background: var(--input-bg);
+    border: 1px solid var(--gold);
+    border-radius: 2px;
+    color: var(--text);
     padding: 3px 7px;
     font-family: 'Fraunces', Georgia, serif;
     font-size: 11px;
     transition: box-shadow 0.2s, border-color 0.2s;
   }
   .edit-input:focus {
-    border-color: #e8c890;
-    box-shadow: 0 0 0 2px rgba(212,165,116,0.2);
+    border-color: var(--gold-dim);
+    box-shadow: 0 0 0 2px rgba(160,120,58,0.2);
   }
 
-  /* ── Buttons ── */
   .btn-icon {
     background: transparent;
     border: none;
@@ -128,18 +184,18 @@
   }
   .milestone-row:hover .btn-icon,
   .edit-row .btn-icon { opacity: 1; }
-  .btn-save { color: #7ba87b; border: 1px solid #7ba87b36; }
-  .btn-save:hover { background: rgba(123,168,123,0.15); border-color: #7ba87b; }
-  .btn-cancel { color: #8a9bab; border: 1px solid #8a9bab36; }
+  .btn-save { color: var(--green); border: 1px solid rgba(123,168,123,0.3); }
+  .btn-save:hover { background: rgba(123,168,123,0.15); }
+  .btn-cancel { color: var(--muted); border: 1px solid rgba(138,155,171,0.3); }
   .btn-cancel:hover { background: rgba(138,155,171,0.15); }
-  .btn-edit { color: #d4a574; border: 1px solid transparent; }
-  .btn-edit:hover { background: rgba(212,165,116,0.15); border-color: #d4a57436; }
-  .btn-delete { color: #c97b5e; border: 1px solid transparent; }
-  .btn-delete:hover { background: rgba(201,123,94,0.15); border-color: #c97b5e36; }
+  .btn-edit { color: var(--gold); border: 1px solid transparent; }
+  .btn-edit:hover { background: rgba(160,120,58,0.15); }
+  .btn-delete { color: var(--rust); border: 1px solid transparent; }
+  .btn-delete:hover { background: rgba(201,123,94,0.15); }
   .btn-add {
     background: transparent;
-    border: 1px dashed #1f3548;
-    color: #8a9bab;
+    border: 1px dashed var(--border);
+    color: var(--muted);
     cursor: pointer;
     font-size: 10px;
     font-family: 'Fraunces', Georgia, serif;
@@ -150,29 +206,20 @@
     border-radius: 2px;
     transition: all 0.2s;
   }
-  .btn-add:hover { border-color: #d4a574; color: #d4a574; background: rgba(212,165,116,0.05); }
+  .btn-add:hover { border-color: var(--gold); color: var(--gold); background: rgba(160,120,58,0.05); }
 
-  /* ── Edit row slide-in ── */
   @keyframes slideIn {
     from { opacity: 0; transform: translateY(-4px); }
     to   { opacity: 1; transform: translateY(0); }
   }
   .edit-row { animation: slideIn 0.18s ease forwards; }
 
-  /* ── Save flash ── */
-  @keyframes saveFlash {
-    0%   { background: rgba(123,168,123,0.25); }
-    100% { background: transparent; }
-  }
-  .save-flash { animation: saveFlash 0.8s ease forwards; }
-
-  /* ── Gold shimmer on large numbers ── */
   @keyframes shimmer {
     0%   { background-position: -200% center; }
     100% { background-position: 200% center; }
   }
   .gold-shimmer {
-    background: linear-gradient(90deg, #d4a574 0%, #f0c98a 40%, #d4a574 60%, #b89968 100%);
+    background: linear-gradient(90deg, var(--shimmer1) 0%, var(--shimmer2) 40%, var(--shimmer1) 60%, var(--shimmer3) 100%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -180,52 +227,20 @@
     animation: shimmer 4s linear infinite;
   }
 
-  /* ── Tab underline animate ── */
-  .tab-active-line {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 2px;
-    background: #d4a574;
-    transform-origin: left;
-    animation: tabLine 0.25s ease forwards;
-  }
-  @keyframes tabLine {
-    from { transform: scaleX(0); }
-    to   { transform: scaleX(1); }
-  }
+  .bar-fill { height: 100%; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
 
-  /* ── Progress bar fill ── */
-  .bar-fill {
-    height: 100%;
-    transition: width 1s cubic-bezier(0.4,0,0.2,1);
-  }
-
-  /* ── Glow on hover for stat boxes ── */
-  .stat-box {
-    transition: all 0.2s;
-    padding: 4px 6px;
-    border-radius: 3px;
-  }
-  .stat-box:hover {
-    background: rgba(212,165,116,0.06);
-    box-shadow: inset 0 0 0 1px rgba(212,165,116,0.15);
-  }
-
-  /* ── Pulse dot ── */
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50%       { opacity: 0.4; transform: scale(0.8); }
   }
   .pulse { animation: pulse 2s ease-in-out infinite; display: inline-block; }
 
-  /* ── Fade in for tab content ── */
   @keyframes fadeInUp {
     from { opacity: 0; transform: translateY(8px); }
     to   { opacity: 1; transform: translateY(0); }
   }
   .tab-content { animation: fadeInUp 0.22s ease forwards; }
 
-  /* ── Net worth negative shake ── */
   @keyframes softPulseRed {
     0%, 100% { text-shadow: 0 0 0 transparent; }
     50%       { text-shadow: 0 0 12px rgba(201,123,94,0.4); }
@@ -287,12 +302,20 @@ const RETIREMENT_AGE = 45;
 const TARGET_YIELD = 0.06;
 const STORAGE_KEY = "retirement_dashboard_v3";
 
-const c = {
+const getColors = (isLight) => isLight ? {
+  bg: "#f5f2eb", panel: "#fffdf7", panel2: "#ede8d8",
+  border: "#d4c9a8", text: "#2c2416", muted: "#7a6e5a",
+  gold: "#a0783a", goldDim: "#c9a060", teal: "#3a7a7a",
+  rust: "#b05a3a", green: "#4a8a4a",
+} : {
   bg: "#0a1520", panel: "#0f1d2c", panel2: "#142536",
   border: "#1f3548", text: "#e8dcc4", muted: "#8a9bab",
   gold: "#d4a574", goldDim: "#b89968", teal: "#5a8a8a",
   rust: "#c97b5e", green: "#7ba87b",
 };
+
+// Module-level c — updated by App before each render, readable by all helper components
+let c = getColors(localStorage.getItem('theme') === 'light');
 
 const DEFAULT_SETTINGS = {
   age: 31,
@@ -314,6 +337,23 @@ function toYahooSymbol(ticker, market) {
 }
 
 function App() {
+  const [isLight, setIsLight] = useState(() => localStorage.getItem('theme') === 'light');
+
+  const toggleTheme = () => {
+    setIsLight(prev => {
+      const next = !prev;
+      localStorage.setItem('theme', next ? 'light' : 'dark');
+      document.body.classList.toggle('light', next);
+      return next;
+    });
+  };
+
+  React.useEffect(() => {
+    document.body.classList.toggle('light', isLight);
+  }, []);
+
+  // Keep module-level c in sync so helper components (Stat, HoldingsTable etc.) see current theme
+  Object.assign(c, getColors(isLight));
   const [settings, setSettings] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -633,6 +673,9 @@ function App() {
           {error && <span style={{ color: c.rust, fontSize: 10 }}>⚠ {error}</span>}
           <span className="mono muted" style={{ fontSize: 9, letterSpacing: 1 }}><span className="pulse" style={{ color: c.green }}>●</span> LIVE</span>
           <span className="gold mono" style={{ fontSize: 10 }}>{lastUpdatedStr}</span>
+          <button className="theme-btn" onClick={toggleTheme} title="Toggle theme">
+            {isLight ? '🌙' : '☀️'}
+          </button>
           <button onClick={fetchData} disabled={refreshing} style={{
             background: refreshing ? c.panel2 : "transparent",
             color: c.gold, border: `1px solid ${c.gold}`,
@@ -666,7 +709,7 @@ function App() {
           <div className="gold-shimmer display-serif" style={{ fontSize: 44, fontWeight: 400, letterSpacing: -1.5, lineHeight: 1.1, marginTop: 4 }}>
             RM<AnimatedNumber value={totalValue} />
           </div>
-          <div className="panel-tag" style={{ color: "white" }}>
+          <div className="panel-tag" style={{ color: c.text }}>
             of RM{TARGET.toLocaleString()} — RM{(TARGET - totalValue).toLocaleString("en-US", { maximumFractionDigits: 0 })} remaining
           </div>
           <div style={{ position: "relative", height: 6, background: c.panel2, marginBottom: 12 }}>
@@ -720,7 +763,7 @@ function App() {
           <div className="display-serif" style={{ fontSize: 16, fontWeight: 500, color: phaseColors[phase], marginBottom: 6, fontStyle: "italic" }}>
             {phaseLabels[phase]}
           </div>
-          <div className="display-serif" style={{ fontSize: 12, lineHeight: 1.5, flex: 1, color: "white" }}>
+          <div className="display-serif" style={{ fontSize: 12, lineHeight: 1.5, flex: 1, color: c.text }}>
             {phaseAdvice[phase]}
           </div>
         </div>
@@ -748,7 +791,7 @@ function App() {
               <div className="panel-tag">◆ PROJECTION</div>
               <h2 className="panel-title" style={{ fontStyle: "italic" }}>The Compound Curve</h2>
             </div>
-            <div className="display-serif" style={{ fontSize: 11, color: "white" }}>Returns: Growth 8%, Dividend 6%.</div>
+            <div className="display-serif" style={{ fontSize: 11, color: c.text }}>Returns: Growth 8%, Dividend 6%.</div>
           </div>
           <div style={{ flex: 1, minHeight: 0 }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -779,7 +822,7 @@ function App() {
             Phase {phase === 1 ? "I" : phase === 2 ? "II" : "III"} · 
             {phaseMonthly > 0 ? `RM${phaseMonthly.toLocaleString()}/mo` : "No contribution"}
           </h2>
-          <div className="display-serif" style={{ display: "flex", flexDirection: "column", gap: 5, color: "white" }}>
+          <div className="display-serif" style={{ display: "flex", flexDirection: "column", gap: 5, color: c.text }}>
             {monthlyPlans[phase].map((item, i) => (
               <div key={i} style={{
                 display: "grid", gridTemplateColumns: "70px 1fr auto", gap: 10, alignItems: "center",
