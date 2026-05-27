@@ -250,7 +250,6 @@
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   .spinner { animation: spin 1s linear infinite; display: inline-block; }
 
-  /* ── Google Sheets-style tab bar ── */
   .sheets-tabbar {
     display: flex;
     align-items: flex-end;
@@ -294,7 +293,6 @@
     border-color: var(--border);
     border-bottom-color: var(--bg);
   }
-  /* fallback for panel-bg being a gradient */
   body:not(.light) .sheets-tab.active { background: #0f1d2c; }
   body.light .sheets-tab.active { background: #fffdf7; }
 
@@ -388,7 +386,7 @@ function toYahooSymbol(ticker, market) {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// TAB 1 — CURRENT PORTFOLIO (overview panels)
+// TAB 1 — CURRENT PORTFOLIO
 // ─────────────────────────────────────────────────────────────────────────────
 function TabPortfolio({ settings, saveSettings, totalValue, dividendTotal, growthTotal, fxRate, progressPct, yearsRemaining, finalProjection, projectionData, allocationData, targetAllocation, yearlyPlan, phaseColors, phaseLabels, phaseAdvice, monthlyPlans, previewPhase, setPreviewPhase, autoPhase }) {
   const phase = previewPhase || autoPhase;
@@ -403,7 +401,6 @@ function TabPortfolio({ settings, saveSettings, totalValue, dividendTotal, growt
       gridTemplateRows: "1fr 1fr",
       gap: 8, padding: "8px 10px",
     }}>
-      {/* Portfolio Value */}
       <div className="panel" style={{ gridColumn: "span 5", padding: "16px 22px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
           <div className="panel-tag">CURRENT PORTFOLIO VALUE</div>
@@ -433,7 +430,6 @@ function TabPortfolio({ settings, saveSettings, totalValue, dividendTotal, growt
         </div>
       </div>
 
-      {/* Phase Panel */}
       <div className="panel" style={{ gridColumn: "span 4" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <div className="panel-tag">PHASE {previewPhase ? "(PREVIEW)" : "(LIVE)"}</div>
@@ -471,7 +467,6 @@ function TabPortfolio({ settings, saveSettings, totalValue, dividendTotal, growt
         </div>
       </div>
 
-      {/* Allocation Donut */}
       <div className="panel" style={{ gridColumn: "span 3" }}>
         <div className="panel-tag">CURRENT ALLOCATION</div>
         <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 0 }}>
@@ -489,7 +484,6 @@ function TabPortfolio({ settings, saveSettings, totalValue, dividendTotal, growt
         </div>
       </div>
 
-      {/* Projection Chart */}
       <div className="panel" style={{ gridColumn: "span 5" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
           <div>
@@ -518,7 +512,6 @@ function TabPortfolio({ settings, saveSettings, totalValue, dividendTotal, growt
         </div>
       </div>
 
-      {/* Monthly Deployment */}
       <div className="panel" style={{ gridColumn: "span 4" }}>
         <div className="panel-tag">◆ MONTHLY DEPLOYMENT{previewPhase && <span style={{ color: c.rust, marginLeft: 6 }}>· PREVIEW</span>}</div>
         <h2 className="panel-title" style={{ fontStyle: "italic" }}>
@@ -538,7 +531,6 @@ function TabPortfolio({ settings, saveSettings, totalValue, dividendTotal, growt
         </div>
       </div>
 
-      {/* Allocation Path */}
       <div className="panel" style={{ gridColumn: "span 3" }}>
         <div className="panel-tag">◆ EVOLUTION</div>
         <h2 className="panel-title" style={{ fontStyle: "italic" }}>Allocation Path</h2>
@@ -584,7 +576,6 @@ function TabHoldings({ dividendRows, growthRows, dividendTotal, growthTotal, fxR
       flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10,
       minHeight: 0, overflow: "hidden", padding: "10px 12px",
     }}>
-      {/* Dividend Holdings */}
       <div className="panel">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", paddingBottom: 8, borderBottom: `1px solid ${c.border}`, marginBottom: 8 }}>
           <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: c.teal, fontWeight: 600 }}>DIVIDEND ACCOUNT</div>
@@ -621,7 +612,6 @@ function TabHoldings({ dividendRows, growthRows, dividendTotal, growthTotal, fxR
         </div>
       </div>
 
-      {/* Growth Holdings */}
       <div className="panel">
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", paddingBottom: 8, borderBottom: `1px solid ${c.border}`, marginBottom: 8 }}>
           <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: c.gold, fontWeight: 600 }}>GROWTH ACCOUNT</div>
@@ -655,7 +645,6 @@ function TabHoldings({ dividendRows, growthRows, dividendTotal, growthTotal, fxR
         </div>
       </div>
 
-      {/* Milestones */}
       <div className="panel">
         <div style={{ paddingBottom: 8, borderBottom: `1px solid ${c.border}`, marginBottom: 8 }}>
           <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: c.gold, fontWeight: 600 }}>MILESTONES</div>
@@ -715,7 +704,6 @@ function TabPlan({ settings, saveSettings, yearlyPlan, phaseColors, fireTargets,
       flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10,
       minHeight: 0, overflow: "hidden", padding: "10px 12px",
     }}>
-      {/* LEFT: Yearly Plan */}
       <div className="panel">
         <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 8 }}>
           <div>
@@ -765,11 +753,8 @@ function TabPlan({ settings, saveSettings, yearlyPlan, phaseColors, fireTargets,
         </div>
       </div>
 
-      {/* RIGHT: FIRE Progress + Retirement Commitment */}
       <div style={{ display: "grid", gridTemplateRows: "auto 1fr", gap: 10, minHeight: 0 }}>
-        {/* FIRE Stats row */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          {/* Portfolio */}
           <div className="panel" style={{ padding: "14px 18px" }}>
             <div className="panel-tag" style={{ marginBottom: 10 }}>◆ FIRE PROGRESS</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -787,7 +772,6 @@ function TabPlan({ settings, saveSettings, yearlyPlan, phaseColors, fireTargets,
               ))}
             </div>
           </div>
-          {/* Income */}
           <div className="panel" style={{ padding: "14px 18px" }}>
             <div className="panel-tag" style={{ marginBottom: 10 }}>◆ INCOME PROGRESS</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -807,7 +791,6 @@ function TabPlan({ settings, saveSettings, yearlyPlan, phaseColors, fireTargets,
           </div>
         </div>
 
-        {/* Retirement Commitment */}
         <div className="panel">
           <div className="panel-tag" style={{ marginBottom: 6 }}>◆ RETIREMENT COMMITMENT</div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 100px 1fr 48px", gap: 0, fontSize: 9, letterSpacing: 1.2, color: c.muted, fontFamily: "'Fraunces', Georgia, serif", padding: "3px 0", borderBottom: `1px solid ${c.border}`, fontWeight: 600 }}>
@@ -871,7 +854,6 @@ function TabPlan({ settings, saveSettings, yearlyPlan, phaseColors, fireTargets,
 function TabNetWorth({ fxRate, emergencyFund, investments, dividendTotal, growthTotal, liabilities, editing, setEditing, editForm, setEditForm, commitEdit, deleteRow, saving, startEdit, startAdd, cancelEdit }) {
   const toRM = (amt, cur) => cur === 'USD' ? (parseFloat(amt)||0) * fxRate : (parseFloat(amt)||0);
 
-  // Separate ASNB entries from real liabilities — match by name only
   const asnbLiabilities = liabilities.filter(r => /asnb/i.test(r.name));
   const realLiabilities = liabilities.filter(r => !/asnb/i.test(r.name));
 
@@ -889,7 +871,12 @@ function TabNetWorth({ fxRate, emergencyFund, investments, dividendTotal, growth
   const hdr = { ...sf, fontSize: 9, letterSpacing: 1.5, fontWeight: 600 };
 
   const efRows = emergencyFund.map(r => ({ ...r, name: r.asset, valRM: toRM(r.amount, r.currency), raw: r }));
-  const invRows = investments.map(r => ({ ...r, valRM: toRM(r.amount, r.currency), raw: r }));
+  // ── PATCH: split investments into Fixed Deposit (→ Emergency Fund) and the rest (→ Retirement)
+  const allInvRows = investments.map(r => ({ ...r, valRM: toRM(r.amount, r.currency), raw: r }));
+  const fdRows = allInvRows.filter(r => (r.category||'').toLowerCase().includes('fixed deposit') || (r.name||'').toLowerCase().includes('fixed deposit'));
+  const invRows = allInvRows.filter(r => !(r.category||'').toLowerCase().includes('fixed deposit') && !(r.name||'').toLowerCase().includes('fixed deposit'));
+  const fdTotal = fdRows.reduce((s,r) => s + (r.valRM||0), 0);
+  const efAndFdTotal = efAndAsnbTotal + fdTotal;
 
   const AssetSection = ({ label, color, tableName, rows, total, fields, extraRows = [] }) => (
     <div style={{ marginBottom: 10 }}>
@@ -912,7 +899,6 @@ function TabNetWorth({ fxRate, emergencyFund, investments, dividendTotal, growth
           <div key={row.id} className="milestone-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", borderBottom: `1px solid ${c.border}20` }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
               <div style={{ ...sf, fontSize: 13, color: c.text }}>{row.name||row.asset||row.account}</div>
-              {(row.note||row.category) && <div style={{ ...sf, fontSize: 10, color: c.muted }}>{row.note||row.category}</div>}
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <div style={{ ...sf, fontSize: 13, color: c.text }}>RM{(row.valRM||0).toLocaleString("en-US",{maximumFractionDigits:0})}</div>
@@ -922,7 +908,6 @@ function TabNetWorth({ fxRate, emergencyFund, investments, dividendTotal, growth
           </div>
         );
       })}
-      {/* Extra read-only rows (e.g. ASNB from liabilities) */}
       {extraRows.map((row) => (
         <div key={`extra-${row.id}`} className="milestone-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", borderBottom: `1px solid ${c.border}20` }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -962,15 +947,23 @@ function TabNetWorth({ fxRate, emergencyFund, investments, dividendTotal, growth
           <div style={{ ...sf, fontSize: 15, color: c.teal, fontWeight: 600 }}>RM{totalAssets.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
         </div>
         <div className="scroll-y">
-          <AssetSection label="EMERGENCY FUND" color={c.teal} tableName="emergency_fund" total={efAndAsnbTotal} rows={efRows}
+          {/* EMERGENCY FUND: includes EF rows + ASNB + Fixed Deposit */}
+          <AssetSection label="EMERGENCY FUND" color={c.teal} tableName="emergency_fund" total={efAndFdTotal} rows={efRows}
             fields={[{key:'asset', label:'Asset', w:100},{key:'amount', label:'Amount', w:80, type:'number'},{key:'currency', label:'MYR/USD', w:60}]}
-            extraRows={asnbLiabilities.map(r => ({
-              id: r.id, name: r.name, valRM: parseFloat(r.saved_up)||0,
-              badge: "ASNB", raw: r, tableName: 'liabilities'
-            }))}
+            extraRows={[
+              ...asnbLiabilities.map(r => ({
+                id: r.id, name: r.name, valRM: parseFloat(r.saved_up)||0,
+                badge: "ASNB", raw: r, tableName: 'liabilities'
+              })),
+              ...fdRows.map(r => ({
+                id: r.id, name: r.name, valRM: r.valRM||0,
+                badge: "FD", raw: r.raw, tableName: 'investments'
+              }))
+            ]}
           />
-          <AssetSection label="INVESTMENTS" color={c.gold} tableName="investments" total={investTotal} rows={invRows}
-            fields={[{key:'name', label:'Name', w:100},{key:'amount', label:'Amount', w:80, type:'number'},{key:'currency', label:'MYR/USD', w:60},{key:'category', label:'Category', w:80},{key:'notes', label:'Notes', w:80}]} />
+          {/* RETIREMENT: EPF and other non-FD investments */}
+          <AssetSection label="RETIREMENT" color={c.gold} tableName="investments" total={invRows.reduce((s,r)=>s+(r.valRM||0),0)} rows={invRows}
+            fields={[{key:'name', label:'Name', w:100},{key:'amount', label:'Amount', w:80, type:'number'},{key:'currency', label:'MYR/USD', w:60},{key:'category', label:'Category', w:80}]} />
           <div style={{ marginBottom: 8 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4, paddingBottom: 4, borderBottom: `1px solid ${c.border}30` }}>
               <div style={{ ...hdr, color: c.gold }}>STOCK PORTFOLIO</div>
@@ -1052,7 +1045,6 @@ function TabNetWorth({ fxRate, emergencyFund, investments, dividendTotal, growth
             {netWorth<0?"-":""}RM<AnimatedNumber value={Math.abs(netWorth)} />
           </div>
         </div>
-        {/* Asset vs Liability bar */}
         <div style={{ marginBottom: 10 }}>
           <div style={{ height: 8, background: c.panel2, display: "flex", marginBottom: 6, borderRadius: 2, overflow: "hidden" }}>
             <div style={{ width: `${Math.min((totalAssets/Math.max(totalAssets+totalLiabilities,1))*100,100)}%`, height:"100%", background: c.teal }} />
@@ -1216,7 +1208,6 @@ function App() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  // Compute holdings
   const holdingsMap = {};
   for (const t of transactions) {
     if (!holdingsMap[t.ticker]) holdingsMap[t.ticker] = { ticker: t.ticker, market: t.market, type: t.type, units: 0, costBasis: 0 };
@@ -1318,7 +1309,6 @@ function App() {
       background: c.bg,
       display: "flex", flexDirection: "column",
     }}>
-      {/* ── HEADER ── */}
       <header style={{
         display: "flex", justifyContent: "space-between", alignItems: "center",
         padding: "5px 16px", borderBottom: `1px solid ${c.border}`,
@@ -1348,7 +1338,6 @@ function App() {
         </div>
       </header>
 
-      {/* ── TAB CONTENT (fills remaining space) ── */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
         {loading ? (
           <div className="display-serif" style={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1, color: c.gold, fontSize: 16 }}>
@@ -1395,7 +1384,6 @@ function App() {
         )}
       </div>
 
-      {/* ── GOOGLE SHEETS–STYLE TAB BAR ── */}
       <div style={{
         display: "flex", alignItems: "flex-end", gap: 2,
         padding: "0 12px", borderTop: `1px solid ${c.border}`,
@@ -1429,7 +1417,6 @@ function App() {
             </div>
           );
         })}
-        {/* footer info on the right */}
         <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 16, fontSize: 9, fontFamily: "JetBrains Mono, monospace", color: c.muted, paddingBottom: 2 }}>
           <span>{transactions.length} TXNS · {dividends.length} DIV · {active.length} POSITIONS</span>
           <span className="display-serif" style={{ fontStyle: "italic", fontSize: 11, fontFamily: "Fraunces, serif", fontWeight: 400 }}>
