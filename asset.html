@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="theme-color" content="#0a0f1e"/>
-<title>Folio</title>
+<title>Assets</title>
 <style>
 :root {
   --bg: #0a0f1e;
@@ -991,7 +991,7 @@ async function renderDashboard() {
         <div class="ticker-wrap">
           <div class="ticker-badge" style="background:${bg};color:${fg};font-size:${r.currency.length<=3?'8':'6'}px;">${r.currency}</div>
           <div>
-            <div class="s-name" style="max-width:90px;">${r.asset}</div>
+            <div class="s-name">${r.asset}</div>
           </div>
         </div>
         <div>
