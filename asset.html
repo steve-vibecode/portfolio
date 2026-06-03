@@ -1109,14 +1109,14 @@ async function renderDashboard() {
   }
 
   const legend = segments.map(s => `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div style="width:10px;height:10px;border-radius:50%;background:${s.color};flex-shrink:0;"></div>
-        <span style="font-size:13px;color:var(--text2);">${s.label}</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;">
+      <div style="display:flex;align-items:center;gap:6px;min-width:0;">
+        <div style="width:8px;height:8px;border-radius:50%;background:${s.color};flex-shrink:0;"></div>
+        <span style="font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.label}</span>
       </div>
-      <div style="text-align:right;">
-        <span style="font-size:13px;font-weight:700;color:var(--text);">RM${s.value.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})}</span>
-        <span style="font-size:11px;color:var(--text3);margin-left:6px;">${totalRM?(s.value/totalRM*100).toFixed(1):0}%</span>
+      <div style="display:flex;align-items:baseline;gap:5px;flex-shrink:0;">
+        <span style="font-size:12px;font-weight:700;color:var(--text);">RM${s.value.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})}</span>
+        <span style="font-size:10px;color:var(--text3);">${totalRM?(s.value/totalRM*100).toFixed(1):0}%</span>
       </div>
     </div>`).join('');
 
