@@ -611,6 +611,49 @@ async function efDelete(id) {
   if (error) console.error('efDelete error:', error);
 }
 
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '') + ' show';
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function fmt(n, currency, decimals = 2) {
+  const sym = currency === 'MY' || currency === 'MYR' ? 'RM' : currency === 'SG' ? 'S$' : currency === 'UK' ? '£' : currency === 'HK' ? 'HK$' : '$';
+  return sym + Math.abs(n).toLocaleString('en', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+}
+function sgn(n, currency) { return (n >= 0 ? '+' : '-') + fmt(n, currency); }
+function pct(n) { return (n >= 0 ? '+' : '') + n.toFixed(2) + '%'; }
+function cc(n)  { return n >= 0 ? 'pos' : 'neg'; }
+function today() { return new Date().toISOString().split('T')[0]; }
+
+function badgeColor(ticker) {
+  if (ticker === 'USD') return ['#0f2d1a','#6ee7b7'];
+  if (ticker === 'MYR') return ['#0f1f45','#7ab4ff'];
+  if (ticker === 'XAU') return ['#3a2800','#fcd34d'];
+  const colors = [
+    ['#1a3a6b','#7ab4ff'], ['#1a4a2a','#6ee7b7'], ['#4a1a1a','#fca5a5'],
+    ['#2a1a4a','#c4b5fd'], ['#4a3a1a','#fcd34d'], ['#1a3a4a','#7dd3fc'],
+    ['#3a1a4a','#f0abfc'], ['#1a4a4a','#5eead4'],
+  ];
+  let h = 0; for (let c of ticker) h = (h * 31 + c.charCodeAt(0)) % colors.length;
+  return colors[Math.abs(h)];
+}
+
+function tickerBadge(ticker, market) {
+  const [bg, fg] = badgeColor(ticker);
+  const label = isASNB(ticker) ? 'ASNB'
+    : market === 'MY' ? ticker + '.KL'
+    : market === 'SG' ? ticker + '.SI'
+    : market === 'UK' ? ticker + '.L'
+    : market === 'HK' ? ticker + '.HK'
+    : ticker;
+  const fs = label.length <= 3 ? '8px' : label.length <= 4 ? '7px' : label.length <= 6 ? '6px' : '5px';
+  return `<div class="ticker-badge" style="background:${bg};color:${fg};font-size:${fs};text-align:center;display:flex;align-items:center;justify-content:center;line-height:1.1;">${label}</div>`;
+}
+
 // ── NAV ───────────────────────────────────────────────────────────────────────
 function goPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
