@@ -1353,8 +1353,6 @@ async function renderDashboard() {
     <div class="hero-label">Total Asset Value</div>
     <div class="hero-amount">${fmt(totalAssetRM,'MY')}</div>
     <div class="hero-row">
-      <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
-      <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
       <span class="hero-badge">USD→MYR: ${rate ? rate.toFixed(4) : '—'}</span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
@@ -1435,7 +1433,7 @@ async function renderDashboard() {
           <div class="acc-type">Cash & Commodities</div>
         </div>
         <div class="acc-head-row" style="align-items:baseline;margin-top:2px;">
-          <div class="acc-val" style="color:#7dd3fc;">RM${cashRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+          <div class="acc-val">RM${cashRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
         </div>
       </div>
       <div class="col-head col-cash"><span>ASSET</span><span>AMOUNT</span><span>LIVE RATE</span><span>VALUE (RM)</span></div>
@@ -2061,8 +2059,6 @@ async function renderDashboardHistorical(year) {
     <div class="hero-label">Total Asset Value — ${year} Year End</div>
     <div class="hero-amount">${fmt(totalAssetRM,'MY')}</div>
     <div class="hero-row">
-      <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
-      <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
       <span class="hero-badge">USD→MYR: ${rate ? rate.toFixed(4) : '—'}</span>
     </div>
     <div style="font-size:10px;color:#7a9adc;margin-top:6px;">Closing prices: 31 Dec ${year}</div>
@@ -2130,7 +2126,7 @@ async function renderDashboardHistorical(year) {
           <div class="acc-type">Cash & Commodities</div>
         </div>
         <div class="acc-head-row" style="align-items:baseline;margin-top:2px;">
-          <div class="acc-val" style="color:#7dd3fc;">RM${cashRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+          <div class="acc-val">RM${cashRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
         </div>
       </div>
       <div class="col-head col-cash"><span>ASSET</span><span>AMOUNT</span><span>RATE (${year})</span><span>VALUE (RM)</span></div>
