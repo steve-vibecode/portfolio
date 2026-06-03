@@ -1093,32 +1093,52 @@ async function renderDashboard() {
 
   function buildPie(segs, total) {
     if (!total) return '';
+    const cx=110, cy=110, r=95, ir=52;
     let cumAngle = -90;
-    const cx=80, cy=80, r=65, ir=38;
-    const paths = segs.map(s => {
+    const paths = []; const labels = [];
+    segs.forEach(s => {
       const angle = (s.value/total)*360;
+      // skip tiny slices for label
+      const midAngle = cumAngle + angle/2;
       const s1 = cumAngle*Math.PI/180, e1 = (cumAngle+angle)*Math.PI/180;
-      const x1=cx+r*Math.cos(s1),y1=cy+r*Math.sin(s1),x2=cx+r*Math.cos(e1),y2=cy+r*Math.sin(e1);
-      const ix1=cx+ir*Math.cos(s1),iy1=cy+ir*Math.sin(s1),ix2=cx+ir*Math.cos(e1),iy2=cy+ir*Math.sin(e1);
+      const x1=cx+r*Math.cos(s1),y1=cy+r*Math.sin(s1);
+      const x2=cx+r*Math.cos(e1),y2=cy+r*Math.sin(e1);
+      const ix1=cx+ir*Math.cos(s1),iy1=cy+ir*Math.sin(s1);
+      const ix2=cx+ir*Math.cos(e1),iy2=cy+ir*Math.sin(e1);
       const large = angle>180?1:0;
       const d = `M${ix1},${iy1} L${x1},${y1} A${r},${r} 0 ${large} 1 ${x2},${y2} L${ix2},${iy2} A${ir},${ir} 0 ${large} 0 ${ix1},${iy1} Z`;
+      paths.push(`<path d="${d}" fill="${s.color}"/>`);
+      // % label inside segment (only if slice big enough)
+      if (angle > 18) {
+        const labelR = (r+ir)/2;
+        const lx = cx + labelR*Math.cos(midAngle*Math.PI/180);
+        const ly = cy + labelR*Math.sin(midAngle*Math.PI/180);
+        paths.push(`<text x="${lx.toFixed(1)}" y="${(ly+4).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="white" opacity="0.95">${(s.value/total*100).toFixed(0)}%</text>`);
+      }
+      // label line + text outside
+      if (angle > 8) {
+        const lineR1 = r+4, lineR2 = r+14;
+        const lx1=cx+lineR1*Math.cos(midAngle*Math.PI/180), ly1=cy+lineR1*Math.sin(midAngle*Math.PI/180);
+        const lx2=cx+lineR2*Math.cos(midAngle*Math.PI/180), ly2=cy+lineR2*Math.sin(midAngle*Math.PI/180);
+        const textAnchor = lx2 >= cx ? 'start' : 'end';
+        const lx3 = lx2 + (lx2>=cx?3:-3);
+        labels.push(`<line x1="${lx1.toFixed(1)}" y1="${ly1.toFixed(1)}" x2="${lx2.toFixed(1)}" y2="${ly2.toFixed(1)}" stroke="${s.color}" stroke-width="1.2"/>`);
+        labels.push(`<text x="${lx3.toFixed(1)}" y="${(ly2+4).toFixed(1)}" text-anchor="${textAnchor}" font-size="9.5" fill="#7a8aaa">${s.label}</text>`);
+      }
       cumAngle += angle;
-      return `<path d="${d}" fill="${s.color}" opacity="0.9"/>`;
-    }).join('');
-    return `<svg viewBox="0 0 160 160" width="120" height="120">${paths}<circle cx="${cx}" cy="${cy}" r="${ir-2}" fill="var(--card)"/></svg>`;
+    });
+    return `<svg viewBox="0 0 220 220" width="100%" style="max-width:220px;display:block;margin:0 auto;">${paths.join('')}${labels.join('')}<circle cx="${cx}" cy="${cy}" r="${ir-2}" fill="var(--card)"/></svg>`;
   }
 
-  const legend = segments.map(s => `
-    <div style="display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;margin-bottom:8px;">
-      <div style="display:flex;align-items:center;gap:6px;min-width:0;">
-        <div style="width:8px;height:8px;border-radius:50%;background:${s.color};flex-shrink:0;"></div>
-        <span style="font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.label}</span>
-      </div>
-      <div style="text-align:right;white-space:nowrap;">
-        <span style="font-size:12px;font-weight:700;color:var(--text);">RM${s.value.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})}</span>
-        <span style="font-size:10px;color:var(--text3);margin-left:4px;">${totalRM?(s.value/totalRM*100).toFixed(1):0}%</span>
-      </div>
-    </div>`).join('');
+  const tableRows = segments.map(s => `
+    <tr>
+      <td style="padding:7px 0;display:flex;align-items:center;gap:7px;">
+        <div style="width:9px;height:9px;border-radius:50%;background:${s.color};flex-shrink:0;"></div>
+        <span style="font-size:12px;color:var(--text2);">${s.label}</span>
+      </td>
+      <td style="padding:7px 0;text-align:right;font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;">RM${s.value.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})}</td>
+      <td style="padding:7px 0;text-align:right;font-size:11px;color:var(--text3);white-space:nowrap;padding-left:8px;">${totalRM?(s.value/totalRM*100).toFixed(1):0}%</td>
+    </tr>`).join('');
 
   el.innerHTML = `
   <div class="hero">
@@ -1131,11 +1151,11 @@ async function renderDashboard() {
     </div>
   </div>
   <div class="card" style="margin-bottom:10px;">
-    <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;">Asset Allocation</div>
-    <div style="display:flex;align-items:center;gap:14px;">
-      <div style="flex-shrink:0;">${buildPie(segments,totalRM)}</div>
-      <div style="flex:1;min-width:0;">${legend}</div>
-    </div>
+    <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;">Asset Allocation</div>
+    ${buildPie(segments,totalRM)}
+    <table style="width:100%;border-collapse:collapse;margin-top:14px;border-top:1px solid var(--border);">
+      <tbody>${tableRows}</tbody>
+    </table>
   </div>`;
 }
 
