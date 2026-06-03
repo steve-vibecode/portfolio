@@ -926,7 +926,7 @@ async function renderRetirementPage() {
       return `
       <div class="log-item" style="align-items:center;">
         <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
-          <div style="width:38px;height:38px;border-radius:10px;background:${bg};color:${fg};font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${initials}</div>
+          <div style="width:38px;height:38px;border-radius:10px;background:${bg};color:${fg};font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1;flex-shrink:0;">${initials}</div>
           <div style="min-width:0;flex:1;">
             <div style="font-size:14px;font-weight:700;">${r.name}</div>
             ${r.category ? `<div style="font-size:11px;color:var(--text2);margin-top:2px;">${r.category}</div>` : ''}
@@ -1321,7 +1321,7 @@ async function renderDashboard() {
         return `
         <div class="stock-row" style="grid-template-columns:2fr 1fr 1fr;">
           <div class="ticker-wrap">
-            <div class="ticker-badge" style="background:${bg};color:${fg};font-size:7px;">${initials}</div>
+            <div class="ticker-badge" style="background:${bg};color:${fg};font-size:7px;width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1;margin-right:7px;">${initials}</div>
             <div><div class="s-name">${r.name}</div></div>
           </div>
           <div><div class="cell-main dim">${r.category || '—'}</div></div>
