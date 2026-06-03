@@ -164,8 +164,8 @@ nav {
   margin-bottom: 8px;
 }
 .cash-head {
-  background: linear-gradient(135deg, #0d2318 0%, #0f2d24 100%);
-  border-bottom: 1px solid rgba(14,165,233,0.2);
+  background: linear-gradient(135deg, #0f1f45 0%, #1a2f60 100%);
+  border-bottom: 1px solid #1e3a7a;
   padding: 12px 16px;
 }
 
@@ -515,7 +515,7 @@ nav {
 <!-- CASH PAGE -->
 <div class="page" id="page-cash">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-    <div class="page-title" style="margin-bottom:0;">Cash & Assets</div>
+    <div class="page-title" style="margin-bottom:0;">Cash & Commodities</div>
     <button onclick="openCashModal(null)" style="background:var(--accent);border:none;color:white;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">+ Add</button>
   </div>
   <div id="cash-list-content">
@@ -574,7 +574,7 @@ nav {
   </div>
   <div class="nav-btn" id="nav-cash" onclick="goPage('cash')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12a2 2 0 100-4 2 2 0 000 4zM6 12h.01M18 12h.01"/></svg>
-    <span>Cash</span>
+    <span>Cash & Commo</span>
   </div>
   <div class="nav-btn" id="nav-transactions" onclick="goPage('transactions')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16m-4-4 4 4 4-4M8 8l4-4 4 4"/></svg>
@@ -1046,10 +1046,10 @@ async function renderCashPage() {
   const sym = cur => cur === 'USD' ? '$' : cur === 'SGD' ? 'S$' : cur === 'GBP' ? '£' : cur === 'HKD' ? 'HK$' : 'RM';
 
   el.innerHTML = `
-    <div style="background:linear-gradient(135deg,#0d2318,#0f2d24);border:1px solid rgba(14,165,233,0.25);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;">
-      <div style="font-size:10px;color:#7dd3fc;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Total Cash & Assets</div>
-      <div style="font-size:28px;font-weight:800;color:#7dd3fc;">RM${totalRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
-      <div style="font-size:11px;color:rgba(125,211,252,0.5);margin-top:4px;">${rows.length} item${rows.length!==1?'s':''}</div>
+    <div style="background:linear-gradient(135deg, #0f1f45 0%, #1a2f60 100%);border:1px solid #1e3a7a;border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;">
+      <div style="font-size:10px;color:#7a9adc;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Total Cash & Commodities</div>
+      <div style="font-size:28px;font-weight:800;color:var(--text);">RM${totalRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px;">${rows.length} item${rows.length!==1?'s':''}</div>
     </div>
     ${rows.map(r => {
       const valueRM = efToRM2(r.amount, r.currency);
@@ -1072,7 +1072,7 @@ async function renderCashPage() {
           </div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;margin-left:10px;">
-          <div style="font-size:14px;font-weight:700;color:#7dd3fc;">${sym(r.currency)}${r.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);">${sym(r.currency)}${r.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
           ${rateStr ? `<div style="font-size:10px;color:var(--text2);">${rateStr}</div>` : ''}
           <div style="font-size:12px;font-weight:600;color:var(--text);">≈ RM${valueRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
           <div style="display:flex;gap:6px;margin-top:2px;">
@@ -1313,14 +1313,13 @@ async function renderDashboard() {
           <div class="ticker-badge" style="background:${bg};color:${fg};font-size:${r.currency.length<=3?'8':'6'}px;">${r.currency}</div>
           <div>
             <div class="s-name" style="max-width:90px;">${r.asset}</div>
-            <div class="s-units">${r.notes || r.currency}</div>
           </div>
         </div>
         <div>
           <div class="cell-main neu">${sym}${r.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
         </div>
         <div>
-          <div class="cell-main ${r.currency !== 'MYR' ? 'teal' : 'dim'}">${rateStr}</div>
+          <div class="cell-main neu">${rateStr}</div>
         </div>
         <div>
           <div class="cell-main neu">RM${valueRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
@@ -2017,14 +2016,13 @@ async function renderDashboardHistorical(year) {
             <div class="ticker-badge" style="background:${bg};color:${fg};font-size:${r.currency.length<=3?'8':'6'}px;">${r.currency}</div>
             <div>
               <div class="s-name" style="max-width:90px;">${r.asset}</div>
-              <div class="s-units">${r.notes || r.currency}</div>
             </div>
           </div>
           <div>
             <div class="cell-main neu">${sym}${r.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
           </div>
           <div>
-            <div class="cell-main ${r.currency !== 'MYR' ? 'teal' : 'dim'}">${rateStr}</div>
+            <div class="cell-main neu">${rateStr}</div>
           </div>
           <div>
             <div class="cell-main neu">RM${valueRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
