@@ -1172,7 +1172,7 @@ async function renderDashboard() {
       return `
       <div class="stock-row row-cash">
         <div class="ticker-wrap">
-          <div class="ticker-badge" style="background:${bg};color:${fg};font-size:${r.currency.length<=3?'8':'6'}px;">${r.currency}</div>
+          <div style="width:34px;height:34px;border-radius:8px;background:${bg};color:${fg};font-size:${r.currency.length<=3?'8':'6'}px;font-weight:800;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1;flex-shrink:0;margin-right:7px;">${r.currency}</div>
           <div>
             <div class="s-name">${r.asset}</div>
           </div>
@@ -1217,7 +1217,7 @@ async function renderDashboard() {
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
       <span style="font-size:10px;color:#7a9adc;">${now}</span>
-      <button onclick="priceCache={};priceCacheTime=0;cachedRate=null;renderDashboard()" style="background:rgba(59,130,246,0.2);border:none;color:#7ab4ff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;">↻ Refresh</button>
+      <button onclick="priceCache={};priceCacheTime=0;cachedRate=null;cachedSgdRate=null;cachedGbpRate=null;cachedHkdRate=null;cachedGoldUSD=null;goldCacheTime=0;renderDashboard()" style="background:rgba(59,130,246,0.2);border:none;color:#7ab4ff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;">↻ Refresh</button>
     </div>
   </div>`;
 
