@@ -363,6 +363,55 @@ nav {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12a2 2 0 100-4 2 2 0 000 4zM6 12h.01M18 12h.01"/></svg>
     <span>Emergency Fund</span>
   </div>
+  <div class="nav-btn" id="nav-retirement" onclick="goPage('retirement')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+    <span>Retirement</span>
+  </div>
+</nav>
+
+<!-- RETIREMENT PAGE -->
+<div class="page" id="page-retirement">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <div class="page-title" style="margin-bottom:0;">Retirement</div>
+    <button onclick="openRetirementModal(null)" style="background:var(--accent);border:none;color:white;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">+ Add</button>
+  </div>
+  <div id="retirement-list-content">
+    <div class="empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      <p>No retirement assets yet.<br>Tap + Add to get started.</p>
+    </div>
+  </div>
+</div>
+
+<!-- RETIREMENT MODAL -->
+<div class="modal-backdrop" id="retirement-modal-backdrop" onclick="onRetirementBackdropClick(event)">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="retirement-modal-title">Add Asset</span>
+      <button class="modal-close" onclick="closeRetirementModal()">✕</button>
+    </div>
+    <input type="hidden" id="retirement-edit-id"/>
+    <div class="form-group">
+      <label class="form-label">Name</label>
+      <input class="form-input" id="retirement-name" placeholder="e.g. EPF, PRS, Unit Trust"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Amount (RM)</label>
+        <input class="form-input" id="retirement-amount" type="number" placeholder="0.00" min="0" step="any"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <input class="form-input" id="retirement-category" placeholder="e.g. Retirement, Savings"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes (optional)</label>
+      <input class="form-input" id="retirement-notes" placeholder="e.g. Akaun 1 + Akaun 2"/>
+    </div>
+    <button class="btn btn-primary" onclick="saveRetirementAsset()" id="retirement-save-btn" style="margin-top:4px;">Save</button>
+  </div>
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -611,6 +660,43 @@ async function efDelete(id) {
   if (error) console.error('efDelete error:', error);
 }
 
+// ── INVESTMENTS (retirement) ──────────────────────────────────────────────────
+async function invGetAll() {
+  const { data, error } = await sb.from('investments').select('*').order('id', { ascending: true });
+  if (error) { console.error('invGetAll error:', error); return []; }
+  return (data || []).map(r => ({
+    id: r.id,
+    name: r.name,
+    amount: parseFloat(r.amount),
+    category: r.category || '',
+    notes: r.notes || '',
+    updatedAt: r.updated_at,
+  }));
+}
+
+async function invUpsert(row) {
+  const payload = {
+    name: row.name,
+    amount: row.amount,
+    category: row.category || '',
+    notes: row.notes || '',
+    updated_at: new Date().toISOString(),
+  };
+  if (row.id) {
+    const { error } = await sb.from('investments').update(payload).eq('id', row.id);
+    if (error) { console.error('invUpsert error:', error); return false; }
+  } else {
+    const { error } = await sb.from('investments').insert(payload);
+    if (error) { console.error('invUpsert error:', error); return false; }
+  }
+  return true;
+}
+
+async function invDelete(id) {
+  const { error } = await sb.from('investments').delete().eq('id', id);
+  if (error) console.error('invDelete error:', error);
+}
+
 // ── TOAST ─────────────────────────────────────────────────────────────────────
 function showToast(msg, isError = false) {
   const t = document.getElementById('toast');
@@ -664,6 +750,7 @@ function goPage(name) {
   if (nav)  nav.classList.add('active');
   if (name === 'dashboard') renderDashboard();
   if (name === 'cash') renderCashPage();
+  if (name === 'retirement') renderRetirementPage();
 }
 
 // ── CASH PAGE (emergency_fund) ────────────────────────────────────────────────
@@ -727,7 +814,7 @@ async function renderCashPage() {
       }
       const updatedStr = r.updatedAt ? new Date(r.updatedAt).toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'}) : '';
       return `
-      <div class="log-item" style="align-items:flex-start;">
+      <div class="log-item" style="align-items:center;">
         <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
           <div style="width:38px;height:38px;border-radius:10px;background:${bg};color:${fg};font-size:${r.currency.length<=3?'9':'7'}px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${r.currency}</div>
           <div style="min-width:0;flex:1;">
@@ -811,10 +898,106 @@ async function deleteCashAsset(id) {
   renderCashPage();
 }
 
+// ── RETIREMENT PAGE (investments) ────────────────────────────────────────────
+async function renderRetirementPage() {
+  const el = document.getElementById('retirement-list-content');
+  const rows = await invGetAll();
+
+  if (!rows.length) {
+    el.innerHTML = `<div class="empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      <p>No retirement assets yet.<br>Tap + Add to get started.</p>
+    </div>`;
+    return;
+  }
+
+  const totalRM = rows.reduce((s, r) => s + r.amount, 0);
+
+  el.innerHTML = `
+    <div style="background:linear-gradient(135deg, #0f1f45 0%, #1a2f60 100%);border:1px solid #1e3a7a;border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;">
+      <div style="font-size:10px;color:#7a9adc;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">Total Retirement</div>
+      <div style="font-size:28px;font-weight:800;color:var(--text);">RM${totalRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+      <div style="font-size:11px;color:var(--text2);margin-top:4px;">${rows.length} item${rows.length!==1?'s':''}</div>
+    </div>
+    ${rows.map(r => {
+      const [bg, fg] = badgeColor(r.name);
+      const initials = r.name.slice(0,3).toUpperCase();
+      const updatedStr = r.updatedAt ? new Date(r.updatedAt).toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'}) : '';
+      return `
+      <div class="log-item" style="align-items:center;">
+        <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0;">
+          <div style="width:38px;height:38px;border-radius:10px;background:${bg};color:${fg};font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${initials}</div>
+          <div style="min-width:0;flex:1;">
+            <div style="font-size:14px;font-weight:700;">${r.name}</div>
+            ${r.category ? `<div style="font-size:11px;color:var(--text2);margin-top:2px;">${r.category}</div>` : ''}
+            ${r.notes ? `<div style="font-size:11px;color:var(--text2);margin-top:1px;">${r.notes}</div>` : ''}
+            ${updatedStr ? `<div style="font-size:10px;color:var(--text3);margin-top:2px;">Updated ${updatedStr}</div>` : ''}
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;margin-left:10px;">
+          <div style="font-size:14px;font-weight:700;color:var(--text);">RM${r.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+          <div style="display:flex;gap:6px;margin-top:2px;">
+            <button class="btn" onclick="openRetirementModal(${JSON.stringify(r).replace(/"/g,'&quot;')})" style="background:rgba(59,130,246,0.15);color:#7ab4ff;border:1px solid rgba(59,130,246,0.3);padding:5px 12px;font-size:11px;border-radius:8px;width:auto;">Edit</button>
+            <button class="btn btn-danger" onclick="deleteRetirementAsset(${r.id})" style="padding:5px 10px;">Delete</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('')}`;
+}
+
+function openRetirementModal(row) {
+  document.getElementById('retirement-modal-title').textContent = row ? 'Edit Asset' : 'Add Asset';
+  document.getElementById('retirement-edit-id').value    = row ? row.id : '';
+  document.getElementById('retirement-name').value       = row ? row.name : '';
+  document.getElementById('retirement-amount').value     = row ? row.amount : '';
+  document.getElementById('retirement-category').value   = row ? row.category : '';
+  document.getElementById('retirement-notes').value      = row ? row.notes : '';
+  document.getElementById('retirement-modal-backdrop').classList.add('open');
+}
+
+function closeRetirementModal() {
+  document.getElementById('retirement-modal-backdrop').classList.remove('open');
+}
+
+function onRetirementBackdropClick(e) {
+  if (e.target === document.getElementById('retirement-modal-backdrop')) closeRetirementModal();
+}
+
+async function saveRetirementAsset() {
+  const id       = document.getElementById('retirement-edit-id').value;
+  const name     = document.getElementById('retirement-name').value.trim();
+  const amount   = parseFloat(document.getElementById('retirement-amount').value);
+  const category = document.getElementById('retirement-category').value.trim();
+  const notes    = document.getElementById('retirement-notes').value.trim();
+
+  if (!name || isNaN(amount) || amount < 0) {
+    showToast('Please fill in all required fields', true); return;
+  }
+
+  const btn = document.getElementById('retirement-save-btn');
+  btn.disabled = true; btn.textContent = 'Saving...';
+  const ok = await invUpsert({ id: id || null, name, amount, category, notes });
+  btn.disabled = false; btn.textContent = 'Save';
+
+  if (ok) {
+    closeRetirementModal();
+    showToast(id ? `${name} updated!` : `${name} added!`);
+    renderRetirementPage();
+  } else {
+    showToast('Save failed. Check Supabase permissions.', true);
+  }
+}
+
+async function deleteRetirementAsset(id) {
+  await invDelete(id);
+  showToast('Asset deleted');
+  renderRetirementPage();
+}
+
 // ── DASHBOARD ─────────────────────────────────────────────────────────────────
 async function renderDashboard() {
   const el = document.getElementById('dashboard-content');
-  const [txns, divs, efRows] = await Promise.all([dbGetAll('transactions'), dbGetAll('dividends'), efGetAll()]);
+  const [txns, divs, efRows, invRows] = await Promise.all([dbGetAll('transactions'), dbGetAll('dividends'), efGetAll(), invGetAll()]);
 
   if (!txns.length && !efRows.length) {
     el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 3v18h18M9 17V9m4 8v-4m4 4V5"/></svg><p>No transactions yet.<br>Add stocks in the Transactions tab.</p></div>`;
@@ -1018,7 +1201,8 @@ async function renderDashboard() {
 
   // ── Cash totals from emergency_fund ───────────────────────────────────────
   const cashRM = efRows.reduce((s, r) => s + efToRM(r.amount, r.currency), 0);
-  const totalAssetRM = stockValRM + cashRM;
+  const retirementRM = invRows.reduce((s, r) => s + r.amount, 0);
+  const totalAssetRM = stockValRM + cashRM + retirementRM;
 
   const now = new Date().toLocaleString('en-MY',{dateStyle:'medium',timeStyle:'short'});
   let html = '';
@@ -1113,6 +1297,37 @@ async function renderDashboard() {
       </div>
       <div class="col-head col-cash"><span>ASSET</span><span>AMOUNT</span><span>LIVE RATE</span><span>VALUE (RM)</span></div>
       ${buildCashRows()}
+    </div>`;
+  }
+
+  // ── Retirement section ────────────────────────────────────────────────
+  if (invRows.length) {
+    html += `
+    <div class="acc-section">
+      <div class="acc-head">
+        <div class="acc-head-row" style="align-items:baseline;">
+          <div class="acc-type">Retirement</div>
+        </div>
+        <div class="acc-head-row" style="align-items:baseline;margin-top:2px;">
+          <div class="acc-val">RM${retirementRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+        </div>
+      </div>
+      <div class="col-head" style="display:grid;grid-template-columns:2fr 1fr 1fr;column-gap:6px;padding:5px 16px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;font-weight:600;text-align:center;">
+        <span style="text-align:left;padding-left:38px;">NAME</span><span>CATEGORY</span><span>VALUE (RM)</span>
+      </div>
+      ${invRows.map(r => {
+        const [bg, fg] = badgeColor(r.name);
+        const initials = r.name.slice(0,3).toUpperCase();
+        return `
+        <div class="stock-row" style="grid-template-columns:2fr 1fr 1fr;">
+          <div class="ticker-wrap">
+            <div class="ticker-badge" style="background:${bg};color:${fg};font-size:7px;">${initials}</div>
+            <div><div class="s-name">${r.name}</div></div>
+          </div>
+          <div><div class="cell-main dim">${r.category || '—'}</div></div>
+          <div><div class="cell-main neu">RM${r.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div></div>
+        </div>`;
+      }).join('')}
     </div>`;
   }
 
