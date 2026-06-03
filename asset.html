@@ -1093,7 +1093,7 @@ async function renderDashboard() {
 
   function buildPie(segs, total) {
     if (!total) return '';
-    const cx=150, cy=130, r=95, ir=52;
+    const cx=170, cy=130, r=95, ir=52;
     let cumAngle = -90;
     const paths = []; const labels = [];
     segs.forEach(s => {
@@ -1125,7 +1125,7 @@ async function renderDashboard() {
       }
       cumAngle += angle;
     });
-    return `<svg viewBox="0 0 300 260" width="100%" style="display:block;overflow:visible;">${paths.join('')}${labels.join('')}<circle cx="${cx}" cy="${cy}" r="${ir-2}" fill="var(--card)"/></svg>`;
+    return `<svg viewBox="0 0 340 260" width="100%" style="display:block;overflow:visible;">${paths.join('')}${labels.join('')}<circle cx="${cx}" cy="${cy}" r="${ir-2}" fill="var(--card)"/></svg>`;
   }
 
   const tableRows = segments.map(s => `
