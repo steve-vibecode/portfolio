@@ -299,200 +299,57 @@ nav {
   </div>
 </div>
 
-<div class="page" id="page-transactions">
-  <div class="page-title">Transactions</div>
-  <div class="segment">
-    <button class="seg-btn active" onclick="switchSeg('txn','add')">Add</button>
-    <button class="seg-btn" onclick="switchSeg('txn','log')">History</button>
-    <button class="seg-btn" onclick="switchSeg('txn','import')">Import</button>
+<!-- CASH PAGE -->
+<div class="page" id="page-cash">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+    <div class="page-title" style="margin-bottom:0;">Cash & Commodities</div>
+    <button onclick="openCashModal(null)" style="background:var(--accent);border:none;color:white;padding:8px 16px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;">+ Add</button>
   </div>
-  <div id="txn-add">
-    <div class="form-section">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Ticker</label>
-          <input class="form-input" id="txn-ticker" placeholder="e.g. AAPL" style="text-transform:uppercase"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Market</label>
-          <select class="form-select" id="txn-market">
-            <option value="US">🇺🇸 US (USD)</option>
-            <option value="MY">🇲🇾 MY (MYR)</option>
-            <option value="SG">🇸🇬 SG (SGD)</option>
-            <option value="CRYPTO">🪙 Crypto (USD)</option>
-            <option value="UK">🇬🇧 UK (GBP)</option>
-            <option value="HK">🇭🇰 HK (HKD)</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Action</label>
-          <select class="form-select" id="txn-action">
-            <option value="buy">Buy / Deposit</option>
-            <option value="sell">Sell / Withdraw</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Type</label>
-          <select class="form-select" id="txn-type" onchange="onTypeChange()">
-            <option value="growth">Growth</option>
-            <option value="dividend">Dividend</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label" id="txn-units-label">Units</label>
-          <input class="form-input" id="txn-units" type="number" placeholder="0" min="0" step="any"/>
-        </div>
-        <div class="form-group" id="txn-price-group">
-          <label class="form-label">Price per unit</label>
-          <input class="form-input" id="txn-price" type="number" placeholder="0.00" min="0" step="any"/>
-        </div>
-      </div>
-      <div class="form-group" id="txn-tax-group" style="display:none;">
-        <label class="form-label">Dividend Withholding Tax (%)</label>
-        <input class="form-input" id="txn-tax" type="number" placeholder="e.g. 30 for US stocks" min="0" max="100" step="any"/>
-        <div style="font-size:11px;color:var(--text2);margin-top:5px;">💡 Typically 30% for US stocks held by Malaysians, 0% for MY stocks</div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Date</label>
-        <input class="form-input" id="txn-date" type="date"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Notes (optional)</label>
-        <input class="form-input" id="txn-notes" placeholder="e.g. DCA, rebalancing..."/>
-      </div>
-      <button class="btn btn-primary" onclick="addTransaction()">Add Transaction</button>
-    </div>
-  </div>
-  <div id="txn-log" style="display:none;">
-    <div id="txn-list"></div>
-  </div>
-  <div id="txn-import" style="display:none;">
-    <div class="form-section">
-      <div class="form-title">Import from CSV / Excel</div>
-
-      <!-- Format guide -->
-      <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.8;">
-        <div style="font-weight:700;color:var(--accent);margin-bottom:6px;">Required column order:</div>
-        <div style="font-family:monospace;font-size:11px;color:var(--text);">date | ticker | market | action | type | units | price | div_tax</div>
-        <div style="margin-top:8px;font-size:11px;">
-          • <b>date</b>: YYYY-MM-DD<br>
-          • <b>market</b>: US/MY/SG/Crypto/UK/HK<br>
-          • <b>action</b>: buy or sell<br>
-          • <b>type</b>: growth / dividend<br>
-          • <b>div_tax</b>: 0–100 (optional, dividend only)
-        </div>
-      </div>
-
-      <!-- Download template -->
-      <button class="btn" onclick="downloadTemplate()" style="background:rgba(59,130,246,0.15);color:var(--accent);border:1px solid rgba(59,130,246,0.3);margin-bottom:12px;">
-        ↓ Download CSV Template
-      </button>
-
-      <!-- File upload -->
-      <div id="import-drop-zone" onclick="document.getElementById('import-file').click()"
-        style="border:2px dashed var(--border);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;transition:border-color 0.2s;margin-bottom:12px;">
-        <div style="font-size:28px;margin-bottom:8px;">📂</div>
-        <div style="font-size:14px;font-weight:600;color:var(--text);">Tap to select file</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:4px;">Supports .csv and .xlsx</div>
-      </div>
-      <input type="file" id="import-file" accept=".csv,.xlsx" style="display:none;" onchange="handleImportFile(this)"/>
-
-      <!-- Preview -->
-      <div id="import-preview" style="display:none;">
-        <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text);">Preview</div>
-        <div id="import-preview-list"></div>
-        <div style="display:flex;gap:10px;margin-top:12px;">
-          <button class="btn btn-primary" onclick="confirmImport()" id="import-confirm-btn">Import All</button>
-          <button class="btn" onclick="cancelImport()" style="background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2);">Cancel</button>
-        </div>
-      </div>
+  <div id="cash-list-content">
+    <div class="empty">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12a2 2 0 100-4 2 2 0 000 4zM6 12h.01M18 12h.01"/></svg>
+      <p>No cash or assets yet.<br>Tap + Add to get started.</p>
     </div>
   </div>
 </div>
 
-<div class="page" id="page-dividends">
-  <div class="page-title">Dividends</div>
-  <div class="segment">
-    <button class="seg-btn active" onclick="switchSeg('div','add')">Add</button>
-    <button class="seg-btn" onclick="switchSeg('div','log')">History</button>
-    <button class="seg-btn" onclick="switchSeg('div','import')">Import</button>
-  </div>
-  <div id="div-add">
-    <div class="form-section">
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Ticker</label>
-          <input class="form-input" id="div-ticker" placeholder="e.g. 5176" style="text-transform:uppercase"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Market</label>
-          <select class="form-select" id="div-market">
-            <option value="US">🇺🇸 US (USD)</option>
-            <option value="MY">🇲🇾 MY (MYR)</option>
-            <option value="SG">🇸🇬 SG (SGD)</option>
-            <option value="CRYPTO">🪙 Crypto (USD)</option>
-            <option value="UK">🇬🇧 UK (GBP)</option>
-            <option value="HK">🇭🇰 HK (HKD)</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Amount received</label>
-          <input class="form-input" id="div-amount" type="number" placeholder="0.00" min="0" step="any"/>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Month</label>
-          <input class="form-input" id="div-date" type="month"/>
-        </div>
+<!-- CASH MODAL (add / edit) -->
+<div class="modal-backdrop" id="cash-modal-backdrop" onclick="onBackdropClick(event)">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="cash-modal-title">Add Asset</span>
+      <button class="modal-close" onclick="closeCashModal()">✕</button>
+    </div>
+    <input type="hidden" id="cash-edit-id"/>
+    <div class="form-group">
+      <label class="form-label">Asset Name</label>
+      <input class="form-input" id="cash-asset" placeholder="e.g. USD Cash, 30G Gold Bar"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label" id="cash-amount-label">Amount</label>
+        <input class="form-input" id="cash-amount" type="number" placeholder="0.00" min="0" step="any"/>
       </div>
       <div class="form-group">
-        <label class="form-label">Notes (optional)</label>
-        <input class="form-input" id="div-notes" placeholder="e.g. Q1 dividend..."/>
-      </div>
-      <button class="btn btn-success" onclick="addDividend()">Log Dividend</button>
-    </div>
-  </div>
-  <div id="div-log" style="display:none;">
-    <div id="div-list"></div>
-  </div>
-  <div id="div-import" style="display:none;">
-    <div class="form-section">
-      <div class="form-title">Import Dividends from CSV / Excel</div>
-      <div style="background:rgba(59,130,246,0.08);border:1px solid rgba(59,130,246,0.2);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:12px;color:var(--text2);line-height:1.8;">
-        <div style="font-weight:700;color:var(--accent);margin-bottom:6px;">Required column order:</div>
-        <div style="font-family:monospace;font-size:11px;color:var(--text);">ticker | market | amount | month</div>
-        <div style="margin-top:8px;font-size:11px;">
-          • <b>ticker</b>: e.g. JEPQ, 1155<br>
-          • <b>market</b>: US/MY/SG/Crypto/UK/HK<br>
-          • <b>amount</b>: e.g. 150.00<br>
-          &nbsp;&nbsp;Also accepts: Mar-2025 · March 2025 · 03/2025 · 2025/03
-        </div>
-      </div>
-      <button class="btn" onclick="downloadDivTemplate()" style="background:rgba(59,130,246,0.15);color:var(--accent);border:1px solid rgba(59,130,246,0.3);margin-bottom:12px;">
-        ↓ Download CSV Template
-      </button>
-      <div onclick="document.getElementById('div-import-file').click()"
-        style="border:2px dashed var(--border);border-radius:12px;padding:28px 20px;text-align:center;cursor:pointer;margin-bottom:12px;">
-        <div style="font-size:28px;margin-bottom:8px;">📂</div>
-        <div style="font-size:14px;font-weight:600;color:var(--text);">Tap to select file</div>
-        <div style="font-size:11px;color:var(--text2);margin-top:4px;">Supports .csv and .xlsx</div>
-      </div>
-      <input type="file" id="div-import-file" accept=".csv,.xlsx" style="display:none;" onchange="handleDivImportFile(this)"/>
-      <div id="div-import-preview" style="display:none;">
-        <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:var(--text);">Preview</div>
-        <div id="div-import-preview-list"></div>
-        <div style="display:flex;gap:10px;margin-top:12px;">
-          <button class="btn btn-success" onclick="confirmDivImport()" id="div-import-confirm-btn">Import All</button>
-          <button class="btn" onclick="cancelDivImport()" style="background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2);">Cancel</button>
-        </div>
+        <label class="form-label">Currency</label>
+        <select class="form-select" id="cash-currency" onchange="onCashCurrencyChange()">
+          <option value="MYR">MYR</option>
+          <option value="USD">USD</option>
+          <option value="SGD">SGD</option>
+          <option value="GBP">GBP</option>
+          <option value="HKD">HKD</option>
+          <option value="XAU">XAU (Gold)</option>
+        </select>
       </div>
     </div>
+    <div id="cash-xau-hint" style="display:none;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:#fcd34d;line-height:1.7;">
+      🪙 <b>Gold (XAU)</b>: enter amount in <b>grams</b>.<br>Live price fetched from GC=F (Gold Futures) via Yahoo Finance, converted to RM automatically.
+    </div>
+    <div class="form-group">
+      <label class="form-label">Notes (optional)</label>
+      <input class="form-input" id="cash-notes" placeholder="e.g. 999 fine gold, Maybank..."/>
+    </div>
+    <button class="btn btn-primary" onclick="saveCashAsset()" id="cash-save-btn" style="margin-top:4px;">Save</button>
   </div>
 </div>
 
@@ -506,15 +363,6 @@ nav {
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12a2 2 0 100-4 2 2 0 000 4zM6 12h.01M18 12h.01"/></svg>
     <span>Cash & Commo</span>
   </div>
-  <div class="nav-btn" id="nav-transactions" onclick="goPage('transactions')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v16m-4-4 4 4 4-4M8 8l4-4 4 4"/></svg>
-    <span>Txn</span>
-  </div>
-  <div class="nav-btn" id="nav-dividends" onclick="goPage('dividends')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-    <span>Dividends</span>
-  </div>
-</nav>
 
 <div class="toast" id="toast"></div>
 
@@ -544,6 +392,8 @@ let cachedRate = null;
 let cachedSgdRate = null;
 let cachedGbpRate = null;
 let cachedHkdRate = null;
+let cachedGoldUSD = null; // XAU: gold price per troy oz in USD (GC=F)
+const TROY_OZ_TO_GRAM = 31.1035;
 
 async function fetchLivePrices(holdings) {
   const now = Date.now();
@@ -604,6 +454,43 @@ function injectSpecialPrices(holdings) {
       priceCache[h.ticker] = { price: 1.00, divYield: ASNB_FIXED_YIELD, divRate: ASNB_FIXED_YIELD, currency: 'MYR', name: 'ASNB Fixed Fund' };
     }
   }
+}
+
+// ── GOLD PRICE (XAU) ──────────────────────────────────────────────────────────
+// GC=F = Gold Futures (USD/troy oz). Convert: price_per_gram = GC_price / 31.1035
+let goldCacheTime = 0;
+async function fetchGoldPrice() {
+  const now = Date.now();
+  if (cachedGoldUSD && now - goldCacheTime < 5 * 60 * 1000) return cachedGoldUSD;
+  try {
+    const resp = await fetch(`${WORKER_URL}/price?symbols=GC%3DF`);
+    const data = await resp.json();
+    const gcf = data['GC=F'] || data['GC%3DF'];
+    if (gcf?.price && gcf.price > 100) {
+      cachedGoldUSD = gcf.price;
+      goldCacheTime = now;
+    }
+  } catch(e) { console.warn('Gold price fetch failed:', e.message); }
+  return cachedGoldUSD;
+}
+
+// Returns RM value per gram of gold (live)
+function goldPricePerGramRM() {
+  if (!cachedGoldUSD || !cachedRate) return null;
+  return (cachedGoldUSD / TROY_OZ_TO_GRAM) * cachedRate;
+}
+
+// Convert emergency_fund row to RM (handles XAU)
+function efRowToRM(amount, currency) {
+  if (currency === 'XAU') {
+    const pgRM = goldPricePerGramRM();
+    return pgRM ? amount * pgRM : 0;
+  }
+  if (currency === 'USD') return amount * (cachedRate || 0);
+  if (currency === 'SGD') return amount * (cachedSgdRate || 0);
+  if (currency === 'GBP') return amount * (cachedGbpRate || 0);
+  if (currency === 'HKD') return amount * (cachedHkdRate || 0);
+  return amount; // MYR
 }
 
 function skeletonDashboard(label) {
@@ -728,218 +615,19 @@ async function efDelete(id) {
 function goPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  document.getElementById('nav-' + name).classList.add('active');
+  const page = document.getElementById('page-' + name);
+  const nav  = document.getElementById('nav-' + name);
+  if (page) page.classList.add('active');
+  if (nav)  nav.classList.add('active');
   if (name === 'dashboard') renderDashboard();
   if (name === 'cash') renderCashPage();
-  if (name === 'transactions') renderTxnLog();
-  if (name === 'dividends') renderDivLog();
-}
-
-function switchSeg(page, tab) {
-  if (page === 'txn') {
-    document.getElementById('txn-add').style.display    = tab === 'add'    ? 'block' : 'none';
-    document.getElementById('txn-log').style.display    = tab === 'log'    ? 'block' : 'none';
-    document.getElementById('txn-import').style.display = tab === 'import' ? 'block' : 'none';
-    if (tab === 'log') renderTxnLog();
-  } else {
-    document.getElementById('div-add').style.display    = tab === 'add'    ? 'block' : 'none';
-    document.getElementById('div-log').style.display    = tab === 'log'    ? 'block' : 'none';
-    document.getElementById('div-import').style.display = tab === 'import' ? 'block' : 'none';
-    if (tab === 'log') renderDivLog();
-  }
-  const pageId = page === 'txn' ? 'transactions' : 'dividends';
-  const btns = document.querySelectorAll(`#page-${pageId} .seg-btn`);
-  const tabs = ['add','log','import'];
-  btns.forEach((b, i) => b.classList.toggle('active', tabs[i] === tab));
-}
-
-// ── TOAST ────────────────────────────────────────────────────────────────────
-function showToast(msg, isError = false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast' + (isError ? ' error' : '') + ' show';
-  setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ── HELPERS ───────────────────────────────────────────────────────────────────
-function fmt(n, currency, decimals = 2) {
-  const sym = currency === 'MY' || currency === 'MYR' ? 'RM' : currency === 'SG' ? 'S$' : currency === 'UK' ? '£' : currency === 'HK' ? 'HK$' : '$';
-  return sym + Math.abs(n).toLocaleString('en', { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
-}
-function sgn(n, currency) { return (n >= 0 ? '+' : '-') + fmt(n, currency); }
-function pct(n) { return (n >= 0 ? '+' : '') + n.toFixed(2) + '%'; }
-function cc(n)  { return n >= 0 ? 'pos' : 'neg'; }
-
-function badgeColor(ticker) {
-  // Special color for cash tickers
-  if (ticker === 'USD') return ['#0f2d1a','#6ee7b7'];
-  if (ticker === 'MYR') return ['#0f1f45','#7ab4ff'];
-  const colors = [
-    ['#1a3a6b','#7ab4ff'], ['#1a4a2a','#6ee7b7'], ['#4a1a1a','#fca5a5'],
-    ['#2a1a4a','#c4b5fd'], ['#4a3a1a','#fcd34d'], ['#1a3a4a','#7dd3fc'],
-    ['#3a1a4a','#f0abfc'], ['#1a4a4a','#5eead4'],
-  ];
-  let h = 0; for (let c of ticker) h = (h * 31 + c.charCodeAt(0)) % colors.length;
-  return colors[Math.abs(h)];
-}
-
-function tickerBadge(ticker, market) {
-  const [bg, fg] = badgeColor(ticker);
-  const label = isASNB(ticker) ? 'ASNB'
-    : market === 'MY' ? ticker + '.KL'
-    : market === 'SG' ? ticker + '.SI'
-    : market === 'UK' ? ticker + '.L'
-    : market === 'HK' ? ticker + '.HK'
-    : ticker;
-  const fs = label.length <= 3 ? '8px' : label.length <= 4 ? '7px' : label.length <= 6 ? '6px' : '5px';
-  return `<div class="ticker-badge" style="background:${bg};color:${fg};font-size:${fs};text-align:center;display:flex;align-items:center;justify-content:center;line-height:1.1;">${label}</div>`;
-}
-
-function today() { return new Date().toISOString().split('T')[0]; }
-
-// ── TRANSACTIONS ──────────────────────────────────────────────────────────────
-function onTypeChange() {
-  const type = document.getElementById('txn-type').value;
-  document.getElementById('txn-tax-group').style.display = type === 'dividend' ? 'block' : 'none';
-  document.getElementById('txn-price-group').style.opacity = '1';
-  document.getElementById('txn-price-group').style.pointerEvents = '';
-  document.getElementById('txn-units-label').textContent = 'Units';
-}
-
-// Keep backward compat name
-function toggleDivTax() { onTypeChange(); }
-
-async function addTransaction() {
-  const ticker = document.getElementById('txn-ticker').value.trim().toUpperCase();
-  const market = document.getElementById('txn-market').value;
-  const action = document.getElementById('txn-action').value;
-  const type   = document.getElementById('txn-type').value;
-  const units  = parseFloat(document.getElementById('txn-units').value);
-  let   price  = parseFloat(document.getElementById('txn-price').value);
-  const date   = document.getElementById('txn-date').value || today();
-  const notes  = document.getElementById('txn-notes').value.trim();
-  const divTax = type === 'dividend' ? (parseFloat(document.getElementById('txn-tax').value) || 0) : 0;
-
-  // ASNB validation
-  if (isASNB(ticker)) {
-    if (market !== 'MY' || type !== 'dividend') {
-      showToast('ASNB must be MY market and dividend type', true); return;
-    }
-    price = 1.00;
-    document.getElementById('txn-price').value = '1.00';
-  }
-
-  if (!ticker || isNaN(units) || units <= 0 || isNaN(price) || price <= 0) {
-    showToast('Please fill in all required fields', true); return;
-  }
-
-  const existing = await dbGetAll('transactions');
-  const prev = existing.find(t => t.ticker === ticker);
-  if (prev) {
-    if (prev.type !== type) {
-      showToast(`${ticker} is already set as ${prev.type}. Type cannot be changed.`, true); return;
-    }
-    if (prev.market !== market) {
-      showToast(`${ticker} is already set as ${prev.market} market. Market cannot be changed.`, true); return;
-    }
-  }
-
-  await dbAdd('transactions', { ticker, market, action, type, units, price, date, notes, divTax, createdAt: Date.now() });
-  showToast(`${action === 'buy' ? 'Bought' : 'Sold'} ${ticker} logged!`);
-
-  document.getElementById('txn-ticker').value = '';
-  document.getElementById('txn-units').value  = '';
-  document.getElementById('txn-price').value  = '';
-  document.getElementById('txn-notes').value  = '';
-  document.getElementById('txn-tax').value    = '';
-  document.getElementById('txn-date').value   = today();
-  onTypeChange();
-}
-
-async function renderTxnLog() {
-  const all = await dbGetAll('transactions');
-  const el  = document.getElementById('txn-list');
-  if (!all.length) {
-    el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><p>No transactions yet.</p></div>`;
-    return;
-  }
-  all.sort((a, b) => b.createdAt - a.createdAt);
-  el.innerHTML = all.map(t => `
-    <div class="log-item">
-      <div class="log-left">
-        <div class="log-ticker">${t.ticker} <span class="tag tag-${t.action}">${t.action}</span> <span class="tag tag-${t.market.toLowerCase()}">${t.market}</span></div>
-        <div class="log-detail">${t.date} · ${t.units} units @ ${fmt(t.price, t.market)}</div>
-        ${t.notes ? `<div class="log-detail" style="color:var(--text3);">${t.notes}</div>` : ''}
-      </div>
-      <div class="log-right">
-        <div class="log-amount ${t.action === 'buy' ? 'neg' : 'pos'}">${t.action === 'buy' ? '-' : '+'}${fmt(t.units * t.price, t.market)}</div>
-        <div class="tag" style="background:rgba(99,102,241,0.12);color:#a5b4fc;">${t.type}</div>
-        <button class="btn btn-danger" onclick="deleteTxn('${t.id}')">Delete</button>
-      </div>
-    </div>`).join('');
-}
-
-async function deleteTxn(id) {
-  await dbDelete('transactions', id);
-  renderTxnLog();
-  showToast('Transaction deleted');
-}
-
-// ── DIVIDENDS ─────────────────────────────────────────────────────────────────
-async function addDividend() {
-  const ticker = document.getElementById('div-ticker').value.trim().toUpperCase();
-  const market = document.getElementById('div-market').value;
-  const amount = parseFloat(document.getElementById('div-amount').value);
-  const date   = document.getElementById('div-date').value || today();
-  const notes  = document.getElementById('div-notes').value.trim();
-
-  if (!ticker || isNaN(amount) || amount <= 0) {
-    showToast('Please fill in all required fields', true); return;
-  }
-
-  await dbAdd('dividends', { ticker, market, amount, date, notes, createdAt: Date.now() });
-  showToast(`Dividend for ${ticker} logged!`);
-
-  document.getElementById('div-ticker').value = '';
-  document.getElementById('div-amount').value = '';
-  document.getElementById('div-notes').value  = '';
-  document.getElementById('div-date').value   = today().slice(0, 7);
-}
-
-async function renderDivLog() {
-  const all = await dbGetAll('dividends');
-  const el  = document.getElementById('div-list');
-  if (!all.length) {
-    el.innerHTML = `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><p>No dividends logged yet.</p></div>`;
-    return;
-  }
-  all.sort((a, b) => b.createdAt - a.createdAt);
-  el.innerHTML = all.map(d => `
-    <div class="log-item">
-      <div class="log-left">
-        <div class="log-ticker">${d.ticker} <span class="tag tag-div">Dividend</span> <span class="tag tag-${d.market.toLowerCase()}">${d.market}</span></div>
-        <div class="log-detail">${d.date}</div>
-        ${d.notes ? `<div class="log-detail" style="color:var(--text3);">${d.notes}</div>` : ''}
-      </div>
-      <div class="log-right">
-        <div class="log-amount pos">+${fmt(d.amount, d.market)}</div>
-        <button class="btn btn-danger" onclick="deleteDiv('${d.id}')">Delete</button>
-      </div>
-    </div>`).join('');
-}
-
-async function deleteDiv(id) {
-  await dbDelete('dividends', id);
-  renderDivLog();
-  showToast('Dividend deleted');
 }
 
 // ── CASH PAGE (emergency_fund) ────────────────────────────────────────────────
 async function renderCashPage() {
   const el = document.getElementById('cash-list-content');
 
-  // Ensure FX rates are loaded
+  // Ensure FX rates are loaded (needed for XAU USD→MYR conversion too)
   if (!cachedRate) {
     try {
       const rateResp = await fetch(`${WORKER_URL}/rate`);
@@ -954,6 +642,9 @@ async function renderCashPage() {
 
   const rows = await efGetAll();
 
+  // Fetch gold price if any XAU rows
+  if (rows.some(r => r.currency === 'XAU')) await fetchGoldPrice();
+
   if (!rows.length) {
     el.innerHTML = `<div class="empty">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12a2 2 0 100-4 2 2 0 000 4zM6 12h.01M18 12h.01"/></svg>
@@ -962,17 +653,11 @@ async function renderCashPage() {
     return;
   }
 
-  const efToRM2 = (amount, currency) => {
-    if (currency === 'USD') return amount * (cachedRate || 0);
-    if (currency === 'SGD') return amount * (cachedSgdRate || 0);
-    if (currency === 'GBP') return amount * (cachedGbpRate || 0);
-    if (currency === 'HKD') return amount * (cachedHkdRate || 0);
-    return amount;
-  };
+  const efToRM2 = efRowToRM;
 
   const totalRM = rows.reduce((s, r) => s + efToRM2(r.amount, r.currency), 0);
 
-  const sym = cur => cur === 'USD' ? '$' : cur === 'SGD' ? 'S$' : cur === 'GBP' ? '£' : cur === 'HKD' ? 'HK$' : 'RM';
+  const sym = cur => cur === 'USD' ? '$' : cur === 'SGD' ? 'S$' : cur === 'GBP' ? '£' : cur === 'HKD' ? 'HK$' : cur === 'XAU' ? '' : 'RM';
 
   el.innerHTML = `
     <div style="background:linear-gradient(135deg, #0f1f45 0%, #1a2f60 100%);border:1px solid #1e3a7a;border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;">
@@ -983,12 +668,20 @@ async function renderCashPage() {
     ${rows.map(r => {
       const valueRM = efToRM2(r.amount, r.currency);
       const [bg, fg] = badgeColor(r.currency + r.id);
-      const rateStr = r.currency !== 'MYR'
-        ? (r.currency === 'USD' && cachedRate ? `× RM${cachedRate.toFixed(4)}` :
-           r.currency === 'SGD' && cachedSgdRate ? `× RM${cachedSgdRate.toFixed(4)}` :
-           r.currency === 'GBP' && cachedGbpRate ? `× RM${cachedGbpRate.toFixed(4)}` :
-           r.currency === 'HKD' && cachedHkdRate ? `× RM${cachedHkdRate.toFixed(4)}` : '')
-        : '';
+      let amtDisplay, rateStr;
+      if (r.currency === 'XAU') {
+        const pgRM = goldPricePerGramRM();
+        amtDisplay = `${r.amount}g gold`;
+        rateStr = pgRM ? `× RM${pgRM.toFixed(2)}/g` : '× fetching...';
+      } else {
+        amtDisplay = `${sym(r.currency)}${r.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
+        rateStr = r.currency !== 'MYR'
+          ? (r.currency === 'USD' && cachedRate ? `× RM${cachedRate.toFixed(4)}` :
+             r.currency === 'SGD' && cachedSgdRate ? `× RM${cachedSgdRate.toFixed(4)}` :
+             r.currency === 'GBP' && cachedGbpRate ? `× RM${cachedGbpRate.toFixed(4)}` :
+             r.currency === 'HKD' && cachedHkdRate ? `× RM${cachedHkdRate.toFixed(4)}` : '')
+          : '';
+      }
       const updatedStr = r.updatedAt ? new Date(r.updatedAt).toLocaleDateString('en-MY',{day:'numeric',month:'short',year:'numeric'}) : '';
       return `
       <div class="log-item" style="align-items:flex-start;">
@@ -1001,7 +694,7 @@ async function renderCashPage() {
           </div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;margin-left:10px;">
-          <div style="font-size:14px;font-weight:700;color:var(--text);">${sym(r.currency)}${r.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);">${amtDisplay}</div>
           ${rateStr ? `<div style="font-size:10px;color:var(--text2);">${rateStr}</div>` : ''}
           <div style="font-size:12px;font-weight:600;color:var(--text);">≈ RM${valueRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
           <div style="display:flex;gap:6px;margin-top:2px;">
@@ -1013,6 +706,15 @@ async function renderCashPage() {
     }).join('')}`;
 }
 
+function onCashCurrencyChange() {
+  const cur = document.getElementById('cash-currency').value;
+  const isXAU = cur === 'XAU';
+  document.getElementById('cash-xau-hint').style.display = isXAU ? 'block' : 'none';
+  document.getElementById('cash-amount-label').textContent = isXAU ? 'Amount (grams)' : 'Amount';
+  if (isXAU) document.getElementById('cash-amount').placeholder = 'e.g. 30';
+  else document.getElementById('cash-amount').placeholder = '0.00';
+}
+
 function openCashModal(row) {
   const modal = document.getElementById('cash-modal-backdrop');
   document.getElementById('cash-modal-title').textContent = row ? 'Edit Asset' : 'Add Asset';
@@ -1021,6 +723,7 @@ function openCashModal(row) {
   document.getElementById('cash-amount').value   = row ? row.amount : '';
   document.getElementById('cash-currency').value = row ? row.currency : 'MYR';
   document.getElementById('cash-notes').value    = row ? row.notes : '';
+  onCashCurrencyChange();
   modal.classList.add('open');
 }
 
@@ -1112,6 +815,9 @@ async function renderDashboard() {
 
   el.innerHTML = skeletonDashboard('Total Asset Value');
 
+  // Fetch gold if any XAU rows exist
+  if (efRows.some(r => r.currency === 'XAU')) await fetchGoldPrice();
+
   // Fetch live prices for stocks
   const prices = active.length ? await fetchLivePrices(active) : {};
   const hasPrices = Object.keys(prices).length > 0 && !prices.error;
@@ -1129,13 +835,7 @@ async function renderDashboard() {
     (val ?? 0);
 
   // Convert emergency_fund amount to RM based on currency
-  const efToRM = (amount, currency) => {
-    if (currency === 'USD') return amount * rate;
-    if (currency === 'SGD') return amount * sgdRate;
-    if (currency === 'GBP') return amount * gbpRate;
-    if (currency === 'HKD') return amount * hkdRate;
-    return amount; // MYR
-  };
+  const efToRM = efRowToRM;
 
   const divStocks = active.filter(h => h.type === 'dividend');
   const grwStocks = active.filter(h => h.type === 'growth');
@@ -1229,13 +929,20 @@ async function renderDashboard() {
   function buildCashRows() {
     return efRows.map(r => {
       const valueRM  = efToRM(r.amount, r.currency);
-      const rateStr  = r.currency === 'USD' ? (rate ? `RM${rate.toFixed(4)}` : '—')
-                     : r.currency === 'SGD' ? (sgdRate ? `RM${sgdRate.toFixed(4)}` : '—')
-                     : r.currency === 'GBP' ? (gbpRate ? `RM${gbpRate.toFixed(4)}` : '—')
-                     : r.currency === 'HKD' ? (hkdRate ? `RM${hkdRate.toFixed(4)}` : '—')
-                     : '—';
+      let rateStr;
+      if (r.currency === 'XAU') {
+        const pgRM = goldPricePerGramRM();
+        rateStr = pgRM ? `RM${pgRM.toFixed(2)}/g` : '—';
+      } else {
+        rateStr = r.currency === 'USD' ? (rate ? `RM${rate.toFixed(4)}` : '—')
+                : r.currency === 'SGD' ? (sgdRate ? `RM${sgdRate.toFixed(4)}` : '—')
+                : r.currency === 'GBP' ? (gbpRate ? `RM${gbpRate.toFixed(4)}` : '—')
+                : r.currency === 'HKD' ? (hkdRate ? `RM${hkdRate.toFixed(4)}` : '—')
+                : '—';
+      }
       const [bg, fg] = badgeColor(r.currency + r.id);
-      const sym = r.currency === 'USD' ? '$' : r.currency === 'SGD' ? 'S$' : r.currency === 'GBP' ? '£' : r.currency === 'HKD' ? 'HK$' : 'RM';
+      const sym = r.currency === 'USD' ? '$' : r.currency === 'SGD' ? 'S$' : r.currency === 'GBP' ? '£' : r.currency === 'HKD' ? 'HK$' : r.currency === 'XAU' ? '' : 'RM';
+      const amtDisplay = r.currency === 'XAU' ? `${r.amount}g` : `${sym}${r.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}`;
       return `
       <div class="stock-row row-cash">
         <div class="ticker-wrap">
@@ -1245,7 +952,7 @@ async function renderDashboard() {
           </div>
         </div>
         <div>
-          <div class="cell-main neu">${sym}${r.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+          <div class="cell-main neu">${amtDisplay}</div>
         </div>
         <div>
           <div class="cell-main neu">${rateStr}</div>
@@ -1369,323 +1076,9 @@ async function renderDashboard() {
   el.innerHTML = html;
 }
 
-// ── IMPORT ────────────────────────────────────────────────────────────────────
-let importRows = [];
-
-function downloadTemplate() {
-  const csv = `date,ticker,market,action,type,units,price,div_tax\n2024-01-15,AAPL,US,buy,growth,10,180.00,\n2024-01-15,JEPQ,US,buy,dividend,100,45.00,30\n2024-02-01,1155,MY,buy,dividend,200,9.50,0\n2024-03-01,ASNB,MY,buy,dividend,10000,1.00,0\n`;
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'folio-template.csv'; a.click();
-}
-
-function excelDateToISO(val) {
-  if (typeof val === 'string' && val.includes('-')) return val.trim();
-  const num = parseFloat(val);
-  if (!isNaN(num) && num > 1000) {
-    const date = new Date((num - 25569) * 86400 * 1000);
-    return date.toISOString().split('T')[0];
-  }
-  return String(val).trim();
-}
-
-function parseImportRow(row) {
-  const [rawDate, rawTicker, market, action, type, units, price, divTax] = row;
-  const errors = [];
-  const date   = excelDateToISO(rawDate);
-  const ticker = String(rawTicker ?? '').trim().toUpperCase();
-
-  if (!date || date === 'NaN-NaN-NaN') errors.push('missing/invalid date');
-  if (!ticker) errors.push('missing ticker');
-  const mkt = String(market||'').trim().toUpperCase();
-  if (!['US','MY','SG','CRYPTO','UK','HK'].includes(mkt)) errors.push(`market must be US/MY/SG/CRYPTO/UK/HK`);
-  const act = String(action||'').trim().toLowerCase();
-  if (!['buy','sell'].includes(act)) errors.push(`action must be buy or sell`);
-  const typ = String(type||'').trim().toLowerCase();
-  if (!['growth','dividend'].includes(typ)) errors.push(`type must be growth or dividend`);
-  const u = parseFloat(units);
-  if (isNaN(u) || u <= 0) errors.push('invalid units');
-  const p = parseFloat(price);
-  if (isNaN(p) || p <= 0) errors.push('invalid price');
-  const tax = parseFloat(divTax) || 0;
-
-  return {
-    valid: errors.length === 0,
-    errors,
-    data: {
-      date, ticker, market: mkt, action: act, type: typ,
-      units: u, price: p,
-      divTax: tax, createdAt: new Date(date).getTime() || Date.now(),
-    }
-  };
-}
-
-function handleImportFile(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const isCsv = file.name.endsWith('.csv');
-  const reader = new FileReader();
-
-  reader.onload = (e) => {
-    let rows = [];
-    if (isCsv) {
-      const text = e.target.result;
-      rows = text.trim().split('\n').map(line => {
-        const cells = []; let cur = ''; let inQ = false;
-        for (let ch of line) {
-          if (ch === '"') { inQ = !inQ; }
-          else if (ch === ',' && !inQ) { cells.push(cur.trim()); cur = ''; }
-          else cur += ch;
-        }
-        cells.push(cur.trim());
-        return cells;
-      });
-    } else {
-      const wb = XLSX.read(e.target.result, { type: 'array' });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: true });
-    }
-
-    if (rows.length && isNaN(rows[0][0]) && String(rows[0][0]).toLowerCase().includes('date')) {
-      rows = rows.slice(1);
-    }
-    rows = rows.filter(r => r.some(c => c !== '' && c !== null && c !== undefined));
-
-    importRows = rows.map((r, i) => ({ rowNum: i + 2, ...parseImportRow(r) }));
-    renderImportPreview();
-  };
-
-  if (isCsv) reader.readAsText(file);
-  else reader.readAsArrayBuffer(file);
-}
-
-function renderImportPreview() {
-  const preview = document.getElementById('import-preview');
-  const list    = document.getElementById('import-preview-list');
-  const validCount = importRows.filter(r => r.valid).length;
-  const errCount   = importRows.filter(r => !r.valid).length;
-
-  preview.style.display = 'block';
-  document.getElementById('import-confirm-btn').textContent = `Import ${validCount} rows`;
-
-  list.innerHTML = importRows.map(r => `
-    <div style="background:${r.valid ? 'rgba(16,185,129,0.06)' : 'rgba(239,68,68,0.06)'};border:1px solid ${r.valid ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'};border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:11px;">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-weight:700;color:var(--text);">Row ${r.rowNum}: ${r.data?.ticker || '?'}</span>
-        <span style="color:${r.valid ? 'var(--green)' : 'var(--red)'};">${r.valid ? '✓ Valid' : '✗ Error'}</span>
-      </div>
-      ${r.valid
-        ? `<div style="color:var(--text2);margin-top:2px;">${r.data.date} · ${r.data.action} ${r.data.units} @ ${r.data.market==='MY'?'RM':r.data.market==='SG'?'S$':r.data.market==='UK'?'£':'$'}${r.data.price} · ${r.data.type}${r.data.divTax ? ` · ${r.data.divTax}% tax` : ''}</div>`
-        : `<div style="color:var(--red);margin-top:2px;">${r.errors.join(', ')}</div>`
-      }
-    </div>`).join('');
-
-  if (errCount > 0) {
-    list.innerHTML += `<div style="font-size:11px;color:var(--text2);margin-top:4px;">⚠️ ${errCount} row(s) with errors will be skipped.</div>`;
-  }
-}
-
-async function confirmImport() {
-  const btn = document.getElementById('import-confirm-btn');
-  if (btn.disabled) return;
-  btn.disabled = true; btn.textContent = 'Importing...';
-  const valid = importRows.filter(r => r.valid).map(r => r.data);
-  if (!valid.length) { showToast('No valid rows to import', true); btn.disabled = false; return; }
-
-  const existing = await dbGetAll('transactions');
-  const conflicts = [];
-  for (const row of valid) {
-    const prev = existing.find(t => t.ticker === row.ticker);
-    if (prev && (prev.type !== row.type || prev.market !== row.market)) {
-      conflicts.push(`${row.ticker} (existing: ${prev.type}/${prev.market}, import: ${row.type}/${row.market})`);
-    }
-  }
-  if (conflicts.length) {
-    showToast(`Conflict: ${conflicts.join('; ')}`, true); return;
-  }
-
-  for (const row of valid) await dbAdd('transactions', row);
-  showToast(`✓ Imported ${valid.length} transactions!`);
-  importRows = [];
-  document.getElementById('import-preview').style.display = 'none';
-  document.getElementById('import-file').value = '';
-  switchSeg('txn', 'log');
-}
-
-function cancelImport() {
-  importRows = [];
-  document.getElementById('import-preview').style.display = 'none';
-  document.getElementById('import-file').value = '';
-}
-
-// ── YEAR SELECTOR ─────────────────────────────────────────────────────────────
-// ── DIVIDEND IMPORT ───────────────────────────────────────────────────────────
-let divImportRows = [];
-
-function downloadDivTemplate() {
-  const csv = `ticker,market,amount,month\nJEPQ,US,150.00,2025-03\n1155,MY,891.00,2025-02\nASNB,MY,475.00,2025-01\n`;
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'dividends-template.csv'; a.click();
-}
-
-function parseMonthToYYYYMM(val) {
-  if (!val && val !== 0) return null;
-  const s = String(val).trim();
-
-  if (/^\d{4,5}$/.test(s) || (typeof val === 'number' && val > 1000)) {
-    const n = typeof val === 'number' ? val : parseInt(s);
-    const d = new Date((n - 25569) * 86400 * 1000);
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-  }
-
-  if (/^\d{4}[-\/]\d{1,2}$/.test(s)) {
-    const [y, m] = s.split(/[-\/]/);
-    return `${y}-${m.padStart(2,'0')}`;
-  }
-
-  if (/^\d{1,2}[-\/]\d{4}$/.test(s)) {
-    const [m, y] = s.split(/[-\/]/);
-    return `${y}-${m.padStart(2,'0')}`;
-  }
-
-  const months = {jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12'};
-  const mMatch = s.match(/([a-zA-Z]+)[\s\-\/](\d{4})/);
-  if (mMatch) {
-    const mKey = mMatch[1].toLowerCase().slice(0,3);
-    if (months[mKey]) return `${mMatch[2]}-${months[mKey]}`;
-  }
-  const mMatch2 = s.match(/(\d{4})[\s\-\/]([a-zA-Z]+)/);
-  if (mMatch2) {
-    const mKey = mMatch2[2].toLowerCase().slice(0,3);
-    if (months[mKey]) return `${mMatch2[1]}-${months[mKey]}`;
-  }
-
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s.slice(0, 7);
-
-  return null;
-}
-
-function parseDivImportRow(row) {
-  const [rawTicker, market, amount, rawMonth] = row;
-  const errors = [];
-  const ticker = String(rawTicker ?? '').trim().toUpperCase();
-  const mkt    = String(market ?? '').trim().toUpperCase();
-  const amt    = parseFloat(amount);
-  const month  = parseMonthToYYYYMM(rawMonth);
-
-  if (!ticker) errors.push('missing ticker');
-  if (!['US','MY','SG','CRYPTO','UK','HK'].includes(mkt)) errors.push('market must be US/MY/SG/CRYPTO/UK/HK');
-  if (isNaN(amt) || amt <= 0) errors.push('invalid amount');
-  if (!month) errors.push(`invalid month: "${rawMonth}" — use YYYY-MM`);
-
-  return {
-    valid: errors.length === 0,
-    errors,
-    data: { ticker, market: mkt, amount: amt, date: month, notes: '', createdAt: month ? new Date(month+'-01').getTime() : Date.now() }
-  };
-}
-
-function handleDivImportFile(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const isCsv = file.name.endsWith('.csv');
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    let rows = [];
-    if (isCsv) {
-      rows = e.target.result.trim().split('\n').map(line => {
-        const cells = []; let cur = ''; let inQ = false;
-        for (let ch of line) {
-          if (ch === '"') { inQ = !inQ; }
-          else if (ch === ',' && !inQ) { cells.push(cur.trim()); cur = ''; }
-          else cur += ch;
-        }
-        cells.push(cur.trim()); return cells;
-      });
-    } else {
-      const wb = XLSX.read(e.target.result, { type: 'array' });
-      rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '', raw: true });
-    }
-    if (rows.length && isNaN(rows[0][0]) && String(rows[0][0]).toLowerCase().includes('ticker')) rows = rows.slice(1);
-    rows = rows.filter(r => r.some(c => c !== '' && c !== null && c !== undefined));
-    divImportRows = rows.map((r, i) => ({ rowNum: i + 2, ...parseDivImportRow(r) }));
-    renderDivImportPreview();
-  };
-  if (isCsv) reader.readAsText(file);
-  else reader.readAsArrayBuffer(file);
-}
-
-function renderDivImportPreview() {
-  const preview = document.getElementById('div-import-preview');
-  const list    = document.getElementById('div-import-preview-list');
-  const validCount = divImportRows.filter(r => r.valid).length;
-  const errCount   = divImportRows.filter(r => !r.valid).length;
-  preview.style.display = 'block';
-  document.getElementById('div-import-confirm-btn').textContent = `Import ${validCount} rows`;
-  list.innerHTML = divImportRows.map(r => `
-    <div style="background:${r.valid?'rgba(16,185,129,0.06)':'rgba(239,68,68,0.06)'};border:1px solid ${r.valid?'rgba(16,185,129,0.2)':'rgba(239,68,68,0.2)'};border-radius:8px;padding:8px 12px;margin-bottom:6px;font-size:11px;">
-      <div style="display:flex;justify-content:space-between;">
-        <span style="font-weight:700;color:var(--text);">Row ${r.rowNum}: ${r.data?.ticker||'?'}</span>
-        <span style="color:${r.valid?'var(--green)':'var(--red)'};">${r.valid?'✓ Valid':'✗ Error'}</span>
-      </div>
-      ${r.valid
-        ? `<div style="color:var(--text2);margin-top:2px;">${r.data.date} · ${r.data.market==='MY'?'RM':r.data.market==='SG'?'S$':r.data.market==='UK'?'£':r.data.market==='HK'?'HK$':'$'}${r.data.amount} · ${r.data.market}</div>`
-        : `<div style="color:var(--red);margin-top:2px;">${r.errors.join(', ')}</div>`}
-    </div>`).join('');
-  if (errCount > 0) list.innerHTML += `<div style="font-size:11px;color:var(--text2);margin-top:4px;">⚠️ ${errCount} row(s) with errors will be skipped.</div>`;
-}
-
-async function confirmDivImport() {
-  const btn = document.getElementById('div-import-confirm-btn');
-  if (btn.disabled) return;
-  btn.disabled = true; btn.textContent = 'Importing...';
-  const valid = divImportRows.filter(r => r.valid).map(r => r.data);
-  if (!valid.length) { showToast('No valid rows to import', true); btn.disabled = false; return; }
-  for (const row of valid) await dbAdd('dividends', row);
-  showToast(`✓ Imported ${valid.length} dividends!`);
-  divImportRows = [];
-  document.getElementById('div-import-preview').style.display = 'none';
-  document.getElementById('div-import-file').value = '';
-  switchSeg('div', 'log');
-}
-
-function cancelDivImport() {
-  divImportRows = [];
-  document.getElementById('div-import-preview').style.display = 'none';
-  document.getElementById('div-import-file').value = '';
-}
-
 // ── INIT ──────────────────────────────────────────────────────────────────────
 (async () => {
-  document.getElementById('txn-date').value = today();
-  document.getElementById('div-date').value = today().slice(0, 7);
   await renderDashboard();
-  document.getElementById('txn-ticker').addEventListener('blur', async function() {
-    const ticker = this.value.trim().toUpperCase();
-    if (!ticker) return;
-
-    if (isASNB(ticker)) {
-      document.getElementById('txn-market').value = 'MY';
-      document.getElementById('txn-type').value   = 'dividend';
-      document.getElementById('txn-price').value  = '1.00';
-      onTypeChange();
-      showToast('ASNB: auto-set to dividend / MY · Fixed NAV RM1.00');
-      return;
-    }
-
-    const existing = await dbGetAll('transactions');
-    const prev = existing.find(t => t.ticker === ticker);
-    if (prev) {
-      document.getElementById('txn-market').value = prev.market;
-      document.getElementById('txn-type').value   = prev.type;
-      onTypeChange();
-      if (prev.type === 'dividend' && prev.divTax != null) {
-        document.getElementById('txn-tax').value = prev.divTax;
-      }
-      showToast(`${ticker}: auto-set to ${prev.type} / ${prev.market}${prev.divTax ? `, ${prev.divTax}% tax` : ''}`);
-    }
-  });
 })();
 </script>
 </body>
