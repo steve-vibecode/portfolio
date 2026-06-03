@@ -1105,18 +1105,18 @@ async function renderDashboard() {
       cumAngle += angle;
       return `<path d="${d}" fill="${s.color}" opacity="0.9"/>`;
     }).join('');
-    return `<svg viewBox="0 0 160 160" width="160" height="160">${paths}<circle cx="${cx}" cy="${cy}" r="${ir-2}" fill="var(--card)"/></svg>`;
+    return `<svg viewBox="0 0 160 160" width="120" height="120">${paths}<circle cx="${cx}" cy="${cy}" r="${ir-2}" fill="var(--card)"/></svg>`;
   }
 
   const legend = segments.map(s => `
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:8px;">
+    <div style="display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;margin-bottom:8px;">
       <div style="display:flex;align-items:center;gap:6px;min-width:0;">
         <div style="width:8px;height:8px;border-radius:50%;background:${s.color};flex-shrink:0;"></div>
         <span style="font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${s.label}</span>
       </div>
-      <div style="display:flex;align-items:baseline;gap:5px;flex-shrink:0;">
+      <div style="text-align:right;white-space:nowrap;">
         <span style="font-size:12px;font-weight:700;color:var(--text);">RM${s.value.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})}</span>
-        <span style="font-size:10px;color:var(--text3);">${totalRM?(s.value/totalRM*100).toFixed(1):0}%</span>
+        <span style="font-size:10px;color:var(--text3);margin-left:4px;">${totalRM?(s.value/totalRM*100).toFixed(1):0}%</span>
       </div>
     </div>`).join('');
 
@@ -1132,9 +1132,9 @@ async function renderDashboard() {
   </div>
   <div class="card" style="margin-bottom:10px;">
     <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:14px;">Asset Allocation</div>
-    <div style="display:flex;align-items:center;gap:20px;">
+    <div style="display:flex;align-items:center;gap:14px;">
       <div style="flex-shrink:0;">${buildPie(segments,totalRM)}</div>
-      <div style="flex:1;">${legend}</div>
+      <div style="flex:1;min-width:0;">${legend}</div>
     </div>
   </div>`;
 }
