@@ -14,176 +14,55 @@
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; height: 100vh; width: 100vw; overflow: hidden; }
-
   :root {
-    --bg:          #0a1520;
-    --bg-grad:     #0d1a26;
-    --panel-bg:    linear-gradient(145deg, #0f1d2c 0%, #0c1925 100%);
-    --panel-sheen: rgba(212,165,116,0.03);
-    --panel-hover: #2a4a60;
-    --panel2:      #142536;
-    --border:      #1f3548;
-    --text:        #e8dcc4;
-    --muted:       #8a9bab;
-    --gold:        #d4a574;
-    --gold-dim:    #b89968;
-    --teal:        #5a8a8a;
-    --rust:        #c97b5e;
-    --green:       #7ba87b;
-    --input-bg:    rgba(10,21,32,0.9);
-    --tag-color:   #d4a574;
-    --chart-grid:  #1f3548;
-    --shimmer1:    #d4a574;
-    --shimmer2:    #f0c98a;
-    --shimmer3:    #b89968;
-    --bar-bg:      #142536;
-    --scrollbar:   #1f3548;
-    --sticky-bg:   #0f1d2c;
-    --white-text:  #e8dcc4;
+    --bg: #0a1520; --bg-grad: #0d1a26;
+    --panel-bg: linear-gradient(145deg, #0f1d2c 0%, #0c1925 100%);
+    --panel-sheen: rgba(212,165,116,0.03); --panel-hover: #2a4a60; --panel2: #142536;
+    --border: #1f3548; --text: #e8dcc4; --muted: #8a9bab; --gold: #d4a574;
+    --gold-dim: #b89968; --teal: #5a8a8a; --rust: #c97b5e; --green: #7ba87b;
+    --input-bg: rgba(10,21,32,0.9); --tag-color: #d4a574; --chart-grid: #1f3548;
+    --shimmer1: #d4a574; --shimmer2: #f0c98a; --shimmer3: #b89968;
+    --bar-bg: #142536; --scrollbar: #1f3548; --sticky-bg: #0f1d2c; --white-text: #e8dcc4;
   }
-
   body.light {
-    --bg:          #f5f2eb;
-    --bg-grad:     #ede8dc;
-    --panel-bg:    linear-gradient(145deg, #fffdf7 0%, #faf6ec 100%);
-    --panel-sheen: rgba(160,120,58,0.03);
-    --panel-hover: #c9a060;
-    --panel2:      #ede8d8;
-    --border:      #d4c9a8;
-    --text:        #2c2416;
-    --muted:       #7a6e5a;
-    --gold:        #a0783a;
-    --gold-dim:    #c9a060;
-    --teal:        #3a7a7a;
-    --rust:        #b05a3a;
-    --green:       #4a8a4a;
-    --input-bg:    #fffdf7;
-    --tag-color:   #a0783a;
-    --chart-grid:  #d4c9a8;
-    --shimmer1:    #a0783a;
-    --shimmer2:    #c9a060;
-    --shimmer3:    #7a5820;
-    --bar-bg:      #e8e0cc;
-    --scrollbar:   #c9b890;
-    --sticky-bg:   #fffdf7;
-    --white-text:  #3a2e1e;
+    --bg: #f5f2eb; --bg-grad: #ede8dc;
+    --panel-bg: linear-gradient(145deg, #fffdf7 0%, #faf6ec 100%);
+    --panel-sheen: rgba(160,120,58,0.03); --panel-hover: #c9a060; --panel2: #ede8d8;
+    --border: #d4c9a8; --text: #2c2416; --muted: #7a6e5a; --gold: #a0783a;
+    --gold-dim: #c9a060; --teal: #3a7a7a; --rust: #b05a3a; --green: #4a8a4a;
+    --input-bg: #fffdf7; --tag-color: #a0783a; --chart-grid: #d4c9a8;
+    --shimmer1: #a0783a; --shimmer2: #c9a060; --shimmer3: #7a5820;
+    --bar-bg: #e8e0cc; --scrollbar: #c9b890; --sticky-bg: #fffdf7; --white-text: #3a2e1e;
   }
-
-  body {
-    background: var(--bg);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    color: var(--text);
-    font-size: 13px;
-    -webkit-font-smoothing: antialiased;
-    transition: background 0.35s, color 0.35s;
-  }
+  body { background: var(--bg); font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: var(--text); font-size: 13px; -webkit-font-smoothing: antialiased; transition: background 0.35s, color 0.35s; }
   input, textarea, button, select { font-family: inherit; }
   input:focus, textarea:focus { outline: none; }
-
-  .panel {
-    background: var(--panel-bg);
-    border: 1px solid var(--border);
-    padding: 12px 16px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    position: relative;
-    transition: border-color 0.3s, background 0.35s;
-  }
-  .panel::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, var(--panel-sheen) 0%, transparent 60%);
-    pointer-events: none;
-  }
+  .panel { background: var(--panel-bg); border: 1px solid var(--border); padding: 12px 16px; overflow: hidden; display: flex; flex-direction: column; min-height: 0; position: relative; transition: border-color 0.3s, background 0.35s; }
+  .panel::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, var(--panel-sheen) 0%, transparent 60%); pointer-events: none; }
   .panel:hover { border-color: var(--panel-hover); }
-
-  .panel-tag {
-    font-size: 9px;
-    letter-spacing: 1.5px;
-    color: var(--tag-color);
-    font-family: 'JetBrains Mono', monospace;
-    margin-bottom: 4px;
-    font-weight: 500;
-  }
-  .panel-title {
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 17px;
-    margin: 0 0 8px 0;
-    font-weight: 500;
-    color: var(--text);
-    line-height: 1.1;
-    letter-spacing: -0.3px;
-  }
+  .panel-tag { font-size: 9px; letter-spacing: 1.5px; color: var(--tag-color); font-family: 'JetBrains Mono', monospace; margin-bottom: 4px; font-weight: 500; }
+  .panel-title { font-family: 'Fraunces', Georgia, serif; font-size: 17px; margin: 0 0 8px 0; font-weight: 500; color: var(--text); line-height: 1.1; letter-spacing: -0.3px; }
   .display-serif { font-family: 'Fraunces', Georgia, serif; }
-
-  .milestone-row {
-    transition: background 0.15s, transform 0.15s, box-shadow 0.15s;
-    cursor: pointer;
-  }
-  .milestone-row:hover {
-    background: rgba(160,120,58,0.08) !important;
-    transform: translateX(2px);
-    box-shadow: inset 2px 0 0 var(--gold);
-  }
+  .milestone-row { transition: background 0.15s, transform 0.15s, box-shadow 0.15s; cursor: pointer; }
+  .milestone-row:hover { background: rgba(160,120,58,0.08) !important; transform: translateX(2px); box-shadow: inset 2px 0 0 var(--gold); }
   .phase-tab-btn { transition: all 0.2s; cursor: pointer; }
   .phase-tab-btn:hover { background: rgba(160,120,58,0.12) !important; }
-
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
   .scroll-y { overflow-y: auto; min-height: 0; flex: 1; }
-
   .mono { font-family: 'JetBrains Mono', monospace; }
   .gold { color: var(--gold); }
   .muted { color: var(--muted); }
   .pos { color: var(--green); }
   .neg { color: var(--rust); }
-
-  .theme-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 3px 9px;
-    font-size: 12px;
-    cursor: pointer;
-    border-radius: 2px;
-    transition: all 0.2s;
-    line-height: 1;
-  }
+  .theme-btn { background: transparent; border: 1px solid var(--border); color: var(--muted); padding: 3px 9px; font-size: 12px; cursor: pointer; border-radius: 2px; transition: all 0.2s; line-height: 1; }
   .theme-btn:hover { border-color: var(--gold); color: var(--gold); }
-
-  .edit-input {
-    background: var(--input-bg);
-    border: 1px solid var(--gold);
-    border-radius: 2px;
-    color: var(--text);
-    padding: 3px 7px;
-    font-family: 'Fraunces', Georgia, serif;
-    font-size: 11px;
-    transition: box-shadow 0.2s, border-color 0.2s;
-  }
-  .edit-input:focus {
-    border-color: var(--gold-dim);
-    box-shadow: 0 0 0 2px rgba(160,120,58,0.2);
-  }
-
-  .btn-icon {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: 11px;
-    padding: 2px 5px;
-    line-height: 1;
-    border-radius: 2px;
-    transition: all 0.15s;
-    opacity: 0;
-  }
-  .milestone-row:hover .btn-icon,
-  .edit-row .btn-icon { opacity: 1; }
+  .edit-input { background: var(--input-bg); border: 1px solid var(--gold); border-radius: 2px; color: var(--text); padding: 3px 7px; font-family: 'Fraunces', Georgia, serif; font-size: 11px; transition: box-shadow 0.2s, border-color 0.2s; }
+  .edit-input:focus { border-color: var(--gold-dim); box-shadow: 0 0 0 2px rgba(160,120,58,0.2); }
+  .btn-icon { background: transparent; border: none; cursor: pointer; font-size: 11px; padding: 2px 5px; line-height: 1; border-radius: 2px; transition: all 0.15s; opacity: 0; }
+  .milestone-row:hover .btn-icon, .edit-row .btn-icon { opacity: 1; }
   .btn-save { color: var(--green); border: 1px solid rgba(123,168,123,0.3); }
   .btn-save:hover { background: rgba(123,168,123,0.15); }
   .btn-cancel { color: var(--muted); border: 1px solid rgba(138,155,171,0.3); }
@@ -192,146 +71,37 @@
   .btn-edit:hover { background: rgba(160,120,58,0.15); }
   .btn-delete { color: var(--rust); border: 1px solid transparent; }
   .btn-delete:hover { background: rgba(201,123,94,0.15); }
-  .btn-add {
-    background: transparent;
-    border: 1px dashed var(--border);
-    color: var(--muted);
-    cursor: pointer;
-    font-size: 10px;
-    font-family: 'Fraunces', Georgia, serif;
-    padding: 4px 10px;
-    margin-top: 5px;
-    width: 100%;
-    letter-spacing: 0.5px;
-    border-radius: 2px;
-    transition: all 0.2s;
-  }
+  .btn-add { background: transparent; border: 1px dashed var(--border); color: var(--muted); cursor: pointer; font-size: 10px; font-family: 'Fraunces', Georgia, serif; padding: 4px 10px; margin-top: 5px; width: 100%; letter-spacing: 0.5px; border-radius: 2px; transition: all 0.2s; }
   .btn-add:hover { border-color: var(--gold); color: var(--gold); background: rgba(160,120,58,0.05); }
-
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes slideIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
   .edit-row { animation: slideIn 0.18s ease forwards; }
-
-  @keyframes shimmer {
-    0%   { background-position: -200% center; }
-    100% { background-position: 200% center; }
-  }
-  .gold-shimmer {
-    background: linear-gradient(90deg, var(--shimmer1) 0%, var(--shimmer2) 40%, var(--shimmer1) 60%, var(--shimmer3) 100%);
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: shimmer 4s linear infinite;
-  }
-
+  @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
+  .gold-shimmer { background: linear-gradient(90deg, var(--shimmer1) 0%, var(--shimmer2) 40%, var(--shimmer1) 60%, var(--shimmer3) 100%); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shimmer 4s linear infinite; }
   .bar-fill { height: 100%; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: 0.4; transform: scale(0.8); }
-  }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
   .pulse { animation: pulse 2s ease-in-out infinite; display: inline-block; }
-
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
   .tab-content { animation: fadeInUp 0.2s ease forwards; }
-
-  @keyframes softPulseRed {
-    0%, 100% { text-shadow: 0 0 0 transparent; }
-    50%       { text-shadow: 0 0 12px rgba(201,123,94,0.4); }
-  }
+  @keyframes softPulseRed { 0%, 100% { text-shadow: 0 0 0 transparent; } 50% { text-shadow: 0 0 12px rgba(201,123,94,0.4); } }
   .neg-glow { animation: softPulseRed 3s ease-in-out infinite; }
-
   @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   .spinner { animation: spin 1s linear infinite; display: inline-block; }
-
-  .sheets-tabbar {
-    display: flex;
-    align-items: flex-end;
-    gap: 2px;
-    padding: 0 12px;
-    border-top: 1px solid var(--border);
-    background: var(--bg);
-    flex-shrink: 0;
-    height: 34px;
-  }
-  .sheets-tab {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 0 16px;
-    height: 30px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 1px;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1px solid transparent;
-    border-bottom: none;
-    border-radius: 3px 3px 0 0;
-    transition: all 0.18s;
-    user-select: none;
-    white-space: nowrap;
-    color: var(--muted);
-    background: transparent;
-    position: relative;
-    bottom: -1px;
-  }
-  .sheets-tab:hover {
-    background: var(--panel2);
-    color: var(--text);
-    border-color: var(--border);
-  }
-  .sheets-tab.active {
-    background: var(--panel-bg, #0f1d2c);
-    color: var(--gold);
-    border-color: var(--border);
-    border-bottom-color: var(--bg);
-  }
-  body:not(.light) .sheets-tab.active { background: #0f1d2c; }
-  body.light .sheets-tab.active { background: #fffdf7; }
-
-  .sheets-tab .tab-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .sheets-tab .tab-num {
-    font-size: 8px;
-    opacity: 0.5;
-    margin-right: -4px;
-  }
 </style>
 </head>
 <body>
-<div id="root">
-  <div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#d4a574;font-family:Inter,sans-serif;font-size:16px;">
-    Loading dashboard...
-  </div>
-</div>
-
+<div id="root"><div style="display:flex;align-items:center;justify-content:center;height:100vh;color:#d4a574;font-family:Inter,sans-serif;font-size:16px;">Loading dashboard...</div></div>
 <script type="text/babel" data-presets="react">
-const {
-  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine
-} = Recharts;
+const { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } = Recharts;
 const { useState, useEffect, useCallback, useRef, useMemo } = React;
 
-function AnimatedNumber({ value, prefix = "", suffix = "", decimals = 0, style = {}, className = "" }) {
+function AnimatedNumber({ value, prefix="", suffix="", decimals=0, style={}, className="" }) {
   const [display, setDisplay] = useState(value);
   const prev = useRef(value);
   const raf = useRef(null);
   useEffect(() => {
-    const start = prev.current;
-    const end = value;
+    const start = prev.current, end = value;
     if (start === end) return;
-    const duration = 700;
-    const startTime = performance.now();
+    const duration = 700, startTime = performance.now();
     const tick = (now) => {
       const t = Math.min((now - startTime) / duration, 1);
       const ease = t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
@@ -352,32 +122,20 @@ const SUPABASE_URL = 'https://gslybwjzsfprkjgximqe.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdzbHlid2p6c2ZwcmtqZ3hpbXFlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNTI4MDYsImV4cCI6MjA5MjkyODgwNn0.nFwMWPWQPQGBGv4OPa358UOUeU2pGzAS6U7xMBh8y9w';
 const WORKER_URL = 'https://folio-price.stevetest181.workers.dev';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const TARGET = 1600000;
-const RETIREMENT_AGE = 45;
-const STORAGE_KEY = "retirement_dashboard_v3";
+const TARGET = 1600000, RETIREMENT_AGE = 45, STORAGE_KEY = "retirement_dashboard_v3";
 
 const getColors = (isLight) => isLight ? {
-  bg: "#f5f2eb", panel: "#fffdf7", panel2: "#ede8d8",
-  border: "#d4c9a8", text: "#2c2416", muted: "#7a6e5a",
-  gold: "#a0783a", goldDim: "#c9a060", teal: "#3a7a7a",
-  rust: "#b05a3a", green: "#4a8a4a",
+  bg:"#f5f2eb",panel:"#fffdf7",panel2:"#ede8d8",border:"#d4c9a8",text:"#2c2416",muted:"#7a6e5a",
+  gold:"#a0783a",goldDim:"#c9a060",teal:"#3a7a7a",rust:"#b05a3a",green:"#4a8a4a",
 } : {
-  bg: "#0a1520", panel: "#0f1d2c", panel2: "#142536",
-  border: "#1f3548", text: "#e8dcc4", muted: "#8a9bab",
-  gold: "#d4a574", goldDim: "#b89968", teal: "#5a8a8a",
-  rust: "#c97b5e", green: "#7ba87b",
+  bg:"#0a1520",panel:"#0f1d2c",panel2:"#142536",border:"#1f3548",text:"#e8dcc4",muted:"#8a9bab",
+  gold:"#d4a574",goldDim:"#b89968",teal:"#5a8a8a",rust:"#c97b5e",green:"#7ba87b",
 };
-
 let c = getColors(localStorage.getItem('theme') === 'light');
 
 const DEFAULT_SETTINGS = {
-  age: 31,
-  monthlyContribution: 4000,
-  milestones: {
-    "first_500k": false, "phase1_60pct": false, "age_38_transition": false,
-    "first_million": false, "age_40_trim": false, "age_42_rotation": false, "target_reached": false,
-  },
+  age: 31, monthlyContribution: 4000,
+  milestones: { "first_500k":false,"phase1_60pct":false,"age_38_transition":false,"first_million":false,"age_40_trim":false,"age_42_rotation":false,"target_reached":false },
 };
 
 function toYahooSymbol(ticker, market) {
@@ -385,294 +143,160 @@ function toYahooSymbol(ticker, market) {
   return ticker.toUpperCase().endsWith('.KL') ? ticker : `${ticker}.KL`;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TAB 1 — CURRENT PORTFOLIO
-// ─────────────────────────────────────────────────────────────────────────────
 function TabPortfolio({ settings, saveSettings, totalValue, dividendTotal, growthTotal, fxRate, progressPct, yearsRemaining, finalProjection, projectionData, allocationData, targetAllocation, yearlyPlan, phaseColors, phaseLabels, phaseAdvice, monthlyPlans, previewPhase, setPreviewPhase, autoPhase }) {
   const phase = previewPhase || autoPhase;
   const phaseMonthly = phase === 1 ? 6000 : phase === 2 ? 4000 : 0;
-  const growthPct = allocationData[0].value;
-  const dividendPct = allocationData[1].value;
-
+  const growthPct = allocationData[0].value, dividendPct = allocationData[1].value;
   return (
-    <div key="portfolio" className="tab-content" style={{
-      flex: 1, display: "grid", minHeight: 0, overflow: "hidden",
-      gridTemplateColumns: "repeat(12, 1fr)",
-      gridTemplateRows: "1fr 1fr",
-      gap: 8, padding: "8px 10px",
-    }}>
-      <div className="panel" style={{ gridColumn: "span 5", padding: "16px 22px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+    <div key="portfolio" className="tab-content" style={{ flex:1,display:"grid",minHeight:0,overflow:"hidden",gridTemplateColumns:"repeat(12, 1fr)",gridTemplateRows:"1fr 1fr",gap:8,padding:"8px 10px" }}>
+      <div className="panel" style={{ gridColumn:"span 5",padding:"16px 22px" }}>
+        <div style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline" }}>
           <div className="panel-tag">CURRENT PORTFOLIO VALUE</div>
-          <div className="mono muted" style={{ fontSize: 10 }}>{progressPct.toFixed(2)}% TO TARGET</div>
+          <div className="mono muted" style={{ fontSize:10 }}>{progressPct.toFixed(2)}% TO TARGET</div>
         </div>
-        <div className="gold-shimmer display-serif" style={{ fontSize: 48, fontWeight: 400, letterSpacing: -1.5, lineHeight: 1.1, marginTop: 4 }}>
-          RM<AnimatedNumber value={totalValue} />
+        <div className="gold-shimmer display-serif" style={{ fontSize:48,fontWeight:400,letterSpacing:-1.5,lineHeight:1.1,marginTop:4 }}>RM<AnimatedNumber value={totalValue} /></div>
+        <div className="panel-tag" style={{ color:c.text,marginTop:4 }}>of RM{TARGET.toLocaleString()} — RM{(TARGET-totalValue).toLocaleString("en-US",{maximumFractionDigits:0})} remaining</div>
+        <div style={{ position:"relative",height:6,background:c.panel2,margin:"10px 0 16px" }}>
+          <div className="bar-fill" style={{ position:"absolute",left:0,top:0,width:`${Math.min(progressPct,100)}%`,background:`linear-gradient(90deg, ${c.goldDim}, ${c.gold})` }} />
+          {[25,50,75].map(pct => <div key={pct} style={{ position:"absolute",left:`${pct}%`,top:-2,bottom:-2,width:1,background:c.border }} />)}
         </div>
-        <div className="panel-tag" style={{ color: c.text, marginTop: 4 }}>
-          of RM{TARGET.toLocaleString()} — RM{(TARGET - totalValue).toLocaleString("en-US", { maximumFractionDigits: 0 })} remaining
-        </div>
-        <div style={{ position: "relative", height: 6, background: c.panel2, margin: "10px 0 16px" }}>
-          <div className="bar-fill" style={{
-            position: "absolute", left: 0, top: 0,
-            width: `${Math.min(progressPct, 100)}%`,
-            background: `linear-gradient(90deg, ${c.goldDim}, ${c.gold})`,
-          }} />
-          {[25, 50, 75].map(pct => (
-            <div key={pct} style={{ position: "absolute", left: `${pct}%`, top: -2, bottom: -2, width: 1, background: c.border }} />
-          ))}
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 12, paddingTop: 8, borderTop: `1px solid ${c.border}` }}>
-          <Stat label="AGE" value={settings.age} />
-          <Stat label="YRS LEFT" value={yearsRemaining} />
-          <Stat label="MONTHLY" value={`RM4K–6K`} />
-          <Stat label="EST @ 45" value={`RM${(finalProjection/1000).toFixed(0)}K`} />
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:12,paddingTop:8,borderTop:`1px solid ${c.border}` }}>
+          <Stat label="AGE" value={settings.age} /><Stat label="YRS LEFT" value={yearsRemaining} /><Stat label="MONTHLY" value="RM4K–6K" /><Stat label="EST @ 45" value={`RM${(finalProjection/1000).toFixed(0)}K`} />
         </div>
       </div>
-
-      <div className="panel" style={{ gridColumn: "span 4" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div className="panel-tag">PHASE {previewPhase ? "(PREVIEW)" : "(LIVE)"}</div>
-          {previewPhase && (
-            <button onClick={() => setPreviewPhase(null)} style={{
-              background: "transparent", color: c.gold, border: `1px solid ${c.gold}`,
-              padding: "1px 6px", fontSize: 8, letterSpacing: 1, cursor: "pointer",
-              fontFamily: "JetBrains Mono, monospace",
-            }}>← LIVE</button>
-          )}
+      <div className="panel" style={{ gridColumn:"span 4" }}>
+        <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+          <div className="panel-tag">PHASE {previewPhase?"(PREVIEW)":"(LIVE)"}</div>
+          {previewPhase && <button onClick={() => setPreviewPhase(null)} style={{ background:"transparent",color:c.gold,border:`1px solid ${c.gold}`,padding:"1px 6px",fontSize:8,letterSpacing:1,cursor:"pointer",fontFamily:"JetBrains Mono, monospace" }}>← LIVE</button>}
         </div>
-        <div style={{ display: "flex", gap: 4, marginTop: 6, marginBottom: 8 }}>
-          {[1, 2, 3].map(p => {
-            const isActive = p === phase;
-            return (
-              <div key={p} className="phase-tab-btn" onClick={() => setPreviewPhase(p === autoPhase ? null : p)} style={{
-                flex: 1, padding: "10px 4px", textAlign: "center",
-                background: isActive ? phaseColors[p] : c.panel2,
-                color: isActive ? c.bg : c.muted,
-                border: `1px solid ${isActive ? phaseColors[p] : c.border}`,
-                fontFamily: "JetBrains Mono, monospace", fontSize: 13,
-                fontWeight: 600, letterSpacing: 1, position: "relative", cursor: "pointer",
-              }}>
-                {p === 1 ? "I" : p === 2 ? "II" : "III"}
-                {p === autoPhase && !previewPhase && <div style={{ position: "absolute", top: 2, right: 4, fontSize: 7, color: isActive ? c.bg : c.gold }}>●</div>}
-              </div>
-            );
+        <div style={{ display:"flex",gap:4,marginTop:6,marginBottom:8 }}>
+          {[1,2,3].map(p => {
+            const isActive = p===phase;
+            return <div key={p} className="phase-tab-btn" onClick={() => setPreviewPhase(p===autoPhase?null:p)} style={{ flex:1,padding:"10px 4px",textAlign:"center",background:isActive?phaseColors[p]:c.panel2,color:isActive?c.bg:c.muted,border:`1px solid ${isActive?phaseColors[p]:c.border}`,fontFamily:"JetBrains Mono, monospace",fontSize:13,fontWeight:600,letterSpacing:1,position:"relative",cursor:"pointer" }}>
+              {p===1?"I":p===2?"II":"III"}
+              {p===autoPhase && !previewPhase && <div style={{ position:"absolute",top:2,right:4,fontSize:7,color:isActive?c.bg:c.gold }}>●</div>}
+            </div>;
           })}
         </div>
-        <div className="display-serif" style={{ fontSize: 17, fontWeight: 500, color: phaseColors[phase], marginBottom: 8, fontStyle: "italic" }}>
-          {phaseLabels[phase]}
-        </div>
-        <div className="display-serif" style={{ fontSize: 13, lineHeight: 1.6, color: c.text }}>
-          {phaseAdvice[phase]}
-        </div>
+        <div className="display-serif" style={{ fontSize:17,fontWeight:500,color:phaseColors[phase],marginBottom:8,fontStyle:"italic" }}>{phaseLabels[phase]}</div>
+        <div className="display-serif" style={{ fontSize:13,lineHeight:1.6,color:c.text }}>{phaseAdvice[phase]}</div>
       </div>
-
-      <div className="panel" style={{ gridColumn: "span 3" }}>
+      <div className="panel" style={{ gridColumn:"span 3" }}>
         <div className="panel-tag">CURRENT ALLOCATION</div>
-        <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", minHeight: 0 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie data={allocationData} cx="50%" cy="50%" innerRadius="50%" outerRadius="80%" dataKey="value" stroke="none">
-                {allocationData.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
+        <div style={{ flex:1,display:"flex",alignItems:"center",justifyContent:"center",minHeight:0 }}>
+          <ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={allocationData} cx="50%" cy="50%" innerRadius="50%" outerRadius="80%" dataKey="value" stroke="none">{allocationData.map((entry,i) => <Cell key={i} fill={entry.fill} />)}</Pie></PieChart></ResponsiveContainer>
         </div>
-        <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontFamily: "JetBrains Mono, monospace" }}>
-          <div><span style={{ color: c.gold }}>● </span>GROWTH {growthPct.toFixed(0)}%</div>
-          <div><span style={{ color: c.teal }}>● </span>DIVIDEND {dividendPct.toFixed(0)}%</div>
+        <div style={{ display:"flex",justifyContent:"space-between",fontSize:11,fontFamily:"JetBrains Mono, monospace" }}>
+          <div><span style={{ color:c.gold }}>● </span>GROWTH {growthPct.toFixed(0)}%</div>
+          <div><span style={{ color:c.teal }}>● </span>DIVIDEND {dividendPct.toFixed(0)}%</div>
         </div>
       </div>
-
-      <div className="panel" style={{ gridColumn: "span 5" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-          <div>
-            <div className="panel-tag">◆ PROJECTION</div>
-            <h2 className="panel-title" style={{ fontStyle: "italic" }}>The Compound Curve</h2>
-          </div>
-          <div className="display-serif" style={{ fontSize: 11, color: c.text }}>Returns: Growth 8%, Dividend 6%.</div>
+      <div className="panel" style={{ gridColumn:"span 5" }}>
+        <div style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline" }}>
+          <div><div className="panel-tag">◆ PROJECTION</div><h2 className="panel-title" style={{ fontStyle:"italic" }}>The Compound Curve</h2></div>
+          <div className="display-serif" style={{ fontSize:11,color:c.text }}>Returns: Growth 8%, Dividend 6%.</div>
         </div>
-        <div style={{ flex: 1, minHeight: 0 }}>
+        <div style={{ flex:1,minHeight:0 }}>
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={projectionData} margin={{ top: 5, right: 10, bottom: 5, left: -10 }}>
-              <defs>
-                <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={c.gold} stopOpacity={0.4} />
-                  <stop offset="100%" stopColor={c.gold} stopOpacity={0} />
-                </linearGradient>
-              </defs>
+            <AreaChart data={projectionData} margin={{ top:5,right:10,bottom:5,left:-10 }}>
+              <defs><linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={c.gold} stopOpacity={0.4} /><stop offset="100%" stopColor={c.gold} stopOpacity={0} /></linearGradient></defs>
               <CartesianGrid stroke={c.border} strokeDasharray="2 4" vertical={false} />
-              <XAxis dataKey="age" stroke={c.muted} style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10 }} />
-              <YAxis stroke={c.muted} style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}K`} />
-              <Tooltip contentStyle={{ background: c.panel2, border: `1px solid ${c.gold}`, fontFamily: "JetBrains Mono, monospace", fontSize: 11 }} labelStyle={{ color: c.gold }} formatter={(v) => `RM${v.toLocaleString()}`} labelFormatter={(v) => `Age ${v}`} />
-              <ReferenceLine y={TARGET} stroke={c.rust} strokeDasharray="4 4" label={{ value: "TARGET", fill: c.rust, fontSize: 10, fontFamily: "JetBrains Mono, monospace", position: "insideTopRight" }} />
+              <XAxis dataKey="age" stroke={c.muted} style={{ fontFamily:"JetBrains Mono, monospace",fontSize:10 }} />
+              <YAxis stroke={c.muted} style={{ fontFamily:"JetBrains Mono, monospace",fontSize:10 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}K`} />
+              <Tooltip contentStyle={{ background:c.panel2,border:`1px solid ${c.gold}`,fontFamily:"JetBrains Mono, monospace",fontSize:11 }} labelStyle={{ color:c.gold }} formatter={(v) => `RM${v.toLocaleString()}`} labelFormatter={(v) => `Age ${v}`} />
+              <ReferenceLine y={TARGET} stroke={c.rust} strokeDasharray="4 4" label={{ value:"TARGET",fill:c.rust,fontSize:10,fontFamily:"JetBrains Mono, monospace",position:"insideTopRight" }} />
               <Area type="monotone" dataKey="value" stroke={c.gold} strokeWidth={2} fill="url(#goldGrad)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
       </div>
-
-      <div className="panel" style={{ gridColumn: "span 4" }}>
-        <div className="panel-tag">◆ MONTHLY DEPLOYMENT{previewPhase && <span style={{ color: c.rust, marginLeft: 6 }}>· PREVIEW</span>}</div>
-        <h2 className="panel-title" style={{ fontStyle: "italic" }}>
-          Phase {phase === 1 ? "I" : phase === 2 ? "II" : "III"} · {phaseMonthly > 0 ? `RM${phaseMonthly.toLocaleString()}/mo` : "No contribution"}
-        </h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {monthlyPlans[phase].map((item, i) => (
-            <div key={i} style={{
-              display: "grid", gridTemplateColumns: "70px 1fr auto", gap: 10, alignItems: "center",
-              padding: "8px 12px", background: c.panel2, borderLeft: `2px solid ${phaseColors[phase]}`,
-            }}>
-              <div className="mono gold" style={{ fontSize: 11, fontWeight: 600 }}>{item.ticker}</div>
-              <div className="display-serif" style={{ fontSize: 12 }}>{item.name}</div>
-              <div className="mono gold" style={{ fontSize: 13, fontWeight: 500 }}>RM{item.amount.toLocaleString()}</div>
+      <div className="panel" style={{ gridColumn:"span 4" }}>
+        <div className="panel-tag">◆ MONTHLY DEPLOYMENT{previewPhase && <span style={{ color:c.rust,marginLeft:6 }}>· PREVIEW</span>}</div>
+        <h2 className="panel-title" style={{ fontStyle:"italic" }}>Phase {phase===1?"I":phase===2?"II":"III"} · {phaseMonthly>0?`RM${phaseMonthly.toLocaleString()}/mo`:"No contribution"}</h2>
+        <div style={{ display:"flex",flexDirection:"column",gap:6 }}>
+          {monthlyPlans[phase].map((item,i) => (
+            <div key={i} style={{ display:"grid",gridTemplateColumns:"70px 1fr auto",gap:10,alignItems:"center",padding:"8px 12px",background:c.panel2,borderLeft:`2px solid ${phaseColors[phase]}` }}>
+              <div className="mono gold" style={{ fontSize:11,fontWeight:600 }}>{item.ticker}</div>
+              <div className="display-serif" style={{ fontSize:12 }}>{item.name}</div>
+              <div className="mono gold" style={{ fontSize:13,fontWeight:500 }}>RM{item.amount.toLocaleString()}</div>
             </div>
           ))}
         </div>
       </div>
-
-      <div className="panel" style={{ gridColumn: "span 3" }}>
+      <div className="panel" style={{ gridColumn:"span 3" }}>
         <div className="panel-tag">◆ EVOLUTION</div>
-        <h2 className="panel-title" style={{ fontStyle: "italic" }}>Allocation Path</h2>
-        <div style={{ flex: 1, minHeight: 0 }}>
+        <h2 className="panel-title" style={{ fontStyle:"italic" }}>Allocation Path</h2>
+        <div style={{ flex:1,minHeight:0 }}>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={targetAllocation} stackOffset="expand" margin={{ top: 5, right: 5, bottom: 5, left: -25 }}>
+            <BarChart data={targetAllocation} stackOffset="expand" margin={{ top:5,right:5,bottom:5,left:-25 }}>
               <CartesianGrid stroke={c.border} strokeDasharray="2 4" vertical={false} />
-              <XAxis dataKey="phase" stroke={c.muted} style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10 }} />
-              <YAxis stroke={c.muted} style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10 }} tickFormatter={(v) => `${(v*100).toFixed(0)}%`} />
-              <Tooltip contentStyle={{ background: c.panel2, border: `1px solid ${c.gold}`, fontFamily: "JetBrains Mono, monospace", fontSize: 11 }} labelStyle={{ color: c.gold }} />
-              <Bar dataKey="growth" stackId="a" fill={c.gold} />
-              <Bar dataKey="dividend" stackId="a" fill={c.teal} />
+              <XAxis dataKey="phase" stroke={c.muted} style={{ fontFamily:"JetBrains Mono, monospace",fontSize:10 }} />
+              <YAxis stroke={c.muted} style={{ fontFamily:"JetBrains Mono, monospace",fontSize:10 }} tickFormatter={(v) => `${(v*100).toFixed(0)}%`} />
+              <Tooltip contentStyle={{ background:c.panel2,border:`1px solid ${c.gold}`,fontFamily:"JetBrains Mono, monospace",fontSize:11 }} labelStyle={{ color:c.gold }} />
+              <Bar dataKey="growth" stackId="a" fill={c.gold} /><Bar dataKey="dividend" stackId="a" fill={c.teal} />
             </BarChart>
           </ResponsiveContainer>
         </div>
-        <div style={{ display: "flex", justifyContent: "center", gap: 20, fontSize: 10, fontFamily: "JetBrains Mono, monospace", color: c.muted }}>
-          <div><span style={{ color: c.gold }}>■</span> GROWTH</div>
-          <div><span style={{ color: c.teal }}>■</span> DIVIDEND</div>
+        <div style={{ display:"flex",justifyContent:"center",gap:20,fontSize:10,fontFamily:"JetBrains Mono, monospace",color:c.muted }}>
+          <div><span style={{ color:c.gold }}>■</span> GROWTH</div><div><span style={{ color:c.teal }}>■</span> DIVIDEND</div>
         </div>
       </div>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TAB 2 — HOLDINGS / MILESTONES
-// ─────────────────────────────────────────────────────────────────────────────
 function TabHoldings({ dividendRows, growthRows, dividendTotal, growthTotal, fxRate, settings, saveSettings }) {
   const milestones = [
-    { key: "phase1_60pct", label: "Growth bucket reaches 70%", target: null },
-    { key: "age_38_transition", label: "Switch to 50/50 contributions", target: null },
-    { key: "first_500k", label: "Cross RM500K portfolio", target: 500000 },
-    { key: "first_million", label: "Cross RM1,000,000", target: 1000000 },
-    { key: "age_42_rotation", label: "Age 40: Begin Growth → Dividend rotation", target: null },
-    { key: "target_reached", label: "Reach RM1.6M target", target: 1600000 },
+    { key:"phase1_60pct",label:"Growth bucket reaches 70%",target:null },
+    { key:"age_38_transition",label:"Switch to 50/50 contributions",target:null },
+    { key:"first_500k",label:"Cross RM500K portfolio",target:500000 },
+    { key:"first_million",label:"Cross RM1,000,000",target:1000000 },
+    { key:"age_42_rotation",label:"Age 40: Begin Growth → Dividend rotation",target:null },
+    { key:"target_reached",label:"Reach RM1.6M target",target:1600000 },
   ];
-  const toggleMilestone = (key) => {
-    saveSettings({ ...settings, milestones: { ...settings.milestones, [key]: !settings.milestones[key] } });
-  };
-
+  const toggleMilestone = (key) => saveSettings({ ...settings, milestones: { ...settings.milestones, [key]: !settings.milestones[key] } });
+  const HoldingTable = ({ rows, total, label, color }) => (
+    <div className="panel">
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline",paddingBottom:8,borderBottom:`1px solid ${c.border}`,marginBottom:8 }}>
+        <div className="mono" style={{ fontSize:11,letterSpacing:1.5,color,fontWeight:600 }}>{label}</div>
+        <div className="mono gold" style={{ fontSize:14,fontWeight:600 }}>RM{total.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+      </div>
+      <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8,fontSize:9,letterSpacing:1.2,color:c.muted,fontFamily:"JetBrains Mono, monospace",padding:"3px 0 8px",fontWeight:500 }}>
+        <div>TICKER</div><div style={{ textAlign:"right" }}>SHARES</div><div style={{ textAlign:"right" }}>LIVE</div><div style={{ textAlign:"right" }}>VAL (RM)</div>
+      </div>
+      <div className="scroll-y">
+        {rows.length===0 && <div className="muted display-serif" style={{ fontSize:13,padding:"20px 0",textAlign:"center",fontStyle:"italic" }}>No positions</div>}
+        {rows.map((h,i) => {
+          const cur = h.market==='MY'?'RM':'$';
+          return (
+            <div key={i} style={{ display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8,padding:"8px 0",borderBottom:`1px solid ${c.border}40`,alignItems:"center" }}>
+              <div className="display-serif" style={{ fontSize:15,fontStyle:"italic",color:c.text }}>{h.ticker}</div>
+              <div className="mono muted" style={{ textAlign:"right",fontSize:12 }}>{h.market==='MY'?h.units.toLocaleString('en',{maximumFractionDigits:0}):h.units.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+              <div className="mono" style={{ textAlign:"right",fontSize:12,color:h.livePrice?c.text:c.muted }}>{h.livePrice?`${cur}${h.livePrice.toFixed(2)}`:'—'}</div>
+              <div className="mono gold" style={{ textAlign:"right",fontSize:14,fontWeight:600 }}>RM{h.curValRM.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+            </div>
+          );
+        })}
+      </div>
+      {label==="DIVIDEND ACCOUNT" && <div style={{ marginTop:8,paddingTop:8,borderTop:`1px solid ${c.border}`,fontSize:10,color:c.muted,fontFamily:"JetBrains Mono, monospace" }}>USD/MYR {fxRate?fxRate.toFixed(4):'—'}</div>}
+    </div>
+  );
   return (
-    <div key="holdings" className="tab-content" style={{
-      flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10,
-      minHeight: 0, overflow: "hidden", padding: "10px 12px",
-    }}>
+    <div key="holdings" className="tab-content" style={{ flex:1,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,minHeight:0,overflow:"hidden",padding:"10px 12px" }}>
+      <HoldingTable rows={dividendRows} total={dividendTotal} label="DIVIDEND ACCOUNT" color={c.teal} />
+      <HoldingTable rows={growthRows} total={growthTotal} label="GROWTH ACCOUNT" color={c.gold} />
       <div className="panel">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", paddingBottom: 8, borderBottom: `1px solid ${c.border}`, marginBottom: 8 }}>
-          <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: c.teal, fontWeight: 600 }}>DIVIDEND ACCOUNT</div>
-          <div className="mono gold" style={{ fontSize: 14, fontWeight: 600 }}>RM{dividendTotal.toLocaleString("en-US", { maximumFractionDigits: 0 })}</div>
+        <div style={{ paddingBottom:8,borderBottom:`1px solid ${c.border}`,marginBottom:8 }}>
+          <div className="mono" style={{ fontSize:11,letterSpacing:1.5,color:c.gold,fontWeight:600 }}>MILESTONES</div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, fontSize: 9, letterSpacing: 1.2, color: c.muted, fontFamily: "JetBrains Mono, monospace", padding: "3px 0 8px", fontWeight: 500 }}>
-          <div>TICKER</div>
-          <div style={{ textAlign: "right" }}>SHARES</div>
-          <div style={{ textAlign: "right" }}>LIVE</div>
-          <div style={{ textAlign: "right" }}>VAL (RM)</div>
-        </div>
-        <div className="scroll-y">
-          {dividendRows.length === 0 && <div className="muted display-serif" style={{ fontSize: 13, padding: "20px 0", textAlign: "center", fontStyle: "italic" }}>No positions</div>}
-          {dividendRows.map((h, i) => {
-            const cur = h.market === 'MY' ? 'RM' : '$';
-            return (
-              <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, padding: "8px 0", borderBottom: `1px solid ${c.border}40`, alignItems: "center" }}>
-                <div className="display-serif" style={{ fontSize: 15, fontStyle: "italic", color: c.text }}>{h.ticker}</div>
-                <div className="mono muted" style={{ textAlign: "right", fontSize: 12 }}>
-                  {h.market === 'MY' ? h.units.toLocaleString('en', { maximumFractionDigits: 0 }) : h.units.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </div>
-                <div className="mono" style={{ textAlign: "right", fontSize: 12, color: h.livePrice ? c.text : c.muted }}>
-                  {h.livePrice ? `${cur}${h.livePrice.toFixed(2)}` : '—'}
-                </div>
-                <div className="mono gold" style={{ textAlign: "right", fontSize: 14, fontWeight: 600 }}>
-                  RM{h.curValRM.toLocaleString("en-US", { maximumFractionDigits: 0 })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px solid ${c.border}`, fontSize: 10, color: c.muted, fontFamily: "JetBrains Mono, monospace" }}>
-          USD/MYR {fxRate ? fxRate.toFixed(4) : '—'}
-        </div>
-      </div>
-
-      <div className="panel">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", paddingBottom: 8, borderBottom: `1px solid ${c.border}`, marginBottom: 8 }}>
-          <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: c.gold, fontWeight: 600 }}>GROWTH ACCOUNT</div>
-          <div className="mono gold" style={{ fontSize: 14, fontWeight: 600 }}>RM{growthTotal.toLocaleString("en-US", { maximumFractionDigits: 0 })}</div>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, fontSize: 9, letterSpacing: 1.2, color: c.muted, fontFamily: "JetBrains Mono, monospace", padding: "3px 0 8px", fontWeight: 500 }}>
-          <div>TICKER</div>
-          <div style={{ textAlign: "right" }}>SHARES</div>
-          <div style={{ textAlign: "right" }}>LIVE</div>
-          <div style={{ textAlign: "right" }}>VAL (RM)</div>
-        </div>
-        <div className="scroll-y">
-          {growthRows.length === 0 && <div className="muted display-serif" style={{ fontSize: 13, padding: "20px 0", textAlign: "center", fontStyle: "italic" }}>No positions</div>}
-          {growthRows.map((h, i) => {
-            const cur = h.market === 'MY' ? 'RM' : '$';
-            return (
-              <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 8, padding: "8px 0", borderBottom: `1px solid ${c.border}40`, alignItems: "center" }}>
-                <div className="display-serif" style={{ fontSize: 15, fontStyle: "italic", color: c.text }}>{h.ticker}</div>
-                <div className="mono muted" style={{ textAlign: "right", fontSize: 12 }}>
-                  {h.market === 'MY' ? h.units.toLocaleString('en', { maximumFractionDigits: 0 }) : h.units.toLocaleString('en', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </div>
-                <div className="mono" style={{ textAlign: "right", fontSize: 12, color: h.livePrice ? c.text : c.muted }}>
-                  {h.livePrice ? `${cur}${h.livePrice.toFixed(2)}` : '—'}
-                </div>
-                <div className="mono gold" style={{ textAlign: "right", fontSize: 14, fontWeight: 600 }}>
-                  RM{h.curValRM.toLocaleString("en-US", { maximumFractionDigits: 0 })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="panel">
-        <div style={{ paddingBottom: 8, borderBottom: `1px solid ${c.border}`, marginBottom: 8 }}>
-          <div className="mono" style={{ fontSize: 11, letterSpacing: 1.5, color: c.gold, fontWeight: 600 }}>MILESTONES</div>
-        </div>
-        <div className="scroll-y" style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        <div className="scroll-y" style={{ display:"flex",flexDirection:"column",gap:6 }}>
           {milestones.map((m) => {
             const checked = settings.milestones[m.key];
             return (
-              <div key={m.key} className="display-serif milestone-row" onClick={() => toggleMilestone(m.key)} style={{
-                display: "flex", alignItems: "center", gap: 12, padding: "10px 12px",
-                background: checked ? `${c.gold}15` : c.panel2,
-                borderLeft: `2px solid ${checked ? c.gold : c.border}`,
-              }}>
-                <div style={{
-                  width: 18, height: 18, flexShrink: 0,
-                  border: `1.5px solid ${checked ? c.gold : c.muted}`,
-                  background: checked ? c.gold : "transparent",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 11, color: c.bg, fontWeight: 700,
-                }}>{checked && "✓"}</div>
-                <div style={{
-                  flex: 1, fontSize: 14, lineHeight: 1.4,
-                  color: checked ? c.gold : c.text,
-                  textDecoration: checked ? "line-through" : "none",
-                }}>{m.label}</div>
-                {m.target && (
-                  <div className="mono muted" style={{ fontSize: 12, flexShrink: 0 }}>RM{(m.target/1000).toFixed(0)}K</div>
-                )}
+              <div key={m.key} className="display-serif milestone-row" onClick={() => toggleMilestone(m.key)} style={{ display:"flex",alignItems:"center",gap:12,padding:"10px 12px",background:checked?`${c.gold}15`:c.panel2,borderLeft:`2px solid ${checked?c.gold:c.border}` }}>
+                <div style={{ width:18,height:18,flexShrink:0,border:`1.5px solid ${checked?c.gold:c.muted}`,background:checked?c.gold:"transparent",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:c.bg,fontWeight:700 }}>{checked&&"✓"}</div>
+                <div style={{ flex:1,fontSize:14,lineHeight:1.4,color:checked?c.gold:c.text,textDecoration:checked?"line-through":"none" }}>{m.label}</div>
+                {m.target && <div className="mono muted" style={{ fontSize:12,flexShrink:0 }}>RM{(m.target/1000).toFixed(0)}K</div>}
               </div>
             );
           })}
@@ -682,164 +306,114 @@ function TabHoldings({ dividendRows, growthRows, dividendTotal, growthTotal, fxR
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TAB 3 — YEARLY PLAN / FIRE PROGRESS
-// ─────────────────────────────────────────────────────────────────────────────
 function TabPlan({ settings, saveSettings, yearlyPlan, phaseColors, fireTargets, totalValue, dividendTotal, editing, setEditing, editForm, setEditForm, commitEdit, deleteRow, saving, startEdit, startAdd, cancelEdit }) {
-  const [checkedTargets, setCheckedTargets] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("checkedTargets") || "{}"); } catch { return {}; }
-  });
-  const toggleTarget = (key) => {
-    const next = { ...checkedTargets, [key]: !checkedTargets[key] };
-    setCheckedTargets(next);
-    localStorage.setItem("checkedTargets", JSON.stringify(next));
-  };
-  const targetCellStyle = (checked, color) => ({
-    textAlign: "right", fontSize: 12, color: checked ? c.muted : color,
-    textDecoration: checked ? "line-through" : "none", opacity: checked ? 0.5 : 1, cursor: "pointer",
-  });
-
+  const [checkedTargets, setCheckedTargets] = useState(() => { try { return JSON.parse(localStorage.getItem("checkedTargets")||"{}"); } catch { return {}; } });
+  const toggleTarget = (key) => { const next={...checkedTargets,[key]:!checkedTargets[key]}; setCheckedTargets(next); localStorage.setItem("checkedTargets",JSON.stringify(next)); };
+  const tcs = (checked, color) => ({ textAlign:"right",fontSize:12,color:checked?c.muted:color,textDecoration:checked?"line-through":"none",opacity:checked?0.5:1,cursor:"pointer" });
   return (
-    <div key="plan" className="tab-content" style={{
-      flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10,
-      minHeight: 0, overflow: "hidden", padding: "10px 12px",
-    }}>
+    <div key="plan" className="tab-content" style={{ flex:1,display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,minHeight:0,overflow:"hidden",padding:"10px 12px" }}>
       <div className="panel">
-        <div style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 8 }}>
-          <div>
-            <div className="panel-tag">◆ YEAR-BY-YEAR TARGETS</div>
-            <div className="panel-title" style={{ fontStyle: "italic", marginBottom: 4 }}>The Roadmap</div>
-          </div>
-          <div style={{ marginLeft: "auto" }}>
-            <ControlInput label="CURRENT AGE" value={settings.age} onChange={(v) => saveSettings({ ...settings, age: parseInt(v) || 31 })} />
-          </div>
+        <div style={{ display:"flex",gap:16,alignItems:"flex-start",marginBottom:8 }}>
+          <div><div className="panel-tag">◆ YEAR-BY-YEAR TARGETS</div><div className="panel-title" style={{ fontStyle:"italic",marginBottom:4 }}>The Roadmap</div></div>
+          <div style={{ marginLeft:"auto" }}><ControlInput label="CURRENT AGE" value={settings.age} onChange={(v) => saveSettings({...settings,age:parseInt(v)||31})} /></div>
         </div>
-        <div style={{ background: c.panel2, padding: "8px 14px", borderLeft: `2px solid ${c.gold}`, fontSize: 11, color: c.muted, lineHeight: 1.7, fontStyle: "italic", marginBottom: 10, display: "flex", gap: 24 }}>
-          <span>Phase I: RM6K/mo · 100% Growth</span>
-          <span>Phase II: RM4K/mo · 50/50</span>
-          <span>Phase III: Rotate → 100% Dividend</span>
-          <span>Returns: Growth 8%, Div 6%</span>
+        <div style={{ background:c.panel2,padding:"8px 14px",borderLeft:`2px solid ${c.gold}`,fontSize:11,color:c.muted,lineHeight:1.7,fontStyle:"italic",marginBottom:10,display:"flex",gap:24 }}>
+          <span>Phase I: RM6K/mo · 100% Growth</span><span>Phase II: RM4K/mo · 50/50</span><span>Phase III: Rotate → 100% Dividend</span><span>Returns: Growth 8%, Div 6%</span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "36px 30px 1fr 1fr 1fr 56px", gap: 0, fontSize: 9, letterSpacing: 1, color: c.muted, fontFamily: "JetBrains Mono, monospace", padding: "4px 6px", fontWeight: 600, borderBottom: `1px solid ${c.border}`, marginBottom: 2 }}>
-          <div>AGE</div><div>PH</div>
-          <div style={{ textAlign: "right", paddingRight: 16 }}>TOTAL</div>
-          <div style={{ textAlign: "right", paddingRight: 16 }}>GROWTH</div>
-          <div style={{ textAlign: "right", paddingRight: 16 }}>DIVIDEND</div>
-          <div style={{ textAlign: "right" }}>SPLIT</div>
+        <div style={{ display:"grid",gridTemplateColumns:"36px 30px 1fr 1fr 1fr 56px",gap:0,fontSize:9,letterSpacing:1,color:c.muted,fontFamily:"JetBrains Mono, monospace",padding:"4px 6px",fontWeight:600,borderBottom:`1px solid ${c.border}`,marginBottom:2 }}>
+          <div>AGE</div><div>PH</div><div style={{ textAlign:"right",paddingRight:16 }}>TOTAL</div><div style={{ textAlign:"right",paddingRight:16 }}>GROWTH</div><div style={{ textAlign:"right",paddingRight:16 }}>DIVIDEND</div><div style={{ textAlign:"right" }}>SPLIT</div>
         </div>
         <div className="scroll-y">
-          {yearlyPlan.map((row, i) => {
-            const pColor = phaseColors[row.phase];
-            const isCurrent = row.age === settings.age;
-            const totalKey = `total-${row.age}`;
-            const growthKey = `growth-${row.age}`;
-            const divKey = `dividend-${row.age}`;
+          {yearlyPlan.map((row,i) => {
+            const pColor=phaseColors[row.phase], isCurrent=row.age===settings.age;
+            const tk=`total-${row.age}`, gk=`growth-${row.age}`, dk=`dividend-${row.age}`;
             return (
-              <div key={i} style={{
-                display: "grid", gridTemplateColumns: "36px 30px 1fr 1fr 1fr 56px", gap: 0,
-                padding: "6px 6px", borderBottom: `1px solid ${c.border}40`, alignItems: "center",
-                background: isCurrent ? `${c.gold}10` : "transparent",
-                borderLeft: isCurrent ? `2px solid ${c.gold}` : "2px solid transparent",
-              }}>
-                <div className="mono" style={{ fontSize: 13, color: isCurrent ? c.gold : c.text }}>{row.age}{isCurrent ? "●" : ""}</div>
-                <div className="mono" style={{ fontSize: 11, color: pColor }}>{row.phase === 1 ? "I" : row.phase === 2 ? "II" : "III"}</div>
-                <div className="mono" onClick={() => toggleTarget(totalKey)} style={{ ...targetCellStyle(checkedTargets[totalKey], c.gold), paddingRight: 16 }}>RM{(row.total/1000).toFixed(0)}K</div>
-                <div className="mono" onClick={() => toggleTarget(growthKey)} style={{ ...targetCellStyle(checkedTargets[growthKey], c.gold), paddingRight: 16 }}>RM{(row.growthValue/1000).toFixed(0)}K</div>
-                <div className="mono" onClick={() => toggleTarget(divKey)} style={{ ...targetCellStyle(checkedTargets[divKey], c.teal), paddingRight: 16 }}>RM{(row.dividendValue/1000).toFixed(0)}K</div>
-                <div className="mono muted" style={{ textAlign: "right", fontSize: 11 }}>{row.growthPct}/{row.dividendPct}</div>
+              <div key={i} style={{ display:"grid",gridTemplateColumns:"36px 30px 1fr 1fr 1fr 56px",gap:0,padding:"6px 6px",borderBottom:`1px solid ${c.border}40`,alignItems:"center",background:isCurrent?`${c.gold}10`:"transparent",borderLeft:isCurrent?`2px solid ${c.gold}`:"2px solid transparent" }}>
+                <div className="mono" style={{ fontSize:13,color:isCurrent?c.gold:c.text }}>{row.age}{isCurrent?"●":""}</div>
+                <div className="mono" style={{ fontSize:11,color:pColor }}>{row.phase===1?"I":row.phase===2?"II":"III"}</div>
+                <div className="mono" onClick={() => toggleTarget(tk)} style={{ ...tcs(checkedTargets[tk],c.gold),paddingRight:16 }}>RM{(row.total/1000).toFixed(0)}K</div>
+                <div className="mono" onClick={() => toggleTarget(gk)} style={{ ...tcs(checkedTargets[gk],c.gold),paddingRight:16 }}>RM{(row.growthValue/1000).toFixed(0)}K</div>
+                <div className="mono" onClick={() => toggleTarget(dk)} style={{ ...tcs(checkedTargets[dk],c.teal),paddingRight:16 }}>RM{(row.dividendValue/1000).toFixed(0)}K</div>
+                <div className="mono muted" style={{ textAlign:"right",fontSize:11 }}>{row.growthPct}/{row.dividendPct}</div>
               </div>
             );
           })}
         </div>
       </div>
-
-      <div style={{ display: "grid", gridTemplateRows: "auto 1fr", gap: 10, minHeight: 0 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          <div className="panel" style={{ padding: "14px 18px" }}>
-            <div className="panel-tag" style={{ marginBottom: 10 }}>◆ FIRE PROGRESS</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display:"grid",gridTemplateRows:"auto 1fr",gap:10,minHeight:0 }}>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10 }}>
+          <div className="panel" style={{ padding:"14px 18px" }}>
+            <div className="panel-tag" style={{ marginBottom:10 }}>◆ FIRE PROGRESS</div>
+            <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
               {[
-                { label: "Target Portfolio", val: `RM${TARGET.toLocaleString()}`, bar: null },
-                { label: "Current Portfolio", val: `RM${totalValue.toLocaleString("en-US",{maximumFractionDigits:0})}`, bar: Math.min((totalValue/TARGET)*100,100) },
-                { label: "Progress", val: `${((totalValue/TARGET)*100).toFixed(2)}%`, bar: null },
-                { label: "Remaining", val: `RM${(TARGET-totalValue).toLocaleString("en-US",{maximumFractionDigits:0})}`, bar: null },
-              ].map((item, i) => (
+                {label:"Target Portfolio",val:`RM${TARGET.toLocaleString()}`,bar:null},
+                {label:"Current Portfolio",val:`RM${totalValue.toLocaleString("en-US",{maximumFractionDigits:0})}`,bar:Math.min((totalValue/TARGET)*100,100)},
+                {label:"Progress",val:`${((totalValue/TARGET)*100).toFixed(2)}%`,bar:null},
+                {label:"Remaining",val:`RM${(TARGET-totalValue).toLocaleString("en-US",{maximumFractionDigits:0})}`,bar:null},
+              ].map((item,i) => (
                 <div key={i}>
-                  <div className="display-serif muted" style={{ fontSize: 9, letterSpacing: 1, marginBottom: 2 }}>{item.label.toUpperCase()}</div>
-                  <div className="display-serif" style={{ fontSize: 14, color: c.gold, fontWeight: 600 }}>{item.val}</div>
-                  {item.bar !== null && <div style={{ height: 3, background: c.panel2, marginTop: 4 }}><div style={{ width: `${item.bar}%`, height: "100%", background: c.gold }} /></div>}
+                  <div className="display-serif muted" style={{ fontSize:9,letterSpacing:1,marginBottom:2 }}>{item.label.toUpperCase()}</div>
+                  <div className="display-serif" style={{ fontSize:14,color:c.gold,fontWeight:600 }}>{item.val}</div>
+                  {item.bar!==null && <div style={{ height:3,background:c.panel2,marginTop:4 }}><div style={{ width:`${item.bar}%`,height:"100%",background:c.gold }} /></div>}
                 </div>
               ))}
             </div>
           </div>
-          <div className="panel" style={{ padding: "14px 18px" }}>
-            <div className="panel-tag" style={{ marginBottom: 10 }}>◆ INCOME PROGRESS</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div className="panel" style={{ padding:"14px 18px" }}>
+            <div className="panel-tag" style={{ marginBottom:10 }}>◆ INCOME PROGRESS</div>
+            <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
               {[
-                { label: "Target Annual Income", val: "RM96,000", bar: null },
-                { label: "Est Annual Dividends", val: `RM${(dividendTotal*0.06).toLocaleString("en-US",{maximumFractionDigits:0})}`, bar: Math.min((dividendTotal*0.06)/96000*100,100) },
-                { label: "Income Progress", val: `${((dividendTotal*0.06)/96000*100).toFixed(2)}%`, bar: null },
-                { label: "Income Remaining", val: `RM${Math.max(0,96000-(dividendTotal*0.06)).toLocaleString("en-US",{maximumFractionDigits:0})}`, bar: null },
-              ].map((item, i) => (
+                {label:"Target Annual Income",val:"RM96,000",bar:null},
+                {label:"Est Annual Dividends",val:`RM${(dividendTotal*0.06).toLocaleString("en-US",{maximumFractionDigits:0})}`,bar:Math.min((dividendTotal*0.06)/96000*100,100)},
+                {label:"Income Progress",val:`${((dividendTotal*0.06)/96000*100).toFixed(2)}%`,bar:null},
+                {label:"Income Remaining",val:`RM${Math.max(0,96000-(dividendTotal*0.06)).toLocaleString("en-US",{maximumFractionDigits:0})}`,bar:null},
+              ].map((item,i) => (
                 <div key={i}>
-                  <div className="display-serif muted" style={{ fontSize: 9, letterSpacing: 1, marginBottom: 2 }}>{item.label.toUpperCase()}</div>
-                  <div className="display-serif" style={{ fontSize: 14, color: c.gold, fontWeight: 600 }}>{item.val}</div>
-                  {item.bar !== null && <div style={{ height: 3, background: c.panel2, marginTop: 4 }}><div style={{ width: `${item.bar}%`, height: "100%", background: c.gold }} /></div>}
+                  <div className="display-serif muted" style={{ fontSize:9,letterSpacing:1,marginBottom:2 }}>{item.label.toUpperCase()}</div>
+                  <div className="display-serif" style={{ fontSize:14,color:c.gold,fontWeight:600 }}>{item.val}</div>
+                  {item.bar!==null && <div style={{ height:3,background:c.panel2,marginTop:4 }}><div style={{ width:`${item.bar}%`,height:"100%",background:c.gold }} /></div>}
                 </div>
               ))}
             </div>
           </div>
         </div>
-
         <div className="panel">
-          <div className="panel-tag" style={{ marginBottom: 6 }}>◆ RETIREMENT COMMITMENT</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 100px 1fr 48px", gap: 0, fontSize: 9, letterSpacing: 1.2, color: c.muted, fontFamily: "'Fraunces', Georgia, serif", padding: "3px 0", borderBottom: `1px solid ${c.border}`, fontWeight: 600 }}>
+          <div className="panel-tag" style={{ marginBottom:6 }}>◆ RETIREMENT COMMITMENT</div>
+          <div style={{ display:"grid",gridTemplateColumns:"1fr 100px 1fr 48px",gap:0,fontSize:9,letterSpacing:1.2,color:c.muted,fontFamily:"'Fraunces', Georgia, serif",padding:"3px 0",borderBottom:`1px solid ${c.border}`,fontWeight:600 }}>
             <div>CATEGORY</div><div>ANNUAL</div><div>NOTES</div><div></div>
           </div>
-          <div className="scroll-y" style={{ flex: 1 }}>
+          <div className="scroll-y" style={{ flex:1 }}>
             {fireTargets.map((row) => {
-              const isEditing = editing?.table === 'fire_targets' && editing?.id === row.id;
+              const isEditing = editing?.table==='fire_targets' && editing?.id===row.id;
               if (isEditing) return (
-                <div key={row.id} className="edit-row" style={{ display: "grid", gridTemplateColumns: "1fr 100px 1fr 48px", gap: 4, padding: "4px 0", borderBottom: `1px solid ${c.border}40`, alignItems: "center" }}>
+                <div key={row.id} className="edit-row" style={{ display:"grid",gridTemplateColumns:"1fr 100px 1fr 48px",gap:4,padding:"4px 0",borderBottom:`1px solid ${c.border}40`,alignItems:"center" }}>
                   <input className="edit-input" value={editForm.category||''} onChange={e=>setEditForm(f=>({...f,category:e.target.value}))} placeholder="Category" />
                   <input className="edit-input" type="number" value={editForm.annual_amount||''} onChange={e=>setEditForm(f=>({...f,annual_amount:e.target.value}))} placeholder="Amount" />
                   <input className="edit-input" value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
-                  <div style={{display:"flex",gap:2}}>
-                    <button className="btn-icon btn-save" style={{opacity:1}} onClick={commitEdit} disabled={saving}>✓</button>
-                    <button className="btn-icon btn-cancel" style={{opacity:1}} onClick={cancelEdit}>✕</button>
-                  </div>
+                  <div style={{ display:"flex",gap:2 }}><button className="btn-icon btn-save" style={{ opacity:1 }} onClick={commitEdit} disabled={saving}>✓</button><button className="btn-icon btn-cancel" style={{ opacity:1 }} onClick={cancelEdit}>✕</button></div>
                 </div>
               );
               return (
-                <div key={row.id} className="milestone-row" style={{ display: "grid", gridTemplateColumns: "1fr 100px 1fr 48px", gap: 0, padding: "5px 0", borderBottom: `1px solid ${c.border}40`, alignItems: "center" }}>
-                  <div className="display-serif" style={{ fontSize: 13, color: c.text }}>{row.category}</div>
-                  <div className="display-serif gold" style={{ fontSize: 13 }}>RM{Number(row.annual_amount||0).toLocaleString("en-US",{maximumFractionDigits:0})}</div>
-                  <div className="display-serif muted" style={{ fontSize: 12 }}>{row.notes||"—"}</div>
-                  <div style={{display:"flex",gap:2}}>
-                    <button className="btn-icon btn-edit" onClick={()=>startEdit('fire_targets',row)}>✎</button>
-                    <button className="btn-icon btn-delete" onClick={()=>deleteRow('fire_targets',row.id)}>✕</button>
-                  </div>
+                <div key={row.id} className="milestone-row" style={{ display:"grid",gridTemplateColumns:"1fr 100px 1fr 48px",gap:0,padding:"5px 0",borderBottom:`1px solid ${c.border}40`,alignItems:"center" }}>
+                  <div className="display-serif" style={{ fontSize:13,color:c.text }}>{row.category}</div>
+                  <div className="display-serif gold" style={{ fontSize:13 }}>RM{Number(row.annual_amount||0).toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                  <div className="display-serif muted" style={{ fontSize:12 }}>{row.notes||"—"}</div>
+                  <div style={{ display:"flex",gap:2 }}><button className="btn-icon btn-edit" onClick={() => startEdit('fire_targets',row)}>✎</button><button className="btn-icon btn-delete" onClick={() => deleteRow('fire_targets',row.id)}>✕</button></div>
                 </div>
               );
             })}
             {editing?.table==='fire_targets' && editing?.id==='new' ? (
-              <div className="edit-row" style={{ display: "grid", gridTemplateColumns: "1fr 100px 1fr 48px", gap: 4, padding: "4px 0", alignItems: "center" }}>
+              <div className="edit-row" style={{ display:"grid",gridTemplateColumns:"1fr 100px 1fr 48px",gap:4,padding:"4px 0",alignItems:"center" }}>
                 <input className="edit-input" value={editForm.category||''} onChange={e=>setEditForm(f=>({...f,category:e.target.value}))} placeholder="Category" />
                 <input className="edit-input" type="number" value={editForm.annual_amount||''} onChange={e=>setEditForm(f=>({...f,annual_amount:e.target.value}))} placeholder="Amount" />
                 <input className="edit-input" value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
-                <div style={{display:"flex",gap:2}}>
-                  <button className="btn-icon btn-save" style={{opacity:1}} onClick={commitEdit} disabled={saving}>✓</button>
-                  <button className="btn-icon btn-cancel" style={{opacity:1}} onClick={cancelEdit}>✕</button>
-                </div>
+                <div style={{ display:"flex",gap:2 }}><button className="btn-icon btn-save" style={{ opacity:1 }} onClick={commitEdit} disabled={saving}>✓</button><button className="btn-icon btn-cancel" style={{ opacity:1 }} onClick={cancelEdit}>✕</button></div>
               </div>
-            ) : (
-              <button className="btn-add" onClick={()=>startAdd('fire_targets',{category:'',annual_amount:'',notes:''})}>+ Add row</button>
-            )}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 100px 1fr 48px", gap: 0, padding: "5px 0", borderTop: `1px solid ${c.gold}`, alignItems: "center", marginTop: 4 }}>
-              <div className="display-serif" style={{ fontSize: 13, fontWeight: 600, color: c.gold }}>TOTAL</div>
-              <div className="display-serif" style={{ fontSize: 13, fontWeight: 600, color: c.green }}>RM{fireTargets.reduce((s,r)=>s+Number(r.annual_amount||0),0).toLocaleString("en-US",{maximumFractionDigits:0})}</div>
-              <div className="display-serif muted" style={{ fontSize: 12 }}>Annual commitment</div>
-              <div></div>
+            ) : <button className="btn-add" onClick={() => startAdd('fire_targets',{category:'',annual_amount:'',notes:''})}>+ Add row</button>}
+            <div style={{ display:"grid",gridTemplateColumns:"1fr 100px 1fr 48px",gap:0,padding:"5px 0",borderTop:`1px solid ${c.gold}`,alignItems:"center",marginTop:4 }}>
+              <div className="display-serif" style={{ fontSize:13,fontWeight:600,color:c.gold }}>TOTAL</div>
+              <div className="display-serif" style={{ fontSize:13,fontWeight:600,color:c.green }}>RM{fireTargets.reduce((s,r)=>s+Number(r.annual_amount||0),0).toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+              <div className="display-serif muted" style={{ fontSize:12 }}>Annual commitment</div><div></div>
             </div>
           </div>
         </div>
@@ -848,250 +422,213 @@ function TabPlan({ settings, saveSettings, yearlyPlan, phaseColors, fireTargets,
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// TAB 4 — NET WORTH
-// ─────────────────────────────────────────────────────────────────────────────
-function TabNetWorth({ fxRate, emergencyFund, investments, dividendTotal, growthTotal, liabilities, editing, setEditing, editForm, setEditForm, commitEdit, deleteRow, saving, startEdit, startAdd, cancelEdit }) {
-  const toRM = (amt, cur) => cur === 'USD' ? (parseFloat(amt)||0) * fxRate : (parseFloat(amt)||0);
+// ── TAB 4 — NET WORTH (PATCHED: xauMyr support) ──────────────────────────────
+function TabNetWorth({ fxRate, xauMyr, emergencyFund, investments, dividendTotal, growthTotal, liabilities, editing, setEditing, editForm, setEditForm, commitEdit, deleteRow, saving, startEdit, startAdd, cancelEdit }) {
+  // PATCH: handle XAU (gold in grams) via live xauMyr rate
+  const toRM = (amt, cur) => {
+    const n = parseFloat(amt) || 0;
+    if (cur === 'USD') return n * fxRate;
+    if (cur === 'XAU') return n * (xauMyr || 0); // grams × RM per gram of gold
+    return n; // MYR default
+  };
 
   const asnbLiabilities = liabilities.filter(r => /asnb/i.test(r.name));
   const realLiabilities = liabilities.filter(r => !/asnb/i.test(r.name));
-
-  const asnbTotal = asnbLiabilities.reduce((s, r) => s + (parseFloat(r.saved_up)||0), 0);
-  const efTotal = emergencyFund.reduce((s, r) => s + toRM(r.amount, r.currency), 0);
+  const asnbTotal = asnbLiabilities.reduce((s,r) => s+(parseFloat(r.saved_up)||0), 0);
+  const efTotal = emergencyFund.reduce((s,r) => s+toRM(r.amount,r.currency), 0);
   const efAndAsnbTotal = efTotal + asnbTotal;
-  const investTotal = investments.reduce((s, r) => s + toRM(r.amount, r.currency), 0);
+  const investTotal = investments.reduce((s,r) => s+toRM(r.amount,r.currency), 0);
   const stocksTotal = dividendTotal + growthTotal;
   const totalAssets = efAndAsnbTotal + investTotal + stocksTotal;
-
-  const totalLiabilities = realLiabilities.reduce((s, r) => s + (parseFloat(r.outstanding)||0), 0);
+  const totalLiabilities = realLiabilities.reduce((s,r) => s+(parseFloat(r.outstanding)||0), 0);
   const netWorth = totalAssets - totalLiabilities;
 
-  const sf = { fontFamily: "'Fraunces', Georgia, serif" };
-  const hdr = { ...sf, fontSize: 9, letterSpacing: 1.5, fontWeight: 600 };
+  const sf = { fontFamily:"'Fraunces', Georgia, serif" };
+  const hdr = { ...sf, fontSize:9, letterSpacing:1.5, fontWeight:600 };
 
-  const efRows = emergencyFund.map(r => ({ ...r, name: r.asset, valRM: toRM(r.amount, r.currency), raw: r }));
-  // ── PATCH: split investments into Fixed Deposit (→ Emergency Fund) and the rest (→ Retirement)
-  const allInvRows = investments.map(r => ({ ...r, valRM: toRM(r.amount, r.currency), raw: r }));
-  const fdRows = allInvRows.filter(r => (r.category||'').toLowerCase().includes('fixed deposit') || (r.name||'').toLowerCase().includes('fixed deposit'));
-  const invRows = allInvRows.filter(r => !(r.category||'').toLowerCase().includes('fixed deposit') && !(r.name||'').toLowerCase().includes('fixed deposit'));
-  const fdTotal = fdRows.reduce((s,r) => s + (r.valRM||0), 0);
+  const efRows = emergencyFund.map(r => ({ ...r, name:r.asset, valRM:toRM(r.amount,r.currency), raw:r }));
+  const allInvRows = investments.map(r => ({ ...r, valRM:toRM(r.amount,r.currency), raw:r }));
+  const fdRows = allInvRows.filter(r => (r.category||'').toLowerCase().includes('fixed deposit')||(r.name||'').toLowerCase().includes('fixed deposit'));
+  const invRows = allInvRows.filter(r => !(r.category||'').toLowerCase().includes('fixed deposit')&&!(r.name||'').toLowerCase().includes('fixed deposit'));
+  const fdTotal = fdRows.reduce((s,r) => s+(r.valRM||0), 0);
   const efAndFdTotal = efAndAsnbTotal + fdTotal;
 
-  const AssetSection = ({ label, color, tableName, rows, total, fields, extraRows = [] }) => (
-    <div style={{ marginBottom: 10 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4, paddingBottom: 4, borderBottom: `1px solid ${c.border}30` }}>
+  const AssetSection = ({ label, color, tableName, rows, total, fields, extraRows=[] }) => (
+    <div style={{ marginBottom:10 }}>
+      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:4,paddingBottom:4,borderBottom:`1px solid ${c.border}30` }}>
         <div style={{ ...hdr, color }}>{label}</div>
-        <div style={{ ...sf, fontSize: 13, color, fontWeight: 600 }}>RM{total.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+        <div style={{ ...sf, fontSize:13, color, fontWeight:600 }}>RM{total.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
       </div>
       {rows.map((row) => {
-        const isEd = editing?.table === tableName && editing?.id === row.id;
+        const isEd = editing?.table===tableName && editing?.id===row.id;
         if (isEd) return (
-          <div key={row.id} className="edit-row" style={{ display: "flex", gap: 4, padding: "3px 0", borderBottom: `1px solid ${c.border}20`, flexWrap: "wrap", alignItems: "center" }}>
-            {fields.map(f => (
-              <input key={f.key} className="edit-input" style={{ width: f.w||80 }} type={f.type||"text"} value={editForm[f.key]||''} onChange={e=>setEditForm(p=>({...p,[f.key]:e.target.value}))} placeholder={f.label} />
-            ))}
-            <button className="btn-icon btn-save" style={{opacity:1}} onClick={commitEdit} disabled={saving}>✓</button>
-            <button className="btn-icon btn-cancel" style={{opacity:1}} onClick={cancelEdit}>✕</button>
+          <div key={row.id} className="edit-row" style={{ display:"flex",gap:4,padding:"3px 0",borderBottom:`1px solid ${c.border}20`,flexWrap:"wrap",alignItems:"center" }}>
+            {fields.map(f => <input key={f.key} className="edit-input" style={{ width:f.w||80 }} type={f.type||"text"} value={editForm[f.key]||''} onChange={e=>setEditForm(p=>({...p,[f.key]:e.target.value}))} placeholder={f.label} />)}
+            <button className="btn-icon btn-save" style={{ opacity:1 }} onClick={commitEdit} disabled={saving}>✓</button>
+            <button className="btn-icon btn-cancel" style={{ opacity:1 }} onClick={cancelEdit}>✕</button>
           </div>
         );
         return (
-          <div key={row.id} className="milestone-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", borderBottom: `1px solid ${c.border}20` }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, minWidth: 0 }}>
-              <div style={{ ...sf, fontSize: 13, color: c.text }}>{row.name||row.asset||row.account}</div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div style={{ ...sf, fontSize: 13, color: c.text }}>RM{(row.valRM||0).toLocaleString("en-US",{maximumFractionDigits:0})}</div>
-              <button className="btn-icon btn-edit" style={{opacity:0.6}} onClick={()=>startEdit(tableName, row.raw)}>✎</button>
-              <button className="btn-icon btn-delete" style={{opacity:0.6}} onClick={()=>deleteRow(tableName, row.raw.id)}>✕</button>
+          <div key={row.id} className="milestone-row" style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 0",borderBottom:`1px solid ${c.border}20` }}>
+            <div style={{ ...sf, fontSize:13, color:c.text }}>{row.name||row.asset||row.account}</div>
+            <div style={{ display:"flex",alignItems:"center",gap:8 }}>
+              <div style={{ ...sf, fontSize:13, color:c.text }}>RM{(row.valRM||0).toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+              <button className="btn-icon btn-edit" style={{ opacity:0.6 }} onClick={() => startEdit(tableName,row.raw)}>✎</button>
+              <button className="btn-icon btn-delete" style={{ opacity:0.6 }} onClick={() => deleteRow(tableName,row.raw.id)}>✕</button>
             </div>
           </div>
         );
       })}
       {extraRows.map((row) => (
-        <div key={`extra-${row.id}`} className="milestone-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "5px 0", borderBottom: `1px solid ${c.border}20` }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ ...sf, fontSize: 13, color: c.text }}>{row.name}</div>
-            {row.badge && <span style={{ ...sf, fontSize: 9, color: c.teal, background: `${c.teal}20`, padding: "1px 5px", borderRadius: 2 }}>{row.badge}</span>}
+        <div key={`extra-${row.id}`} className="milestone-row" style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 0",borderBottom:`1px solid ${c.border}20` }}>
+          <div style={{ display:"flex",alignItems:"center",gap:8 }}>
+            <div style={{ ...sf, fontSize:13, color:c.text }}>{row.name}</div>
+            {row.badge && <span style={{ ...sf,fontSize:9,color:c.teal,background:`${c.teal}20`,padding:"1px 5px",borderRadius:2 }}>{row.badge}</span>}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ ...sf, fontSize: 13, color: c.text }}>RM{(row.valRM||0).toLocaleString("en-US",{maximumFractionDigits:0})}</div>
-            <button className="btn-icon btn-edit" style={{opacity:0.6}} onClick={()=>startEdit(row.tableName, row.raw)}>✎</button>
-            <button className="btn-icon btn-delete" style={{opacity:0.6}} onClick={()=>deleteRow(row.tableName, row.raw.id)}>✕</button>
+          <div style={{ display:"flex",alignItems:"center",gap:8 }}>
+            <div style={{ ...sf, fontSize:13, color:c.text }}>RM{(row.valRM||0).toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+            <button className="btn-icon btn-edit" style={{ opacity:0.6 }} onClick={() => startEdit(row.tableName,row.raw)}>✎</button>
+            <button className="btn-icon btn-delete" style={{ opacity:0.6 }} onClick={() => deleteRow(row.tableName,row.raw.id)}>✕</button>
           </div>
         </div>
       ))}
       {editing?.table===tableName && editing?.id==='new' ? (
-        <div className="edit-row" style={{ display: "flex", gap: 4, padding: "3px 0", flexWrap: "wrap", alignItems: "center" }}>
-          {fields.map(f => (
-            <input key={f.key} className="edit-input" style={{ width: f.w||80 }} type={f.type||"text"} value={editForm[f.key]||''} onChange={e=>setEditForm(p=>({...p,[f.key]:e.target.value}))} placeholder={f.label} />
-          ))}
-          <button className="btn-icon btn-save" style={{opacity:1}} onClick={commitEdit} disabled={saving}>✓</button>
-          <button className="btn-icon btn-cancel" style={{opacity:1}} onClick={cancelEdit}>✕</button>
+        <div className="edit-row" style={{ display:"flex",gap:4,padding:"3px 0",flexWrap:"wrap",alignItems:"center" }}>
+          {fields.map(f => <input key={f.key} className="edit-input" style={{ width:f.w||80 }} type={f.type||"text"} value={editForm[f.key]||''} onChange={e=>setEditForm(p=>({...p,[f.key]:e.target.value}))} placeholder={f.label} />)}
+          <button className="btn-icon btn-save" style={{ opacity:1 }} onClick={commitEdit} disabled={saving}>✓</button>
+          <button className="btn-icon btn-cancel" style={{ opacity:1 }} onClick={cancelEdit}>✕</button>
         </div>
-      ) : (
-        <button className="btn-add" onClick={()=>startAdd(tableName, fields.reduce((a,f)=>({...a,[f.key]:''}),{}))}>+ Add</button>
-      )}
+      ) : <button className="btn-add" onClick={() => startAdd(tableName,fields.reduce((a,f)=>({...a,[f.key]:''}),{}))}>+ Add</button>}
     </div>
   );
 
   return (
-    <div key="networth" className="tab-content" style={{
-      flex: 1, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gridTemplateRows: "1fr", gap: 10,
-      minHeight: 0, overflow: "hidden", padding: "10px 12px",
-    }}>
-      {/* COL 1: Assets */}
+    <div key="networth" className="tab-content" style={{ flex:1,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gridTemplateRows:"1fr",gap:10,minHeight:0,overflow:"hidden",padding:"10px 12px" }}>
       <div className="panel">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", paddingBottom: 8, borderBottom: `1px solid ${c.border}`, marginBottom: 10 }}>
-          <div style={{ ...hdr, color: c.teal, fontSize: 11 }}>◆ TOTAL ASSETS</div>
-          <div style={{ ...sf, fontSize: 15, color: c.teal, fontWeight: 600 }}>RM{totalAssets.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+        <div style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline",paddingBottom:8,borderBottom:`1px solid ${c.border}`,marginBottom:10 }}>
+          <div style={{ ...hdr, color:c.teal, fontSize:11 }}>◆ TOTAL ASSETS</div>
+          <div style={{ ...sf, fontSize:15, color:c.teal, fontWeight:600 }}>RM{totalAssets.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
         </div>
         <div className="scroll-y">
-          {/* EMERGENCY FUND: includes EF rows + ASNB + Fixed Deposit */}
           <AssetSection label="EMERGENCY FUND" color={c.teal} tableName="emergency_fund" total={efAndFdTotal} rows={efRows}
-            fields={[{key:'asset', label:'Asset', w:100},{key:'amount', label:'Amount', w:80, type:'number'},{key:'currency', label:'MYR/USD', w:60}]}
+            fields={[{key:'asset',label:'Asset',w:100},{key:'amount',label:'Amount',w:80,type:'number'},{key:'currency',label:'MYR/USD/XAU',w:70}]}
             extraRows={[
-              ...asnbLiabilities.map(r => ({
-                id: r.id, name: r.name, valRM: parseFloat(r.saved_up)||0,
-                badge: "ASNB", raw: r, tableName: 'liabilities'
-              })),
-              ...fdRows.map(r => ({
-                id: r.id, name: r.name, valRM: r.valRM||0,
-                badge: "FD", raw: r.raw, tableName: 'investments'
-              }))
+              ...asnbLiabilities.map(r => ({ id:r.id,name:r.name,valRM:parseFloat(r.saved_up)||0,badge:"ASNB",raw:r,tableName:'liabilities' })),
+              ...fdRows.map(r => ({ id:r.id,name:r.name,valRM:r.valRM||0,badge:"FD",raw:r.raw,tableName:'investments' }))
             ]}
           />
-          {/* RETIREMENT: EPF and other non-FD investments */}
           <AssetSection label="RETIREMENT" color={c.gold} tableName="investments" total={invRows.reduce((s,r)=>s+(r.valRM||0),0)} rows={invRows}
-            fields={[{key:'name', label:'Name', w:100},{key:'amount', label:'Amount', w:80, type:'number'},{key:'currency', label:'MYR/USD', w:60},{key:'category', label:'Category', w:80}]} />
-          <div style={{ marginBottom: 8 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 4, paddingBottom: 4, borderBottom: `1px solid ${c.border}30` }}>
-              <div style={{ ...hdr, color: c.gold }}>STOCK PORTFOLIO</div>
-              <div style={{ ...sf, fontSize: 13, color: c.gold, fontWeight: 600 }}>RM{stocksTotal.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+            fields={[{key:'name',label:'Name',w:100},{key:'amount',label:'Amount',w:80,type:'number'},{key:'currency',label:'MYR/USD/XAU',w:70},{key:'category',label:'Category',w:80}]} />
+          <div style={{ marginBottom:8 }}>
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:4,paddingBottom:4,borderBottom:`1px solid ${c.border}30` }}>
+              <div style={{ ...hdr, color:c.gold }}>STOCK PORTFOLIO</div>
+              <div style={{ ...sf, fontSize:13, color:c.gold, fontWeight:600 }}>RM{stocksTotal.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
             </div>
-            {[{name:"Dividend Stocks",val:dividendTotal},{name:"Growth Stocks",val:growthTotal}].map((r,i)=>(
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "5px 0", borderBottom: `1px solid ${c.border}20` }}>
-                <div style={{ ...sf, fontSize: 13, color: c.text }}>{r.name}</div>
-                <div style={{ ...sf, fontSize: 13, color: c.text }}>RM{r.val.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+            {[{name:"Dividend Stocks",val:dividendTotal},{name:"Growth Stocks",val:growthTotal}].map((r,i) => (
+              <div key={i} style={{ display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:`1px solid ${c.border}20` }}>
+                <div style={{ ...sf, fontSize:13, color:c.text }}>{r.name}</div>
+                <div style={{ ...sf, fontSize:13, color:c.text }}>RM{r.val.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
               </div>
             ))}
-            <div style={{ ...sf, fontSize: 9, color: c.muted, fontStyle:"italic", marginTop:4 }}>From transactions — edit via Holdings tab</div>
+            <div style={{ ...sf, fontSize:9, color:c.muted, fontStyle:"italic", marginTop:4 }}>From transactions — edit via Holdings tab</div>
           </div>
         </div>
       </div>
-
-      {/* COL 2: Liabilities */}
       <div className="panel">
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", paddingBottom: 8, borderBottom: `1px solid ${c.border}`, marginBottom: 6 }}>
-          <div style={{ ...hdr, color: c.rust, fontSize: 11 }}>◆ TOTAL LIABILITIES</div>
-          <div style={{ ...sf, fontSize: 15, color: c.rust, fontWeight: 600 }}>RM{totalLiabilities.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+        <div style={{ display:"flex",justifyContent:"space-between",alignItems:"baseline",paddingBottom:8,borderBottom:`1px solid ${c.border}`,marginBottom:6 }}>
+          <div style={{ ...hdr, color:c.rust, fontSize:11 }}>◆ TOTAL LIABILITIES</div>
+          <div style={{ ...sf, fontSize:15, color:c.rust, fontWeight:600 }}>RM{totalLiabilities.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr auto 52px", gap: 8, ...hdr, color: c.muted, padding: "3px 0", borderBottom: `1px solid ${c.border}30`, marginBottom: 4 }}>
-          <div>NAME</div><div style={{textAlign:"right"}}>OUTSTANDING</div><div></div>
+        <div style={{ display:"grid",gridTemplateColumns:"1fr auto 52px",gap:8,...hdr,color:c.muted,padding:"3px 0",borderBottom:`1px solid ${c.border}30`,marginBottom:4 }}>
+          <div>NAME</div><div style={{ textAlign:"right" }}>OUTSTANDING</div><div></div>
         </div>
         <div className="scroll-y">
           {realLiabilities.map((row) => {
-            const outstanding = parseFloat(row.outstanding)||0;
-            const isEd = editing?.table==='liabilities' && editing?.id===row.id;
+            const outstanding=parseFloat(row.outstanding)||0;
+            const isEd=editing?.table==='liabilities'&&editing?.id===row.id;
             if (isEd) return (
-              <div key={row.id} className="edit-row" style={{ display: "flex", gap: 4, padding: "4px 0", borderBottom: `1px solid ${c.border}20`, flexWrap: "wrap", alignItems: "center" }}>
-                <input className="edit-input" style={{width:100}} value={editForm.name||''} onChange={e=>setEditForm(f=>({...f,name:e.target.value}))} placeholder="Name" />
-                <input className="edit-input" style={{width:90}} type="number" value={editForm.outstanding||''} onChange={e=>setEditForm(f=>({...f,outstanding:e.target.value}))} placeholder="Outstanding" />
-                <input className="edit-input" style={{width:100}} value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
-                <button className="btn-icon btn-save" style={{opacity:1}} onClick={commitEdit} disabled={saving}>✓</button>
-                <button className="btn-icon btn-cancel" style={{opacity:1}} onClick={cancelEdit}>✕</button>
+              <div key={row.id} className="edit-row" style={{ display:"flex",gap:4,padding:"4px 0",borderBottom:`1px solid ${c.border}20`,flexWrap:"wrap",alignItems:"center" }}>
+                <input className="edit-input" style={{ width:100 }} value={editForm.name||''} onChange={e=>setEditForm(f=>({...f,name:e.target.value}))} placeholder="Name" />
+                <input className="edit-input" style={{ width:90 }} type="number" value={editForm.outstanding||''} onChange={e=>setEditForm(f=>({...f,outstanding:e.target.value}))} placeholder="Outstanding" />
+                <input className="edit-input" style={{ width:100 }} value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
+                <button className="btn-icon btn-save" style={{ opacity:1 }} onClick={commitEdit} disabled={saving}>✓</button>
+                <button className="btn-icon btn-cancel" style={{ opacity:1 }} onClick={cancelEdit}>✕</button>
               </div>
             );
             return (
-              <div key={row.id} className="milestone-row" style={{ display: "grid", gridTemplateColumns: "1fr auto 52px", gap: 8, padding: "6px 0", borderBottom: `1px solid ${c.border}20`, alignItems: "center" }}>
-                <div style={{ ...sf, fontSize: 13, color: c.text }}>{row.name}</div>
-                <div style={{ ...sf, textAlign: "right", fontSize: 13, color: c.rust, whiteSpace: "nowrap" }}>RM{outstanding.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
-                <div style={{ display:"flex", gap:2, justifyContent:"flex-end", flexShrink: 0 }}>
-                  <button className="btn-icon btn-edit" style={{opacity:0.6}} onClick={()=>startEdit('liabilities',row)}>✎</button>
-                  <button className="btn-icon btn-delete" style={{opacity:0.6}} onClick={()=>deleteRow('liabilities',row.id)}>✕</button>
+              <div key={row.id} className="milestone-row" style={{ display:"grid",gridTemplateColumns:"1fr auto 52px",gap:8,padding:"6px 0",borderBottom:`1px solid ${c.border}20`,alignItems:"center" }}>
+                <div style={{ ...sf, fontSize:13, color:c.text }}>{row.name}</div>
+                <div style={{ ...sf, textAlign:"right", fontSize:13, color:c.rust, whiteSpace:"nowrap" }}>RM{outstanding.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+                <div style={{ display:"flex",gap:2,justifyContent:"flex-end",flexShrink:0 }}>
+                  <button className="btn-icon btn-edit" style={{ opacity:0.6 }} onClick={() => startEdit('liabilities',row)}>✎</button>
+                  <button className="btn-icon btn-delete" style={{ opacity:0.6 }} onClick={() => deleteRow('liabilities',row.id)}>✕</button>
                 </div>
               </div>
             );
           })}
-          {editing?.table==='liabilities' && editing?.id==='new' ? (
-            <div className="edit-row" style={{ display: "flex", gap: 4, padding: "4px 0", flexWrap: "wrap", alignItems: "center" }}>
-              <input className="edit-input" style={{width:100}} value={editForm.name||''} onChange={e=>setEditForm(f=>({...f,name:e.target.value}))} placeholder="Name" />
-              <input className="edit-input" style={{width:90}} type="number" value={editForm.outstanding||''} onChange={e=>setEditForm(f=>({...f,outstanding:e.target.value}))} placeholder="Outstanding" />
-              <input className="edit-input" style={{width:100}} value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
-              <button className="btn-icon btn-save" style={{opacity:1}} onClick={commitEdit} disabled={saving}>✓</button>
-              <button className="btn-icon btn-cancel" style={{opacity:1}} onClick={cancelEdit}>✕</button>
+          {editing?.table==='liabilities'&&editing?.id==='new' ? (
+            <div className="edit-row" style={{ display:"flex",gap:4,padding:"4px 0",flexWrap:"wrap",alignItems:"center" }}>
+              <input className="edit-input" style={{ width:100 }} value={editForm.name||''} onChange={e=>setEditForm(f=>({...f,name:e.target.value}))} placeholder="Name" />
+              <input className="edit-input" style={{ width:90 }} type="number" value={editForm.outstanding||''} onChange={e=>setEditForm(f=>({...f,outstanding:e.target.value}))} placeholder="Outstanding" />
+              <input className="edit-input" style={{ width:100 }} value={editForm.notes||''} onChange={e=>setEditForm(f=>({...f,notes:e.target.value}))} placeholder="Notes" />
+              <button className="btn-icon btn-save" style={{ opacity:1 }} onClick={commitEdit} disabled={saving}>✓</button>
+              <button className="btn-icon btn-cancel" style={{ opacity:1 }} onClick={cancelEdit}>✕</button>
             </div>
-          ) : (
-            <button className="btn-add" onClick={()=>startAdd('liabilities',{name:'',outstanding:'',notes:''})}>+ Add liability</button>
-          )}
+          ) : <button className="btn-add" onClick={() => startAdd('liabilities',{name:'',outstanding:'',notes:''})}>+ Add liability</button>}
         </div>
       </div>
-
-      {/* COL 3: Net Worth Summary */}
-      <div className="panel" style={{ justifyContent: "center", gap: 16 }}>
-        <div style={{ ...hdr, color: c.gold, fontSize: 11, marginBottom: 8 }}>◆ NET WORTH SUMMARY</div>
-        {[
-          { label: "TOTAL ASSETS", val: totalAssets, color: c.teal },
-          { label: "TOTAL LIABILITIES (NET)", val: totalLiabilities, color: c.rust },
-        ].map((item, i) => (
-          <div key={i} style={{ marginBottom: 14 }}>
-            <div style={{ ...sf, fontSize: 9, color: c.muted, letterSpacing: 1, marginBottom: 2 }}>{item.label}</div>
-            <div style={{ ...sf, fontSize: 20, color: item.color, fontWeight: 600 }}>RM{item.val.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
+      <div className="panel" style={{ justifyContent:"center",gap:16 }}>
+        <div style={{ ...hdr, color:c.gold, fontSize:11, marginBottom:8 }}>◆ NET WORTH SUMMARY</div>
+        {[{label:"TOTAL ASSETS",val:totalAssets,color:c.teal},{label:"TOTAL LIABILITIES (NET)",val:totalLiabilities,color:c.rust}].map((item,i) => (
+          <div key={i} style={{ marginBottom:14 }}>
+            <div style={{ ...sf, fontSize:9, color:c.muted, letterSpacing:1, marginBottom:2 }}>{item.label}</div>
+            <div style={{ ...sf, fontSize:20, color:item.color, fontWeight:600 }}>RM{item.val.toLocaleString("en-US",{maximumFractionDigits:0})}</div>
           </div>
         ))}
-        <div style={{ borderTop: `1px solid ${c.gold}`, paddingTop: 14, marginBottom: 14 }}>
-          <div style={{ ...sf, fontSize: 9, color: c.muted, letterSpacing: 1, marginBottom: 4 }}>NET WORTH</div>
-          <div className={netWorth < 0 ? "neg-glow" : "gold-shimmer"} style={{ ...sf, fontSize: 32, fontWeight: 700, fontStyle: "italic" }}>
+        <div style={{ borderTop:`1px solid ${c.gold}`,paddingTop:14,marginBottom:14 }}>
+          <div style={{ ...sf, fontSize:9, color:c.muted, letterSpacing:1, marginBottom:4 }}>NET WORTH</div>
+          <div className={netWorth<0?"neg-glow":"gold-shimmer"} style={{ ...sf, fontSize:32, fontWeight:700, fontStyle:"italic" }}>
             {netWorth<0?"-":""}RM<AnimatedNumber value={Math.abs(netWorth)} />
           </div>
         </div>
-        <div style={{ marginBottom: 10 }}>
-          <div style={{ height: 8, background: c.panel2, display: "flex", marginBottom: 6, borderRadius: 2, overflow: "hidden" }}>
-            <div style={{ width: `${Math.min((totalAssets/Math.max(totalAssets+totalLiabilities,1))*100,100)}%`, height:"100%", background: c.teal }} />
-            <div style={{ flex:1, height:"100%", background: c.rust }} />
+        <div style={{ marginBottom:10 }}>
+          <div style={{ height:8,background:c.panel2,display:"flex",marginBottom:6,borderRadius:2,overflow:"hidden" }}>
+            <div style={{ width:`${Math.min((totalAssets/Math.max(totalAssets+totalLiabilities,1))*100,100)}%`,height:"100%",background:c.teal }} />
+            <div style={{ flex:1,height:"100%",background:c.rust }} />
           </div>
-          <div style={{ display:"flex", justifyContent:"space-between" }}>
-            <div style={{ ...sf, fontSize: 10, color: c.teal }}>Assets {((totalAssets/Math.max(totalAssets+totalLiabilities,1))*100).toFixed(1)}%</div>
-            <div style={{ ...sf, fontSize: 10, color: c.rust }}>Liab {((totalLiabilities/Math.max(totalAssets+totalLiabilities,1))*100).toFixed(1)}%</div>
+          <div style={{ display:"flex",justifyContent:"space-between" }}>
+            <div style={{ ...sf, fontSize:10, color:c.teal }}>Assets {((totalAssets/Math.max(totalAssets+totalLiabilities,1))*100).toFixed(1)}%</div>
+            <div style={{ ...sf, fontSize:10, color:c.rust }}>Liab {((totalLiabilities/Math.max(totalAssets+totalLiabilities,1))*100).toFixed(1)}%</div>
           </div>
         </div>
-        <div style={{ flex: 1 }} />
-        <div style={{ ...sf, fontSize: 11, color: c.muted, fontStyle: "italic", lineHeight: 1.6, borderTop: `1px solid ${c.border}`, paddingTop: 12 }}>
-          {netWorth>=0 ? `Assets exceed liabilities by RM${netWorth.toLocaleString("en-US",{maximumFractionDigits:0})}.` : `Liabilities exceed assets by RM${Math.abs(netWorth).toLocaleString("en-US",{maximumFractionDigits:0})}. Keep building.`}
+        <div style={{ flex:1 }} />
+        {xauMyr > 0 && (
+          <div style={{ ...sf, fontSize:9, color:c.muted, fontStyle:"italic", marginBottom:6 }}>
+            Gold spot: RM{xauMyr.toFixed(2)}/g (live)
+          </div>
+        )}
+        <div style={{ ...sf, fontSize:11, color:c.muted, fontStyle:"italic", lineHeight:1.6, borderTop:`1px solid ${c.border}`, paddingTop:12 }}>
+          {netWorth>=0?`Assets exceed liabilities by RM${netWorth.toLocaleString("en-US",{maximumFractionDigits:0})}.`:`Liabilities exceed assets by RM${Math.abs(netWorth).toLocaleString("en-US",{maximumFractionDigits:0})}. Keep building.`}
         </div>
       </div>
     </div>
   );
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// MAIN APP
-// ─────────────────────────────────────────────────────────────────────────────
 function App() {
-  const [isLight, setIsLight] = useState(() => localStorage.getItem('theme') === 'light');
-  const toggleTheme = () => {
-    setIsLight(prev => {
-      const next = !prev;
-      localStorage.setItem('theme', next ? 'light' : 'dark');
-      document.body.classList.toggle('light', next);
-      return next;
-    });
-  };
-  useEffect(() => { document.body.classList.toggle('light', isLight); }, []);
+  const [isLight, setIsLight] = useState(() => localStorage.getItem('theme')==='light');
+  const toggleTheme = () => { setIsLight(prev => { const next=!prev; localStorage.setItem('theme',next?'light':'dark'); document.body.classList.toggle('light',next); return next; }); };
+  useEffect(() => { document.body.classList.toggle('light',isLight); }, []);
   Object.assign(c, getColors(isLight));
 
   const [activeTab, setActiveTab] = useState("portfolio");
-  const [settings, setSettings] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
-    } catch (e) { return DEFAULT_SETTINGS; }
-  });
-
+  const [settings, setSettings] = useState(() => { try { const s=localStorage.getItem(STORAGE_KEY); return s?{...DEFAULT_SETTINGS,...JSON.parse(s)}:DEFAULT_SETTINGS; } catch(e) { return DEFAULT_SETTINGS; } });
   const [transactions, setTransactions] = useState([]);
   const [dividends, setDividends] = useState([]);
   const [prices, setPrices] = useState({});
   const [fxRate, setFxRate] = useState(0);
+  // ── PATCH 1: xauMyr state ──
+  const [xauMyr, setXauMyr] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
@@ -1102,13 +639,12 @@ function App() {
   const [investments, setInvestments] = useState([]);
   const [liabilities, setLiabilities] = useState([]);
   const [previewPhase, setPreviewPhase] = useState(null);
-
   const [editing, setEditing] = useState(null);
   const [editForm, setEditForm] = useState({});
   const [saving, setSaving] = useState(false);
 
-  const startEdit = (table, row) => { setEditing({ table, id: row.id }); setEditForm({ ...row }); };
-  const startAdd = (table, defaults) => { setEditing({ table, id: 'new' }); setEditForm(defaults); };
+  const startEdit = (table, row) => { setEditing({table,id:row.id}); setEditForm({...row}); };
+  const startAdd = (table, defaults) => { setEditing({table,id:'new'}); setEditForm(defaults); };
   const cancelEdit = () => { setEditing(null); setEditForm({}); };
 
   const commitEdit = async () => {
@@ -1116,312 +652,170 @@ function App() {
     setSaving(true);
     try {
       const { table, id } = editing;
-      if (id === 'new') {
-        const { id: _id, ...payload } = editForm;
-        const { error } = await sb.from(table).insert([payload]).select();
-        if (error) throw error;
-      } else {
-        const { error } = await sb.from(table).update(editForm).eq('id', id);
-        if (error) throw error;
-      }
-      await fetchData();
-      cancelEdit();
-    } catch (e) { alert('Save failed: ' + e.message); }
+      if (id==='new') { const {id:_id,...payload}=editForm; const {error}=await sb.from(table).insert([payload]).select(); if (error) throw error; }
+      else { const {error}=await sb.from(table).update(editForm).eq('id',id); if (error) throw error; }
+      await fetchData(); cancelEdit();
+    } catch(e) { alert('Save failed: '+e.message); }
     finally { setSaving(false); }
   };
 
   const deleteRow = async (table, id) => {
     if (!confirm('Delete this row?')) return;
     setSaving(true);
-    try {
-      const { error } = await sb.from(table).delete().eq('id', id);
-      if (error) throw error;
-      await fetchData();
-    } catch (e) { alert('Delete failed: ' + e.message); }
+    try { const {error}=await sb.from(table).delete().eq('id',id); if (error) throw error; await fetchData(); }
+    catch(e) { alert('Delete failed: '+e.message); }
     finally { setSaving(false); }
   };
 
-  const saveSettings = (newSettings) => {
-    setSettings(newSettings);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(newSettings)); } catch (e) {}
-  };
+  const saveSettings = (newSettings) => { setSettings(newSettings); try { localStorage.setItem(STORAGE_KEY,JSON.stringify(newSettings)); } catch(e) {} };
 
   const fetchData = useCallback(async () => {
-    setRefreshing(true);
-    setError(null);
+    setRefreshing(true); setError(null);
     try {
-      const [txnRes, divRes, fireRes, savRes, emgRes, invRes, liabRes] = await Promise.all([
-        sb.from('transactions').select('*').order('created_at', { ascending: true }),
-        sb.from('dividends').select('*').order('created_at', { ascending: true }),
-        sb.from('fire_targets').select('*').order('id', { ascending: true }),
+      const [txnRes,divRes,fireRes,savRes,emgRes,invRes,liabRes] = await Promise.all([
+        sb.from('transactions').select('*').order('created_at',{ascending:true}),
+        sb.from('dividends').select('*').order('created_at',{ascending:true}),
+        sb.from('fire_targets').select('*').order('id',{ascending:true}),
         sb.from('savings').select('*'),
         sb.from('emergency_fund').select('*'),
         sb.from('investments').select('*'),
         sb.from('liabilities').select('*'),
       ]);
-      if (txnRes.error) throw new Error('Supabase txn: ' + txnRes.error.message);
-      setSavings(savRes.data || []);
-      setEmergencyFund(emgRes.data || []);
-      setInvestments(invRes.data || []);
-      setLiabilities(liabRes.data || []);
-
-      const txns = (txnRes.data || []).map(r => ({
-        id: r.id, ticker: r.ticker, market: r.market, action: r.action,
-        type: r.type, units: parseFloat(r.units), price: parseFloat(r.price),
-        date: r.date, divTax: r.div_tax || 0,
-      }));
+      if (txnRes.error) throw new Error('Supabase txn: '+txnRes.error.message);
+      setSavings(savRes.data||[]); setEmergencyFund(emgRes.data||[]); setInvestments(invRes.data||[]); setLiabilities(liabRes.data||[]);
+      const txns=(txnRes.data||[]).map(r=>({id:r.id,ticker:r.ticker,market:r.market,action:r.action,type:r.type,units:parseFloat(r.units),price:parseFloat(r.price),date:r.date,divTax:r.div_tax||0}));
       setTransactions(txns);
-      setDividends((divRes.data || []).map(r => ({
-        id: r.id, ticker: r.ticker, market: r.market, amount: parseFloat(r.amount), date: r.date,
-      })));
-      setFireTargets(fireRes.data || []);
-
-      const holdings = {};
+      setDividends((divRes.data||[]).map(r=>({id:r.id,ticker:r.ticker,market:r.market,amount:parseFloat(r.amount),date:r.date})));
+      setFireTargets(fireRes.data||[]);
+      const holdings={};
       for (const t of txns) {
-        if (!holdings[t.ticker]) holdings[t.ticker] = { ticker: t.ticker, market: t.market, units: 0 };
-        if (t.action === 'buy') holdings[t.ticker].units += t.units;
-        else holdings[t.ticker].units -= t.units;
+        if (!holdings[t.ticker]) holdings[t.ticker]={ticker:t.ticker,market:t.market,units:0};
+        if (t.action==='buy') holdings[t.ticker].units+=t.units;
+        else holdings[t.ticker].units-=t.units;
       }
-      const active = Object.values(holdings).filter(h => h.units > 0.00001);
-      const symbols = active.map(h => toYahooSymbol(h.ticker, h.market));
-
+      const active=Object.values(holdings).filter(h=>h.units>0.00001);
+      const symbols=active.map(h=>toYahooSymbol(h.ticker,h.market));
       if (symbols.length) {
-        const [priceResp, rateResp] = await Promise.all([
+        const [priceResp,rateResp] = await Promise.all([
           fetch(`${WORKER_URL}/price?symbols=${symbols.join(',')}`),
           fetch(`${WORKER_URL}/rate`),
         ]);
-        const priceData = await priceResp.json();
-        const rateData = await rateResp.json();
-        setPrices(priceData || {});
-        const usdMyr = rateData.usdMyr || rateData.rate;
-        if (usdMyr && usdMyr > 1) setFxRate(usdMyr);
+        const priceData=await priceResp.json(), rateData=await rateResp.json();
+        setPrices(priceData||{});
+        const usdMyr=rateData.usdMyr||rateData.rate;
+        if (usdMyr&&usdMyr>1) {
+          setFxRate(usdMyr);
+          // ── PATCH 2: Fetch XAU/USD spot price and compute RM per gram ──
+          try {
+            const xauResp = await fetch(`${WORKER_URL}/price?symbols=GC%3DF`);
+            const xauData = await xauResp.json();
+            const xauUsd = xauData['GC=F']?.price;
+            if (xauUsd) {
+              // 1 troy oz = 31.1035g; amount stored as grams in DB
+              setXauMyr((xauUsd / 31.1035) * usdMyr);
+            }
+          } catch(e) { console.warn('XAU price fetch failed', e); }
+        }
       }
       setLastUpdated(new Date());
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-    } finally {
-      setRefreshing(false);
-      setLoading(false);
-    }
+    } catch(err) { console.error(err); setError(err.message); }
+    finally { setRefreshing(false); setLoading(false); }
   }, []);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const holdingsMap = {};
+  const holdingsMap={};
   for (const t of transactions) {
-    if (!holdingsMap[t.ticker]) holdingsMap[t.ticker] = { ticker: t.ticker, market: t.market, type: t.type, units: 0, costBasis: 0 };
-    const h = holdingsMap[t.ticker];
-    if (t.action === 'buy') { h.costBasis += t.units * t.price; h.units += t.units; }
-    else { const avg = h.units ? h.costBasis / h.units : 0; h.costBasis -= avg * t.units; h.units -= t.units; }
+    if (!holdingsMap[t.ticker]) holdingsMap[t.ticker]={ticker:t.ticker,market:t.market,type:t.type,units:0,costBasis:0};
+    const h=holdingsMap[t.ticker];
+    if (t.action==='buy') { h.costBasis+=t.units*t.price; h.units+=t.units; }
+    else { const avg=h.units?h.costBasis/h.units:0; h.costBasis-=avg*t.units; h.units-=t.units; }
   }
-  const active = Object.values(holdingsMap).filter(h => h.units > 0.00001);
-  const toMYR = (val, market) => market === 'US' ? (val || 0) * fxRate : (val || 0);
-  const calcStock = (h) => {
-    const sym = toYahooSymbol(h.ticker, h.market);
-    const livePrice = prices[sym]?.price ?? null;
-    const curVal = livePrice ? livePrice * h.units : null;
-    const curValRM = curVal !== null ? toMYR(curVal, h.market) : toMYR(h.costBasis, h.market);
-    return { livePrice, curValRM };
-  };
-
-  const dividendStocks = active.filter(h => h.type === 'dividend');
-  const growthStocks = active.filter(h => h.type === 'growth');
-  const dividendRows = dividendStocks.map(h => ({ ...h, ...calcStock(h) }));
-  const growthRows = growthStocks.map(h => ({ ...h, ...calcStock(h) }));
-  const dividendTotal = dividendRows.reduce((s, h) => s + h.curValRM, 0);
-  const growthTotal = growthRows.reduce((s, h) => s + h.curValRM, 0);
-  const totalValue = dividendTotal + growthTotal;
-  const growthPct = totalValue > 0 ? (growthTotal / totalValue) * 100 : 0;
-  const dividendPct = 100 - growthPct;
-
-  const yearsRemaining = RETIREMENT_AGE - settings.age;
-  const progressPct = (totalValue / TARGET) * 100;
-  let autoPhase = 1;
-  if (settings.age > 40) autoPhase = 3;
-  else if (settings.age > 35) autoPhase = 2;
-  const phaseLabels = { 1: "Aggressive Accumulation", 2: "Transition", 3: "Income Rotation" };
-  const phaseColors = { 1: c.gold, 2: c.goldDim, 3: c.rust };
-  const phaseAdvice = {
-    1: "RM6K/month. 100% Growth allocation. Focus on capital accumulation. Dividends from Dividend stocks reinvested.",
-    2: "RM4K/month. Still 50/50 split. Maintain discipline — no chasing growth. Build dividend base while continuing selective growth exposure until age 40.",
-    3: "Gradually rotate Growth → Dividend from age 40 to 45. Reduce growth exposure yearly until 100% dividend at 45. No abrupt selling — smooth transition.",
-  };
-  const monthlyPlans = {
-    1: [
-      { ticker: "VWRA", name: "VWRA", amount: 3000 },
-      { ticker: "GROWTH", name: "MSFT / NVDA / META / AAPL rotation", amount: 3000 },
-    ],
-    2: [
-      { ticker: "VWRA", name: "VWRA", amount: 1000 },
-      { ticker: "GROWTH", name: "MSFT / NVDA / META / AAPL rotation", amount: 1000 },
-      { ticker: "JEPQ", name: "JEPQ", amount: 1000 },
-      { ticker: "DIV", name: "MAYBANK / SUNREIT rotation", amount: 1000 },
-    ],
-    3: [{ ticker: "ROTATE", name: "Growth → Dividend Rotation", amount: 0 }],
-  };
-  const yearlyPlan = [
-    { age: 31, phase: 1, dividendValue: 140000, growthValue: 128000, total: 268000, growthPct: 48, dividendPct: 52 },
-    { age: 32, phase: 1, dividendValue: 148400, growthValue: 210240, total: 358640, growthPct: 59, dividendPct: 41 },
-    { age: 33, phase: 1, dividendValue: 157304, growthValue: 299059, total: 456363, growthPct: 66, dividendPct: 34 },
-    { age: 34, phase: 1, dividendValue: 166742, growthValue: 394984, total: 561726, growthPct: 70, dividendPct: 30 },
-    { age: 35, phase: 1, dividendValue: 176747, growthValue: 498583, total: 675329, growthPct: 74, dividendPct: 26 },
-    { age: 36, phase: 2, dividendValue: 211352, growthValue: 562469, total: 773821, growthPct: 73, dividendPct: 27 },
-    { age: 37, phase: 2, dividendValue: 248032, growthValue: 631467, total: 879499, growthPct: 72, dividendPct: 28 },
-    { age: 38, phase: 2, dividendValue: 286915, growthValue: 705984, total: 992899, growthPct: 71, dividendPct: 29 },
-    { age: 39, phase: 2, dividendValue: 328130, growthValue: 786463, total: 1114592, growthPct: 71, dividendPct: 29 },
-    { age: 40, phase: 2, dividendValue: 371817, growthValue: 873379, total: 1245197, growthPct: 70, dividendPct: 30 },
-    { age: 41, phase: 3, dividendValue: 594126, growthValue: 727250, total: 1321376, growthPct: 55, dividendPct: 45 },
-    { age: 42, phase: 3, dividendValue: 829773, growthValue: 569430, total: 1399204, growthPct: 41, dividendPct: 59 },
-    { age: 43, phase: 3, dividendValue: 1079560, growthValue: 398984, total: 1478545, growthPct: 27, dividendPct: 73 },
-    { age: 44, phase: 3, dividendValue: 1344333, growthValue: 214903, total: 1559237, growthPct: 14, dividendPct: 86 },
-    { age: 45, phase: 3, dividendValue: 1639897, growthValue: 0, total: 1639897, growthPct: 0, dividendPct: 100 },
+  const active=Object.values(holdingsMap).filter(h=>h.units>0.00001);
+  const toMYR=(val,market)=>market==='US'?(val||0)*fxRate:(val||0);
+  const calcStock=(h)=>{ const sym=toYahooSymbol(h.ticker,h.market),livePrice=prices[sym]?.price??null,curVal=livePrice?livePrice*h.units:null; return {livePrice,curValRM:curVal!==null?toMYR(curVal,h.market):toMYR(h.costBasis,h.market)}; };
+  const dividendStocks=active.filter(h=>h.type==='dividend'), growthStocks=active.filter(h=>h.type==='growth');
+  const dividendRows=dividendStocks.map(h=>({...h,...calcStock(h)})), growthRows=growthStocks.map(h=>({...h,...calcStock(h)}));
+  const dividendTotal=dividendRows.reduce((s,h)=>s+h.curValRM,0), growthTotal=growthRows.reduce((s,h)=>s+h.curValRM,0);
+  const totalValue=dividendTotal+growthTotal, growthPct=totalValue>0?(growthTotal/totalValue)*100:0, dividendPct=100-growthPct;
+  const yearsRemaining=RETIREMENT_AGE-settings.age, progressPct=(totalValue/TARGET)*100;
+  let autoPhase=1; if (settings.age>40) autoPhase=3; else if (settings.age>35) autoPhase=2;
+  const phaseLabels={1:"Aggressive Accumulation",2:"Transition",3:"Income Rotation"};
+  const phaseColors={1:c.gold,2:c.goldDim,3:c.rust};
+  const phaseAdvice={1:"RM6K/month. 100% Growth allocation. Focus on capital accumulation. Dividends from Dividend stocks reinvested.",2:"RM4K/month. Still 50/50 split. Maintain discipline — no chasing growth. Build dividend base while continuing selective growth exposure until age 40.",3:"Gradually rotate Growth → Dividend from age 40 to 45. Reduce growth exposure yearly until 100% dividend at 45. No abrupt selling — smooth transition."};
+  const monthlyPlans={1:[{ticker:"VWRA",name:"VWRA",amount:3000},{ticker:"GROWTH",name:"MSFT / NVDA / META / AAPL rotation",amount:3000}],2:[{ticker:"VWRA",name:"VWRA",amount:1000},{ticker:"GROWTH",name:"MSFT / NVDA / META / AAPL rotation",amount:1000},{ticker:"JEPQ",name:"JEPQ",amount:1000},{ticker:"DIV",name:"MAYBANK / SUNREIT rotation",amount:1000}],3:[{ticker:"ROTATE",name:"Growth → Dividend Rotation",amount:0}]};
+  const yearlyPlan=[
+    {age:31,phase:1,dividendValue:140000,growthValue:128000,total:268000,growthPct:48,dividendPct:52},
+    {age:32,phase:1,dividendValue:148400,growthValue:210240,total:358640,growthPct:59,dividendPct:41},
+    {age:33,phase:1,dividendValue:157304,growthValue:299059,total:456363,growthPct:66,dividendPct:34},
+    {age:34,phase:1,dividendValue:166742,growthValue:394984,total:561726,growthPct:70,dividendPct:30},
+    {age:35,phase:1,dividendValue:176747,growthValue:498583,total:675329,growthPct:74,dividendPct:26},
+    {age:36,phase:2,dividendValue:211352,growthValue:562469,total:773821,growthPct:73,dividendPct:27},
+    {age:37,phase:2,dividendValue:248032,growthValue:631467,total:879499,growthPct:72,dividendPct:28},
+    {age:38,phase:2,dividendValue:286915,growthValue:705984,total:992899,growthPct:71,dividendPct:29},
+    {age:39,phase:2,dividendValue:328130,growthValue:786463,total:1114592,growthPct:71,dividendPct:29},
+    {age:40,phase:2,dividendValue:371817,growthValue:873379,total:1245197,growthPct:70,dividendPct:30},
+    {age:41,phase:3,dividendValue:594126,growthValue:727250,total:1321376,growthPct:55,dividendPct:45},
+    {age:42,phase:3,dividendValue:829773,growthValue:569430,total:1399204,growthPct:41,dividendPct:59},
+    {age:43,phase:3,dividendValue:1079560,growthValue:398984,total:1478545,growthPct:27,dividendPct:73},
+    {age:44,phase:3,dividendValue:1344333,growthValue:214903,total:1559237,growthPct:14,dividendPct:86},
+    {age:45,phase:3,dividendValue:1639897,growthValue:0,total:1639897,growthPct:0,dividendPct:100},
   ];
-  const projectionData = yearlyPlan.map(r => ({ age: r.age, value: r.total }));
-  const finalProjection = yearlyPlan[yearlyPlan.length - 1].total;
-  const allocationData = [
-    { name: "Growth", value: growthPct, fill: c.gold },
-    { name: "Dividend", value: dividendPct, fill: c.teal },
-  ];
-  const targetAllocation = [
-    { phase: "Now", growth: Math.round(growthPct), dividend: Math.round(dividendPct) },
-    { phase: "35", growth: 100, dividend: 0 },
-    { phase: "40", growth: 50, dividend: 50 },
-    { phase: "45", growth: 0, dividend: 100 },
-  ];
-
-  const lastUpdatedStr = lastUpdated
-    ? lastUpdated.toLocaleString('en-MY', { dateStyle: 'medium', timeStyle: 'short' })
-    : '—';
-
-  const tabs = [
-    { id: "portfolio", label: "Current Portfolio", dot: c.gold },
-    { id: "holdings", label: "Holdings / Milestones", dot: c.teal },
-    { id: "plan", label: "Yearly Plan / FIRE Progress", dot: c.goldDim },
-    { id: "networth", label: "Net Worth", dot: c.rust },
-  ];
-
-  const sharedEditProps = { editing, setEditing, editForm, setEditForm, commitEdit, deleteRow, saving, startEdit, startAdd, cancelEdit };
+  const projectionData=yearlyPlan.map(r=>({age:r.age,value:r.total})), finalProjection=yearlyPlan[yearlyPlan.length-1].total;
+  const allocationData=[{name:"Growth",value:growthPct,fill:c.gold},{name:"Dividend",value:dividendPct,fill:c.teal}];
+  const targetAllocation=[{phase:"Now",growth:Math.round(growthPct),dividend:Math.round(dividendPct)},{phase:"35",growth:100,dividend:0},{phase:"40",growth:50,dividend:50},{phase:"45",growth:0,dividend:100}];
+  const lastUpdatedStr=lastUpdated?lastUpdated.toLocaleString('en-MY',{dateStyle:'medium',timeStyle:'short'}):'—';
+  const tabs=[{id:"portfolio",label:"Current Portfolio",dot:c.gold},{id:"holdings",label:"Holdings / Milestones",dot:c.teal},{id:"plan",label:"Yearly Plan / FIRE Progress",dot:c.goldDim},{id:"networth",label:"Net Worth",dot:c.rust}];
+  const sharedEditProps={editing,setEditing,editForm,setEditForm,commitEdit,deleteRow,saving,startEdit,startAdd,cancelEdit};
 
   return (
-    <div style={{
-      height: "100vh", width: "100vw",
-      background: c.bg,
-      display: "flex", flexDirection: "column",
-    }}>
-      <header style={{
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        padding: "5px 16px", borderBottom: `1px solid ${c.border}`,
-        flexShrink: 0, background: c.bg,
-      }}>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 16 }}>
-          <div className="mono" style={{ fontSize: 9, letterSpacing: 2.5, color: c.gold, fontWeight: 500 }}>◆ PORTFOLIO LEDGER</div>
-          <h1 className="display-serif" style={{ fontSize: 22, fontWeight: 500, margin: 0, letterSpacing: -0.5 }}>
-            The Road to <span className="gold" style={{ fontStyle: "italic" }}>Forty-Five</span>
-          </h1>
-          <div className="mono" style={{ fontSize: 9, letterSpacing: 2.5, fontWeight: 500, color: c.muted }}>14yr · RM1.6M @ 6%</div>
+    <div style={{ height:"100vh",width:"100vw",background:c.bg,display:"flex",flexDirection:"column" }}>
+      <header style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 16px",borderBottom:`1px solid ${c.border}`,flexShrink:0,background:c.bg }}>
+        <div style={{ display:"flex",alignItems:"baseline",gap:16 }}>
+          <div className="mono" style={{ fontSize:9,letterSpacing:2.5,color:c.gold,fontWeight:500 }}>◆ PORTFOLIO LEDGER</div>
+          <h1 className="display-serif" style={{ fontSize:22,fontWeight:500,margin:0,letterSpacing:-0.5 }}>The Road to <span className="gold" style={{ fontStyle:"italic" }}>Forty-Five</span></h1>
+          <div className="mono" style={{ fontSize:9,letterSpacing:2.5,fontWeight:500,color:c.muted }}>14yr · RM1.6M @ 6%</div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          {error && <span style={{ color: c.rust, fontSize: 10 }}>⚠ {error}</span>}
-          <span className="mono muted" style={{ fontSize: 9, letterSpacing: 1 }}><span className="pulse" style={{ color: c.green }}>●</span> LIVE</span>
-          <span className="gold mono" style={{ fontSize: 10 }}>{lastUpdatedStr}</span>
-          <button className="theme-btn" onClick={toggleTheme}>{isLight ? '🌙' : '☀️'}</button>
-          <button onClick={fetchData} disabled={refreshing} style={{
-            background: refreshing ? c.panel2 : "transparent",
-            color: c.gold, border: `1px solid ${c.gold}`,
-            padding: "3px 12px", fontSize: 9, letterSpacing: 1.5,
-            cursor: refreshing ? "wait" : "pointer",
-            fontFamily: "JetBrains Mono, monospace", fontWeight: 500,
-          }}>
-            {refreshing ? <span className="spinner">⟳</span> : "↻"} {refreshing ? "SYNCING..." : "REFRESH"}
+        <div style={{ display:"flex",alignItems:"center",gap:12 }}>
+          {error && <span style={{ color:c.rust,fontSize:10 }}>⚠ {error}</span>}
+          <span className="mono muted" style={{ fontSize:9,letterSpacing:1 }}><span className="pulse" style={{ color:c.green }}>●</span> LIVE</span>
+          <span className="gold mono" style={{ fontSize:10 }}>{lastUpdatedStr}</span>
+          <button className="theme-btn" onClick={toggleTheme}>{isLight?'🌙':'☀️'}</button>
+          <button onClick={fetchData} disabled={refreshing} style={{ background:refreshing?c.panel2:"transparent",color:c.gold,border:`1px solid ${c.gold}`,padding:"3px 12px",fontSize:9,letterSpacing:1.5,cursor:refreshing?"wait":"pointer",fontFamily:"JetBrains Mono, monospace",fontWeight:500 }}>
+            {refreshing?<span className="spinner">⟳</span>:"↻"} {refreshing?"SYNCING...":"REFRESH"}
           </button>
         </div>
       </header>
-
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, overflow: "hidden" }}>
+      <div style={{ flex:1,display:"flex",flexDirection:"column",minHeight:0,overflow:"hidden" }}>
         {loading ? (
-          <div className="display-serif" style={{ display: "flex", alignItems: "center", justifyContent: "center", flex: 1, color: c.gold, fontSize: 16 }}>
-            <span className="spinner" style={{ marginRight: 12 }}>⟳</span>
-            Connecting to Supabase + fetching live prices...
+          <div className="display-serif" style={{ display:"flex",alignItems:"center",justifyContent:"center",flex:1,color:c.gold,fontSize:16 }}>
+            <span className="spinner" style={{ marginRight:12 }}>⟳</span>Connecting to Supabase + fetching live prices...
           </div>
         ) : (
           <>
-            {activeTab === "portfolio" && (
-              <TabPortfolio
-                settings={settings} saveSettings={saveSettings}
-                totalValue={totalValue} dividendTotal={dividendTotal} growthTotal={growthTotal}
-                fxRate={fxRate} progressPct={progressPct} yearsRemaining={yearsRemaining}
-                finalProjection={finalProjection} projectionData={projectionData}
-                allocationData={allocationData} targetAllocation={targetAllocation}
-                yearlyPlan={yearlyPlan} phaseColors={phaseColors} phaseLabels={phaseLabels}
-                phaseAdvice={phaseAdvice} monthlyPlans={monthlyPlans}
-                previewPhase={previewPhase} setPreviewPhase={setPreviewPhase} autoPhase={autoPhase}
-              />
-            )}
-            {activeTab === "holdings" && (
-              <TabHoldings
-                dividendRows={dividendRows} growthRows={growthRows}
-                dividendTotal={dividendTotal} growthTotal={growthTotal}
-                fxRate={fxRate} settings={settings} saveSettings={saveSettings}
-              />
-            )}
-            {activeTab === "plan" && (
-              <TabPlan
-                settings={settings} saveSettings={saveSettings}
-                yearlyPlan={yearlyPlan} phaseColors={phaseColors}
-                fireTargets={fireTargets} totalValue={totalValue} dividendTotal={dividendTotal}
-                {...sharedEditProps}
-              />
-            )}
-            {activeTab === "networth" && (
-              <TabNetWorth
-                fxRate={fxRate} emergencyFund={emergencyFund} investments={investments}
-                dividendTotal={dividendTotal} growthTotal={growthTotal} liabilities={liabilities}
-                {...sharedEditProps}
-              />
-            )}
+            {activeTab==="portfolio" && <TabPortfolio settings={settings} saveSettings={saveSettings} totalValue={totalValue} dividendTotal={dividendTotal} growthTotal={growthTotal} fxRate={fxRate} progressPct={progressPct} yearsRemaining={yearsRemaining} finalProjection={finalProjection} projectionData={projectionData} allocationData={allocationData} targetAllocation={targetAllocation} yearlyPlan={yearlyPlan} phaseColors={phaseColors} phaseLabels={phaseLabels} phaseAdvice={phaseAdvice} monthlyPlans={monthlyPlans} previewPhase={previewPhase} setPreviewPhase={setPreviewPhase} autoPhase={autoPhase} />}
+            {activeTab==="holdings" && <TabHoldings dividendRows={dividendRows} growthRows={growthRows} dividendTotal={dividendTotal} growthTotal={growthTotal} fxRate={fxRate} settings={settings} saveSettings={saveSettings} />}
+            {activeTab==="plan" && <TabPlan settings={settings} saveSettings={saveSettings} yearlyPlan={yearlyPlan} phaseColors={phaseColors} fireTargets={fireTargets} totalValue={totalValue} dividendTotal={dividendTotal} {...sharedEditProps} />}
+            {/* PATCH 3: pass xauMyr to TabNetWorth */}
+            {activeTab==="networth" && <TabNetWorth fxRate={fxRate} xauMyr={xauMyr} emergencyFund={emergencyFund} investments={investments} dividendTotal={dividendTotal} growthTotal={growthTotal} liabilities={liabilities} {...sharedEditProps} />}
           </>
         )}
       </div>
-
-      <div style={{
-        display: "flex", alignItems: "flex-end", gap: 2,
-        padding: "0 12px", borderTop: `1px solid ${c.border}`,
-        background: c.bg, flexShrink: 0, height: 34,
-      }}>
-        {tabs.map((tab, i) => {
-          const isActive = activeTab === tab.id;
+      <div style={{ display:"flex",alignItems:"flex-end",gap:2,padding:"0 12px",borderTop:`1px solid ${c.border}`,background:c.bg,flexShrink:0,height:34 }}>
+        {tabs.map((tab) => {
+          const isActive=activeTab===tab.id;
           return (
-            <div
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                display: "flex", alignItems: "center", gap: 7,
-                padding: "0 16px", height: 30,
-                fontFamily: "JetBrains Mono, monospace",
-                fontSize: 10, letterSpacing: 0.8, fontWeight: 500,
-                cursor: "pointer",
-                border: `1px solid ${isActive ? c.border : "transparent"}`,
-                borderBottom: "none",
-                borderRadius: "3px 3px 0 0",
-                background: isActive ? (isLight ? "#fffdf7" : "#0f1d2c") : "transparent",
-                color: isActive ? c.gold : c.muted,
-                position: "relative", bottom: -1,
-                transition: "all 0.15s", userSelect: "none",
-              }}
-              onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = c.panel2; e.currentTarget.style.color = c.text; } }}
-              onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = c.muted; } }}
-            >
-              <div style={{ width: 7, height: 7, borderRadius: "50%", background: tab.dot, flexShrink: 0, opacity: isActive ? 1 : 0.4 }} />
+            <div key={tab.id} onClick={() => setActiveTab(tab.id)} style={{ display:"flex",alignItems:"center",gap:7,padding:"0 16px",height:30,fontFamily:"JetBrains Mono, monospace",fontSize:10,letterSpacing:0.8,fontWeight:500,cursor:"pointer",border:`1px solid ${isActive?c.border:"transparent"}`,borderBottom:"none",borderRadius:"3px 3px 0 0",background:isActive?(isLight?"#fffdf7":"#0f1d2c"):"transparent",color:isActive?c.gold:c.muted,position:"relative",bottom:-1,transition:"all 0.15s",userSelect:"none" }}
+              onMouseEnter={e=>{ if (!isActive){e.currentTarget.style.background=c.panel2;e.currentTarget.style.color=c.text;} }}
+              onMouseLeave={e=>{ if (!isActive){e.currentTarget.style.background="transparent";e.currentTarget.style.color=c.muted;} }}>
+              <div style={{ width:7,height:7,borderRadius:"50%",background:tab.dot,flexShrink:0,opacity:isActive?1:0.4 }} />
               {tab.label}
             </div>
           );
         })}
-        <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 16, fontSize: 9, fontFamily: "JetBrains Mono, monospace", color: c.muted, paddingBottom: 2 }}>
+        <div style={{ marginLeft:"auto",display:"flex",alignItems:"center",gap:16,fontSize:9,fontFamily:"JetBrains Mono, monospace",color:c.muted,paddingBottom:2 }}>
           <span>{transactions.length} TXNS · {dividends.length} DIV · {active.length} POSITIONS</span>
-          <span className="display-serif" style={{ fontStyle: "italic", fontSize: 11, fontFamily: "Fraunces, serif", fontWeight: 400 }}>
-            "Compound interest is the eighth wonder of the world."
-          </span>
+          <span className="display-serif" style={{ fontStyle:"italic",fontSize:11,fontFamily:"Fraunces, serif",fontWeight:400 }}>"Compound interest is the eighth wonder of the world."</span>
           <span>NOT FINANCIAL ADVICE</span>
         </div>
       </div>
@@ -1430,37 +824,17 @@ function App() {
 }
 
 function Stat({ label, value }) {
-  return (
-    <div>
-      <div className="mono muted" style={{ fontSize: 9, letterSpacing: 1.5, marginBottom: 2, fontWeight: 500 }}>{label}</div>
-      <div style={{ fontSize: 17, fontWeight: 500, color: c.text }}>{value}</div>
-    </div>
-  );
+  return <div><div className="mono muted" style={{ fontSize:9,letterSpacing:1.5,marginBottom:2,fontWeight:500 }}>{label}</div><div style={{ fontSize:17,fontWeight:500,color:c.text }}>{value}</div></div>;
 }
-
-function ControlInput({ label, value, onChange, type = "number" }) {
-  return (
-    <div>
-      <div className="mono muted" style={{ fontSize: 9, letterSpacing: 1.5, marginBottom: 4, fontWeight: 500 }}>{label}</div>
-      <input type={type} value={value} onChange={(e) => onChange(e.target.value)} style={{
-        width: "100%", background: c.panel2, border: `1px solid ${c.border}`,
-        color: c.gold, padding: "6px 10px", fontFamily: "JetBrains Mono, monospace", fontSize: 13, fontWeight: 500,
-      }} />
-    </div>
-  );
+function ControlInput({ label, value, onChange, type="number" }) {
+  return <div><div className="mono muted" style={{ fontSize:9,letterSpacing:1.5,marginBottom:4,fontWeight:500 }}>{label}</div><input type={type} value={value} onChange={(e)=>onChange(e.target.value)} style={{ width:"100%",background:c.panel2,border:`1px solid ${c.border}`,color:c.gold,padding:"6px 10px",fontFamily:"JetBrains Mono, monospace",fontSize:13,fontWeight:500 }} /></div>;
 }
 
 try {
-  if (typeof Recharts === 'undefined') {
-    document.getElementById('root').innerHTML = '<div style="padding:40px;color:#c97b5e;font-family:Inter,sans-serif;">Recharts library failed to load.</div>';
-  } else if (typeof supabase === 'undefined') {
-    document.getElementById('root').innerHTML = '<div style="padding:40px;color:#c97b5e;font-family:Inter,sans-serif;">Supabase library failed to load.</div>';
-  } else {
-    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
-  }
-} catch (err) {
-  document.getElementById('root').innerHTML = '<div style="padding:40px;color:#c97b5e;font-family:Inter,sans-serif;white-space:pre-wrap;">ERROR: ' + err.message + '\n\n' + err.stack + '</div>';
-}
+  if (typeof Recharts==='undefined') { document.getElementById('root').innerHTML='<div style="padding:40px;color:#c97b5e;font-family:Inter,sans-serif;">Recharts library failed to load.</div>'; }
+  else if (typeof supabase==='undefined') { document.getElementById('root').innerHTML='<div style="padding:40px;color:#c97b5e;font-family:Inter,sans-serif;">Supabase library failed to load.</div>'; }
+  else { ReactDOM.createRoot(document.getElementById("root")).render(<App />); }
+} catch(err) { document.getElementById('root').innerHTML='<div style="padding:40px;color:#c97b5e;font-family:Inter,sans-serif;white-space:pre-wrap;">ERROR: '+err.message+'\n\n'+err.stack+'</div>'; }
 </script>
 </body>
 </html>
