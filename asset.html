@@ -1304,7 +1304,7 @@ async function renderDashboard() {
                      : r.currency === 'SGD' ? (sgdRate ? `RM${sgdRate.toFixed(4)}` : '—')
                      : r.currency === 'GBP' ? (gbpRate ? `RM${gbpRate.toFixed(4)}` : '—')
                      : r.currency === 'HKD' ? (hkdRate ? `RM${hkdRate.toFixed(4)}` : '—')
-                     : 'Base';
+                     : '—';
       const [bg, fg] = badgeColor(r.currency + r.id);
       const sym = r.currency === 'USD' ? '$' : r.currency === 'SGD' ? 'S$' : r.currency === 'GBP' ? '£' : r.currency === 'HKD' ? 'HK$' : 'RM';
       return `
@@ -1318,11 +1318,9 @@ async function renderDashboard() {
         </div>
         <div>
           <div class="cell-main neu">${sym}${r.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
-          <div class="cell-sub dim">${r.currency}</div>
         </div>
         <div>
           <div class="cell-main ${r.currency !== 'MYR' ? 'teal' : 'dim'}">${rateStr}</div>
-          <div class="cell-sub dim">${r.currency !== 'MYR' ? 'live rate' : 'base'}</div>
         </div>
         <div>
           <div class="cell-main neu">RM${valueRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
@@ -2024,11 +2022,9 @@ async function renderDashboardHistorical(year) {
           </div>
           <div>
             <div class="cell-main neu">${sym}${r.amount.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
-            <div class="cell-sub dim">${r.currency}</div>
           </div>
           <div>
             <div class="cell-main ${r.currency !== 'MYR' ? 'teal' : 'dim'}">${rateStr}</div>
-            <div class="cell-sub dim">${r.currency !== 'MYR' ? `${year} rate` : 'base'}</div>
           </div>
           <div>
             <div class="cell-main neu">RM${valueRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
