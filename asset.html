@@ -1353,10 +1353,9 @@ async function renderDashboard() {
     <div class="hero-label">Total Asset Value</div>
     <div class="hero-amount">${fmt(totalAssetRM,'MY')}</div>
     <div class="hero-row">
-      <span style="font-size:11px;color:#7a9adc;">Stock P/L:</span>
       <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
       <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
-      <span class="hero-badge" style="line-height:1.5;">USD→MYR: ${rate ? rate.toFixed(2) : '—'} · SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}<br>GBP→MYR: ${gbpRate ? gbpRate.toFixed(2) : '—'} · HKD→MYR: ${hkdRate ? hkdRate.toFixed(3) : '—'}</span>
+      <span class="hero-badge">USD→MYR: ${rate ? rate.toFixed(4) : '—'}</span>
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
       <span style="font-size:10px;color:#7a9adc;">${now}</span>
@@ -1364,25 +1363,6 @@ async function renderDashboard() {
     </div>
     <div id="year-select-wrap" style="position:absolute;top:12px;right:14px;"></div>
   </div>`;
-
-  // ── Breakdown strip ───────────────────────────────────────────────────────
-  if (hasCash) {
-    html += `
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;">
-        <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">Stocks</div>
-        <div style="font-size:14px;font-weight:700;">RM${stockValRM.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
-      </div>
-      <div style="background:rgba(14,165,233,0.06);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:10px 12px;">
-        <div style="font-size:9px;color:#7dd3fc;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">Cash</div>
-        <div style="font-size:14px;font-weight:700;color:#7dd3fc;">RM${cashRM.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;">
-        <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">Cash %</div>
-        <div style="font-size:14px;font-weight:700;">${totalAssetRM ? ((cashRM/totalAssetRM)*100).toFixed(1) : '0'}%</div>
-      </div>
-    </div>`;
-  }
 
   if (!hasPrices && active.length) {
     html += `<div style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:12px;color:var(--orange);">
@@ -1446,25 +1426,20 @@ async function renderDashboard() {
     </div>`;
   }
 
-  // ── Cash Reserve section ──────────────────────────────────────────────────
+  // ── Cash & Commodities section (acc-section style) ────────────────────────
   if (hasCash) {
-    const cashRows = buildCashRows();
     html += `
-    <div class="cash-section">
-      <div class="cash-head">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;">
-          <div style="font-size:10px;color:#7dd3fc;text-transform:uppercase;letter-spacing:0.5px;">Cash & Assets</div>
-          <div style="font-size:19px;font-weight:700;color:#7dd3fc;">RM${cashRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+    <div class="acc-section">
+      <div class="acc-head">
+        <div class="acc-head-row" style="align-items:baseline;">
+          <div class="acc-type">Cash & Commodities</div>
         </div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-          <div style="font-size:11px;color:rgba(125,211,252,0.6);">${totalAssetRM ? ((cashRM/totalAssetRM)*100).toFixed(1) : '0'}% of total assets · ${efRows.length} item${efRows.length!==1?'s':''}</div>
-          <button onclick="goPage('cash')" style="background:rgba(14,165,233,0.15);border:1px solid rgba(14,165,233,0.3);color:#7dd3fc;padding:3px 10px;border-radius:8px;font-size:10px;font-weight:600;cursor:pointer;">Manage →</button>
+        <div class="acc-head-row" style="align-items:baseline;margin-top:2px;">
+          <div class="acc-val" style="color:#7dd3fc;">RM${cashRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
         </div>
       </div>
-      <div style="background:#0d1a2a;display:grid;grid-template-columns:1.4fr 1fr 1.2fr 1fr;column-gap:6px;padding:5px 16px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;font-weight:600;text-align:center;">
-        <span style="text-align:left;padding-left:38px;">ASSET</span><span>AMOUNT</span><span>LIVE RATE</span><span>VALUE (RM)</span>
-      </div>
-      ${cashRows}
+      <div class="col-head col-cash"><span>ASSET</span><span>AMOUNT</span><span>LIVE RATE</span><span>VALUE (RM)</span></div>
+      ${buildCashRows()}
     </div>`;
   }
 
@@ -2086,32 +2061,13 @@ async function renderDashboardHistorical(year) {
     <div class="hero-label">Total Asset Value — ${year} Year End</div>
     <div class="hero-amount">${fmt(totalAssetRM,'MY')}</div>
     <div class="hero-row">
-      <span style="font-size:11px;color:#7a9adc;">Stock P/L:</span>
       <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
       <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
-      <span class="hero-badge" style="line-height:1.5;">USD→MYR: ${rate ? rate.toFixed(2) : '—'} · SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}<br>GBP→MYR: ${gbpRate ? gbpRate.toFixed(2) : '—'} · HKD→MYR: ${hkdRate ? hkdRate.toFixed(3) : '—'}</span>
+      <span class="hero-badge">USD→MYR: ${rate ? rate.toFixed(4) : '—'}</span>
     </div>
     <div style="font-size:10px;color:#7a9adc;margin-top:6px;">Closing prices: 31 Dec ${year}</div>
     <div id="year-select-wrap" style="position:absolute;top:12px;right:14px;"></div>
   </div>`;
-
-  if (hasCash) {
-    html += `
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;">
-        <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">Stocks</div>
-        <div style="font-size:14px;font-weight:700;">RM${stockValRM.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
-      </div>
-      <div style="background:rgba(14,165,233,0.06);border:1px solid rgba(14,165,233,0.2);border-radius:12px;padding:10px 12px;">
-        <div style="font-size:9px;color:#7dd3fc;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">Cash</div>
-        <div style="font-size:14px;font-weight:700;color:#7dd3fc;">RM${cashRM.toLocaleString('en',{minimumFractionDigits:0,maximumFractionDigits:0})}</div>
-      </div>
-      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 12px;">
-        <div style="font-size:9px;color:var(--text2);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px;">Cash %</div>
-        <div style="font-size:14px;font-weight:700;">${totalAssetRM ? ((cashRM/totalAssetRM)*100).toFixed(1) : '0'}%</div>
-      </div>
-    </div>`;
-  }
 
   if (divStocks.length) {
     const divCurVal  = divStocks.reduce((s,h)=>{ const {curVal}=calcHistStock(h); return s+toRM(curVal??h.costBasis,h.market); },0);
@@ -2168,17 +2124,16 @@ async function renderDashboardHistorical(year) {
 
   if (hasCash) {
     html += `
-    <div class="cash-section">
-      <div class="cash-head">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;">
-          <div style="font-size:10px;color:#7dd3fc;text-transform:uppercase;letter-spacing:0.5px;">Cash & Assets</div>
-          <div style="font-size:19px;font-weight:700;color:#7dd3fc;">RM${cashRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+    <div class="acc-section">
+      <div class="acc-head">
+        <div class="acc-head-row" style="align-items:baseline;">
+          <div class="acc-type">Cash & Commodities</div>
         </div>
-        <div style="font-size:11px;color:rgba(125,211,252,0.6);margin-top:4px;">${totalAssetRM ? ((cashRM/totalAssetRM)*100).toFixed(1) : '0'}% of total assets · ${year} rates</div>
+        <div class="acc-head-row" style="align-items:baseline;margin-top:2px;">
+          <div class="acc-val" style="color:#7dd3fc;">RM${cashRM.toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+        </div>
       </div>
-      <div style="background:#0d1a2a;display:grid;grid-template-columns:1.4fr 1fr 1.2fr 1fr;column-gap:6px;padding:5px 16px;font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.4px;font-weight:600;text-align:center;">
-        <span style="text-align:left;padding-left:38px;">ASSET</span><span>AMOUNT</span><span>RATE (${year})</span><span>VALUE (RM)</span>
-      </div>
+      <div class="col-head col-cash"><span>ASSET</span><span>AMOUNT</span><span>RATE (${year})</span><span>VALUE (RM)</span></div>
       ${buildCashRowsHist()}
     </div>`;
   }
