@@ -96,6 +96,8 @@ nav {
 .hero-row { display: flex; gap: 10px; margin-top: 8px; align-items: center; flex-wrap: wrap; }
 .hero-gain { font-size: 13px; font-weight: 600; }
 .hero-badge { font-size: 9px; color: #7a9adc; margin-left: auto; }
+.hero-today { display: flex; gap: 8px; align-items: baseline; margin-top: 4px; font-size: 12px; font-weight: 600; }
+.hero-today-label { font-size: 10px; color: #7a9adc; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
 
 /* ── ACC SECTION ── */
 .acc-section { margin-bottom: 8px; }
@@ -517,6 +519,9 @@ function toYahooSymbol(ticker, market) {
 const ASNB_FIXED_YIELD = 0.0475; // 4.75% annual dividend yield
 function isASNB(ticker) { return ticker.toUpperCase() === 'ASNB'; }
 
+// ASNB quote: price and previous close are both fixed at RM1.00, so its daily change is always 0
+const ASNB_QUOTE = { price: 1.00, previousClose: 1.00, divYield: ASNB_FIXED_YIELD, divRate: ASNB_FIXED_YIELD, currency: 'MYR', name: 'ASNB Fixed Fund' };
+
 // Price + rate cache (5 min TTL)
 let priceCache = {};
 let priceCacheTime = 0;
@@ -545,10 +550,7 @@ async function fetchLivePrices(holdings) {
   if (cacheValid) {
     // Re-inject ASNB on every call since price never changes and it won't be in Yahoo results
     for (const h of holdings) {
-      if (isASNB(h.ticker)) {
-        const sym = toYahooSymbol(h.ticker, h.market);
-        priceCache[sym] = { price: 1.00, divYield: ASNB_FIXED_YIELD, divRate: ASNB_FIXED_YIELD, currency: 'MYR', name: 'ASNB Fixed Fund' };
-      }
+      if (isASNB(h.ticker)) priceCache[toYahooSymbol(h.ticker, h.market)] = { ...ASNB_QUOTE };
     }
     return priceCache;
   }
@@ -561,10 +563,7 @@ async function fetchLivePrices(holdings) {
     // Only ASNB holdings — inject directly
     priceCache = {};
     for (const h of holdings) {
-      if (isASNB(h.ticker)) {
-        const sym = toYahooSymbol(h.ticker, h.market);
-        priceCache[sym] = { price: 1.00, divYield: ASNB_FIXED_YIELD, divRate: ASNB_FIXED_YIELD, currency: 'MYR', name: 'ASNB Fixed Fund' };
-      }
+      if (isASNB(h.ticker)) priceCache[toYahooSymbol(h.ticker, h.market)] = { ...ASNB_QUOTE };
     }
     priceCacheTime = now;
     return priceCache;
@@ -586,10 +585,7 @@ async function fetchLivePrices(holdings) {
     priceCacheTime = now;
     // Inject ASNB fixed quote — never fetched from Yahoo Finance
     for (const h of holdings) {
-      if (isASNB(h.ticker)) {
-        const sym = toYahooSymbol(h.ticker, h.market);
-        priceCache[sym] = { price: 1.00, divYield: ASNB_FIXED_YIELD, divRate: ASNB_FIXED_YIELD, currency: 'MYR', name: 'ASNB Fixed Fund' };
-      }
+      if (isASNB(h.ticker)) priceCache[toYahooSymbol(h.ticker, h.market)] = { ...ASNB_QUOTE };
     }
     return priceCache;
   } catch (e) {
@@ -959,7 +955,13 @@ async function renderDashboard() {
     const rawEstDV    = divRate !== null ? divRate * h.units : (divYield !== null && curVal !== null ? divYield * curVal : null);
     const estAnnualDV = rawEstDV !== null ? rawEstDV * (1 - taxRate) : null;
     const netDivYield = divYield !== null ? divYield * (1 - taxRate) : null;
-    return { livePrice, avgCost, curVal, unrealised, realised, pl, plPct, divYield: netDivYield, estAnnualDV };
+    // Today's change: (live − previous close) × units.
+    // ASNB is fixed at RM1.00, so it always adds RM0 but still counts in the % base.
+    const prevClose  = isASNB(h.ticker) ? 1.00
+      : (quote?.previousClose ?? quote?.prevClose ?? quote?.regularMarketPreviousClose ?? null);
+    const dayPL      = (livePrice !== null && prevClose) ? (livePrice - prevClose) * h.units : null;
+    const prevVal    = prevClose ? prevClose * h.units : null;
+    return { livePrice, avgCost, curVal, unrealised, realised, pl, plPct, divYield: netDivYield, estAnnualDV, dayPL, prevVal };
   }
 
   function buildDivRows(stocks) {
@@ -1063,6 +1065,24 @@ async function renderDashboard() {
   const totalCost  = active.reduce((s,h) => s + toRM(h.costBasis, h.market), 0);
   const totalPLPct = totalCost ? (totalPLRM / totalCost * 100) : 0;
 
+  // Today's P/L across all holdings (ASNB included: adds RM0, counts in the % base)
+  let dayPLRM = 0, dayBaseRM = 0, dayCount = 0;
+  for (const h of active) {
+    const { dayPL, prevVal } = calcStock(h);
+    if (dayPL === null || prevVal === null) continue;
+    dayPLRM   += toRM(dayPL, h.market);
+    dayBaseRM += toRM(prevVal, h.market);
+    if (!isASNB(h.ticker)) dayCount++;
+  }
+  const dayPLPct = dayBaseRM ? (dayPLRM / dayBaseRM * 100) : 0;
+  // Show the line once at least one market-priced holding has a previous close
+  // (or when the portfolio is only ASNB, where today's change is genuinely RM0)
+  const showDay = dayCount > 0 || active.every(h => isASNB(h.ticker));
+  const dayPLHtml = showDay
+    ? `<span class="${cc(dayPLRM)}">${dayPLRM>=0?'+':'-'}RM${Math.abs(dayPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+       <span class="${cc(dayPLPct)}">${dayPLPct>=0?'+':''}${dayPLPct.toFixed(2)}%</span>`
+    : `<span class="dim">—</span>`;
+
   const now = new Date().toLocaleString('en-MY',{dateStyle:'medium',timeStyle:'short'});
   let html = '';
 
@@ -1075,6 +1095,10 @@ async function renderDashboard() {
       <span class="hero-gain ${cc(totalPLRM)}">${totalPLRM>=0?'+':'-'}RM${Math.abs(totalPLRM).toLocaleString('en',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
       <span class="hero-gain ${cc(totalPLPct)}">${totalPLPct>=0?'+':''}${totalPLPct.toFixed(2)}%</span>
       <span class="hero-badge" style="line-height:1.5;">USD→MYR: ${rate ? rate.toFixed(2) : '—'} · SGD→MYR: ${sgdRate ? sgdRate.toFixed(2) : '—'}<br>GBP→MYR: ${gbpRate ? gbpRate.toFixed(2) : '—'} · HKD→MYR: ${hkdRate ? hkdRate.toFixed(3) : '—'}</span>
+    </div>
+    <div class="hero-today">
+      <span class="hero-today-label">Today</span>
+      ${dayPLHtml}
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
       <span style="font-size:10px;color:#7a9adc;">${now}</span>
